@@ -1,0 +1,246 @@
+/**
+ * Frontend Authentication Module
+ * Handles login, registration, and OTP-based password reset
+ * Integrates with Express.js backend API
+ */
+
+const AuthService = (() => {
+  const API_BASE = 'http://localhost:3000/api';
+  const USERS_STORAGE_KEY = 'auth_users';
+  
+  // Get all registered users from localStorage
+  const getAllUsers = () => {
+    const usersStr = localStorage.getItem(USERS_STORAGE_KEY);
+    return usersStr ? JSON.parse(usersStr) : {};
+  };
+  
+  // Save users to localStorage
+  const saveUsers = (users) => {
+    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+  };
+  
+  // Simple hash function (not secure, but works for demo)
+  const hashPassword = (password) => {
+    return btoa(password); // Base64 encoding
+  };
+  
+  // Get JWT token from localStorage
+  const getToken = () => localStorage.getItem('auth_token');
+  
+  // Set JWT token
+  const setToken = (token) => {
+    localStorage.setItem('auth_token', token);
+    localStorage.setItem('loggedIn', 'true');
+  };
+  
+  // Clear token
+  const clearToken = () => {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('loggedIn');
+    localStorage.removeItem('currentUser');
+  };
+  
+  // Check if user is logged in
+  const isLoggedIn = () => {
+    return !!getToken();
+  };
+  
+  // Get current user
+  const getCurrentUser = () => {
+    const userStr = localStorage.getItem('currentUser');
+    if (!userStr) return null;
+    try {
+      return JSON.parse(userStr);
+    } catch (e) {
+      // If it's just a string (old format), return it
+      return userStr;
+    }
+  };
+  
+  // Make authenticated API request
+  const apiRequest = async (endpoint, method = 'GET', data = null) => {
+    const options = {
+      method,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+    
+    const token = getToken();
+    if (token) {
+      options.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    if (data) {
+      options.body = JSON.stringify(data);
+    }
+    
+    try {
+      console.log(`[AuthService] ${method} ${API_BASE}${endpoint}`, data || '');
+      const response = await fetch(`${API_BASE}${endpoint}`, options);
+      const result = await response.json();
+      console.log(`[AuthService] Response (${response.status}):`, result);
+      
+      if (!response.ok && response.status === 401) {
+        clearToken();
+      }
+      
+      return { status: response.status, ...result };
+    } catch (error) {
+      console.error('API request error:', error);
+      return { ok: false, error: 'Failed to connect to server. Please make sure the backend is running on port 3000.' };
+    }
+  };
+  
+  // Login - uses localStorage as fallback
+  const login = async (email, password) => {
+    console.log('[AuthService] Login attempt for:', email);
+    
+    // Try API first
+    const apiResult = await apiRequest('/auth/login', 'POST', { email, password });
+    if (apiResult && apiResult.ok && apiResult.token) {
+      console.log('[AuthService] API login successful');
+      setToken(apiResult.token);
+      if (apiResult.user) {
+        localStorage.setItem('currentUser', JSON.stringify(apiResult.user));
+      } else {
+        localStorage.setItem('currentUser', email);
+      }
+      return apiResult;
+    }
+    
+    // Fallback to localStorage authentication
+    console.log('[AuthService] Using localStorage fallback');
+    const users = getAllUsers();
+    const user = users[email];
+    
+    if (!user || user.password !== hashPassword(password)) {
+      return { ok: false, error: 'Invalid email or password' };
+    }
+    
+    // Login successful
+    const token = 'local_' + btoa(email + ':' + Date.now());
+    setToken(token);
+    localStorage.setItem('currentUser', email);
+    
+    return { ok: true, token, user: { email, name: user.name } };
+  };
+  
+  // Register - uses localStorage as fallback
+  const register = async (email, password, name = null) => {
+    console.log('[AuthService] Register attempt for:', email);
+    
+    // Try API first
+    const apiResult = await apiRequest('/auth/register', 'POST', { email, password, name });
+    if (apiResult && apiResult.ok && apiResult.token) {
+      console.log('[AuthService] API registration successful');
+      setToken(apiResult.token);
+      if (apiResult.user) {
+        localStorage.setItem('currentUser', JSON.stringify(apiResult.user));
+      } else {
+        localStorage.setItem('currentUser', email);
+      }
+      return apiResult;
+    }
+    
+    // Fallback to localStorage registration
+    console.log('[AuthService] Using localStorage fallback');
+    const users = getAllUsers();
+    
+    if (users[email]) {
+      return { ok: false, error: 'Email already registered' };
+    }
+    
+    // Register user
+    users[email] = {
+      email,
+      password: hashPassword(password),
+      name: name || email.split('@')[0],
+      createdAt: new Date().toISOString()
+    };
+    saveUsers(users);
+    
+    // Auto-login after registration
+    const token = 'local_' + btoa(email + ':' + Date.now());
+    setToken(token);
+    localStorage.setItem('currentUser', email);
+    
+    console.log('[AuthService] User registered and logged in');
+    return { ok: true, token, user: { email, name: users[email].name } };
+  };
+  
+  // Send OTP
+  const sendOTP = async (email) => {
+    return await apiRequest('/auth/send-otp', 'POST', { email });
+  };
+  
+  // Verify OTP and reset password
+  const verifyOTP = async (email, code, newPassword) => {
+    const result = await apiRequest('/auth/verify-otp', 'POST', {
+      email,
+      code,
+      newPassword
+    });
+    
+    if (result.ok && result.token) {
+      setToken(result.token);
+      // Store full user object
+      if (result.user) {
+        localStorage.setItem('currentUser', JSON.stringify(result.user));
+      } else {
+        localStorage.setItem('currentUser', email);
+      }
+    }
+    
+    return result;
+  };
+  
+  // Get user profile
+  const getProfile = async () => {
+    return await apiRequest('/users/profile');
+  };
+  
+  // Update user profile
+  const updateProfile = async (name) => {
+    return await apiRequest('/users/profile', 'PUT', { name });
+  };
+  
+  // Get saved books
+  const getSavedBooks = async () => {
+    return await apiRequest('/saved');
+  };
+  
+  // Save book
+  const saveBook = async (book) => {
+    return await apiRequest('/saved', 'POST', { book });
+  };
+  
+  // Remove saved book
+  const removeBook = async (bookId) => {
+    return await apiRequest(`/saved/${bookId}`, 'DELETE');
+  };
+  
+  // Logout
+  const logout = () => {
+    clearToken();
+  };
+  
+  return {
+    getToken,
+    setToken,
+    clearToken,
+    isLoggedIn,
+    getCurrentUser,
+    login,
+    register,
+    sendOTP,
+    verifyOTP,
+    getProfile,
+    updateProfile,
+    getSavedBooks,
+    saveBook,
+    removeBook,
+    logout,
+    apiRequest
+  };
+})();

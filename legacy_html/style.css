@@ -1,0 +1,35 @@
+body {
+  margin: 0;
+  background-image: url('notebackground1.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 99vh;
+  width: 97vw;
+  background-attachment: fixed;
+}
+.fonty {
+  font-family: "Bitter", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+.info{
+  display: flex;
+  gap: 10px;
+}
+
+.anchor{
+  background: none;
+  font-family: cursive;
+  border: none;
+  font-size: larger;
+  color: white;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.1s ease;
+}
+
+.anchor:hover{
+  color: darkslateblue;
+}
+

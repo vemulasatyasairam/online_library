@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login — Online Library</title>
+  <style>
+    body { margin:0; font-family: Arial, sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; background: url("https://static.vecteezy.com/system/resources/previews/000/702/015/non_2x/online-digital-library-education-vector.jpg") no-repeat center/cover; background-size:cover; }
+    .login-card { width:360px; background: rgba(255,255,255,0.95); padding:28px; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.2); }
+    h3{ margin-top:0; text-align:center; font-family:cursive }
+    .field{ margin-bottom:12px; position: relative; }
+    .field input{ width:100%; height:42px; padding:8px 10px; border-radius:6px; border:1px solid #ddd; font-size:14px; padding-right: 40px; }
+    .field .toggle-password { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; padding: 0; }
+    .btn{ width:100%; height:42px; background:#2563eb; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:700 }
+    .msg{ font-size:0.95rem; color:#333; margin-top:12px; text-align:center; min-height:20px }
+    .link { display:block; text-align:center; margin-top:10px; color:#2563eb; text-decoration:underline; cursor:pointer }
+    .tabs { display:flex; gap:10px; margin-bottom:15px; border-bottom:2px solid #ddd; }
+    .tab { padding:8px 12px; cursor:pointer; border:none; background:transparent; font-weight:600; color:#666; border-bottom:3px solid transparent; }
+    .tab.active { color:#2563eb; border-bottom-color:#2563eb; }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+    #otp-area { display:none; margin-top:15px; padding-top:15px; border-top:2px solid #eee; }
+    #forgot-link { transition: all 0.3s ease; }
+    #forgot-link:hover { font-weight:700; }
+  </style>
+</head>
+<body>
+  <div class="login-card" role="main" aria-labelledby="login-title">
+    <h3 id="login-title">Online Library</h3>
+
+    <!-- Tabs for Login / Register -->
+    <div class="tabs">
+      <button class="tab active" data-tab="login">Login</button>
+      <button class="tab" data-tab="register">Register</button>
+    </div>
+
+    <!-- Login Form -->
+    <div id="login" class="tab-content active">
+      <form id="login-form" autocomplete="on">
+        <div class="field"><input id="email" name="email" type="email" placeholder="Email" required></div>
+        <div class="field">
+          <input id="password" name="password" type="password" placeholder="Password" required>
+          <button type="button" class="toggle-password" onclick="togglePassword('password')">👁️</button>
+        </div>
+        <button class="btn" type="submit">Login</button>
+      </form>
+      <div id="login-msg" class="msg" role="status" aria-live="polite"></div>
+      <span id="forgot-link" class="link">Forgot Password</span>
+    </div>
+
+    <!-- Register Form -->
+    <div id="register" class="tab-content">
+      <form id="register-form" autocomplete="on">
+        <div class="field"><input id="reg-name" name="name" type="text" placeholder="Name (optional)"></div>
+        <div class="field"><input id="reg-email" name="email" type="email" placeholder="Email" required></div>
+        <div class="field">
+          <input id="reg-password" name="password" type="password" placeholder="Password" required>
+          <button type="button" class="toggle-password" onclick="togglePassword('reg-password')">👁️</button>
+        </div>
+        <button class="btn" type="submit">Create Account</button>
+      </form>
+      <div id="register-msg" class="msg" role="status" aria-live="polite"></div>
+    </div>
+
+    <!-- OTP Reset Area (hidden by default) -->
+    <div id="otp-area">
+      <h4 style="margin-top:0; font-size:14px;">Reset Password via OTP</h4>
+      <div class="field"><input id="otp-email" type="email" placeholder="Enter your email"></div>
+      <button id="send-otp" class="btn" type="button">Send OTP</button>
+      <div id="otp-step" style="display:none; margin-top:10px;">
+        <div class="field"><input id="otp-input" type="text" placeholder="Enter OTP (6 digits)"></div>
+        <div class="field">
+          <input id="new-password" type="password" placeholder="New password">
+          <button type="button" class="toggle-password" onclick="togglePassword('new-password')">👁️</button>
+        </div>
+        <button id="verify-otp" class="btn" type="button">Verify & Reset</button>
+      </div>
+      <div id="otp-msg" class="msg"></div>
+    </div>
+  </div>
+
+  <script src="auth-service.js"></script>
+  <script>
+    // Toggle password visibility function
+    function togglePassword(inputId) {
+      const input = document.getElementById(inputId);
+      const button = input.nextElementSibling;
+      
+      if (input.type === 'password') {
+        input.type = 'text';
+        button.textContent = '🙈';
+      } else {
+        input.type = 'password';
+        button.textContent = '👁️';
+      }
+    }
+
+    (function () {
+      // Redirect if already logged in
+      if (localStorage.getItem('loggedIn') === 'true') {
+        console.log('[Login Page] User already logged in, redirecting to main.html');
+        location.href = 'main.html';
+        return;
+      }
+
+      // Tab switching
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function () {
+          const tabName = this.getAttribute('data-tab');
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          this.classList.add('active');
+          document.getElementById(tabName).classList.add('active');
+        });
+      });
+
+      // Get next page parameter
+      function getNext() {
+        try {
+          const p = new URLSearchParams(location.search).get('next');
+          if (p) return decodeURIComponent(p);
+        } catch (e) {}
+        return 'main.html';
+      }
+
+      // ===== LOGIN FORM =====
+      const loginForm = document.getElementById('login-form');
+      const emailEl = document.getElementById('email');
+      const passEl = document.getElementById('password');
+      const loginMsg = document.getElementById('login-msg');
+
+      loginForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        loginMsg.textContent = 'Signing in…';
+        const email = (emailEl.value || '').trim().toLowerCase();
+        const password = passEl.value || '';
+        
+        if (!email || !password) {
+          loginMsg.textContent = 'Enter email and password.';
+          return;
+        }
+
+        console.log('Attempting login with email:', email);
+        const result = await AuthService.login(email, password);
+        console.log('Login result:', result);
+
+        if (result && result.ok) {
+          loginMsg.textContent = 'Login successful. Redirecting…';
+          const nextPage = getNext();
+          console.log('Redirecting to:', nextPage);
+          setTimeout(() => { 
+            console.log('Executing redirect now');
+            location.href = nextPage; 
+          }, 300);
+        } else {
+          loginMsg.textContent = (result && result.error) || 'Login failed. Try again.';
+          console.error('Login error:', result && result.error);
+        }
+      });
+
+      // ===== REGISTER FORM =====
+      const registerForm = document.getElementById('register-form');
+      const regNameEl = document.getElementById('reg-name');
+      const regEmailEl = document.getElementById('reg-email');
+      const regPasswordEl = document.getElementById('reg-password');
+      const registerMsg = document.getElementById('register-msg');
+
+      registerForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        registerMsg.textContent = 'Creating account…';
+        const email = (regEmailEl.value || '').trim().toLowerCase();
+        const password = regPasswordEl.value || '';
+        const name = regNameEl.value || null;
+
+        if (!email || !password) {
+          registerMsg.textContent = 'Email and password required.';
+          return;
+        }
+
+        if (password.length < 6) {
+          registerMsg.textContent = 'Password must be at least 6 characters.';
+          return;
+        }
+
+        const result = await AuthService.register(email, password, name);
+
+        if (result && result.ok) {
+          registerMsg.textContent = 'Account created! Redirecting…';
+          setTimeout(() => { location.href = getNext(); }, 300);
+        } else {
+          registerMsg.textContent = (result && result.error) || 'Registration failed. Try again.';
+        }
+      });
+
+      // ===== FORGOT PASSWORD (OTP) =====
+      const forgotLink = document.getElementById('forgot-link');
+      const otpArea = document.getElementById('otp-area');
+      const otpEmailEl = document.getElementById('otp-email');
+      const sendOtpBtn = document.getElementById('send-otp');
+      const otpStep = document.getElementById('otp-step');
+      const otpMsg = document.getElementById('otp-msg');
+      const otpInput = document.getElementById('otp-input');
+      const verifyBtn = document.getElementById('verify-otp');
+      const newPasswordEl = document.getElementById('new-password');
+
+      forgotLink.addEventListener('click', function () {
+        otpArea.style.display = otpArea.style.display === 'none' || !otpArea.style.display ? 'block' : 'none';
+        if (otpArea.style.display === 'block') {
+          otpEmailEl.value = emailEl.value || '';
+          otpEmailEl.focus();
+        }
+      });
+
+      sendOtpBtn.addEventListener('click', async function () {
+        const email = (otpEmailEl.value || '').trim().toLowerCase();
+        if (!email) {
+          otpMsg.textContent = 'Enter email first';
+          return;
+        }
+
+        otpMsg.textContent = 'Sending OTP…';
+        const result = await AuthService.sendOTP(email);
+
+        if (result && result.ok) {
+          otpMsg.textContent = result.message || 'OTP sent to your email';
+          otpStep.style.display = 'block';
+          otpInput.focus();
+        } else {
+          otpMsg.textContent = (result && result.error) || 'Failed to send OTP';
+        }
+      });
+
+      verifyBtn.addEventListener('click', async function () {
+        const email = (otpEmailEl.value || '').trim().toLowerCase();
+        const code = (otpInput.value || '').trim();
+        const newPassword = newPasswordEl.value || '';
+
+        if (!code) {
+          otpMsg.textContent = 'Enter OTP';
+          return;
+        }
+        if (!newPassword || newPassword.length < 6) {
+          otpMsg.textContent = 'Password must be at least 6 characters';
+          return;
+        }
+
+        otpMsg.textContent = 'Verifying…';
+        const result = await AuthService.verifyOTP(email, code, newPassword);
+
+        if (result && result.ok) {
+          otpMsg.textContent = 'Password reset! Redirecting…';
+          setTimeout(() => { location.href = getNext(); }, 300);
+        } else {
+          otpMsg.textContent = (result && result.error) || 'Verification failed';
+        }
+      });
+
+      // Focus email on page load
+      emailEl.focus();
+    })();
+  </script>
+</body>
+</html>

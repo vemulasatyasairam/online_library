@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>English Stories</title>
+  <style>
+    :root{
+      --accent:#0b72b9;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --bg:#f3f6f8;
+      --radius:10px;
+      --shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    html,body{height:100%;margin:0;font-family:system-ui,Arial;background:var(--bg);color:#0f1724}
+    .topbar{
+      display:flex;
+      align-items:center;
+      gap:18px;
+      padding:12px 20px;
+      background:linear-gradient(90deg,var(--accent),#0963a0);
+      color:#fff;
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+    .topbar img.logo{height:48px;width:48px;border-radius:8px;object-fit:cover}
+    .topbar h1{margin:0;font-size:18px}
+    .search-wrap{margin-left:auto}
+    .search-wrap input{
+      height:36px;border-radius:8px;border:0;padding:6px 10px;width:300px;
+      font-size:14px;
+    }
+    .topbar nav { display:flex; gap:16px; align-items:center; }
+    .topbar a, .topbar button{color:#fff;text-decoration:none;border:none;background:transparent;cursor:pointer;margin-left:0;white-space:nowrap;padding:8px 14px;border-radius:6px;transition:all 0.3s ease;position:relative;font-weight:500;letter-spacing:0.5px}
+    .topbar a:hover, .topbar button:hover { background:rgba(255,255,255,0.15); transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.2); }
+    .profile-btn-explorer { 
+      width:44px; 
+      height:44px; 
+      border-radius:50%; 
+      background:linear-gradient(135deg,#FFD700,#FFA500);
+      border:2px solid #FFE55C;
+      color:#0b72b9; 
+      font-size:20px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all 0.3s ease;
+      padding:0;
+      flex-shrink:0;
+      box-shadow:0 4px 15px rgba(255,165,0,0.4),inset 0 1px 2px rgba(255,255,255,0.5);
+      position:relative;
+      overflow:hidden;
+      font-weight:bold;
+    }
+    .profile-btn-explorer:hover { 
+      background:linear-gradient(135deg,#FFE55C,#FFB84D);
+      transform:scale(1.15);
+      border-color:#FFEB3B;
+      box-shadow:0 6px 20px rgba(255,165,0,0.5),inset 0 1px 2px rgba(255,255,255,0.6),0 0 15px rgba(255,215,0,0.5);
+    }
+    .profile-btn-explorer:active { transform:scale(0.95); }
+    .profile-btn-explorer.hidden { display:none; }
+    .profile-modal { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; }
+    .profile-modal.show { display:flex; }
+    .profile-content { background:white; border-radius:16px; padding:32px; max-width:400px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3); animation:slideDown 0.3s ease; position:relative; }
+    @keyframes slideDown { from { transform:translateY(-30px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+    .profile-header { display:flex; align-items:center; gap:16px; margin-bottom:24px; }
+    .profile-avatar { width:60px; height:60px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:28px; color:white; }
+    .profile-name { margin:0; font-size:18px; font-weight:700; color:#0f1724; }
+    .profile-email { margin:4px 0 0 0; font-size:13px; color:var(--muted); }
+    .profile-divider { height:1px; background:#e5e7eb; margin:16px 0; }
+    .profile-item { display:flex; justify-content:space-between; padding:10px 0; font-size:14px; color:#0f1724; }
+    .profile-label { color:var(--muted); }
+    .profile-value { font-weight:600; }
+    .profile-actions { display:flex; gap:10px; margin-top:20px; }
+    .profile-actions button { flex:1; padding:10px; border:1px solid #e5e7eb; border-radius:8px; background:transparent; color:#0f1724; cursor:pointer; transition:all 0.3s ease; }
+    .profile-actions button:hover { background:var(--accent); color:white; border-color:var(--accent); }
+    .profile-close { position:absolute; top:16px; right:16px; background:transparent; border:none; color:#0f1724; font-size:24px; cursor:pointer; }
+
+    .category-links {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:20px;
+      padding:0 8px;
+    }
+    .category-link {
+      padding:10px 18px;
+      background:linear-gradient(135deg,#0b72b9,#0963a0);
+      color:white;
+      text-decoration:none;
+      border-radius:8px;
+      font-weight:600;
+      font-size:14px;
+      transition:all 0.3s ease;
+      box-shadow:0 3px 10px rgba(11,114,185,0.25);
+      border:1px solid rgba(255,255,255,0.2);
+    }
+    .category-link:hover {
+      transform:translateY(-2px);
+      box-shadow:0 5px 15px rgba(11,114,185,0.4);
+      background:linear-gradient(135deg,#0963a0,#085089);
+    }
+    
+    .layout{display:flex;gap:20px;max-width:1200px;margin:20px auto;padding:0 16px;box-sizing:border-box}
+    .content{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+    .book-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+      gap:16px;
+    }
+    .book-card{
+      background:var(--card);
+      border-radius:12px;
+      padding:10px;
+      box-shadow:var(--shadow);
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      align-items:stretch;
+    }
+    .book-card figure{margin:0}
+    .book-card img{
+      width:100%;
+      height:220px;
+      object-fit:cover;
+      border-radius:8px;
+      display:block;
+      cursor:pointer;
+    }
+    .book-card .meta{padding:6px 2px}
+    .book-card h3{margin:6px 0;font-size:16px}
+    .book-card p{margin:0;color:var(--muted);font-size:13px}
+    .book-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .book-actions button {
+      flex: 1;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .btn-open {
+      background: linear-gradient(135deg, #0b72b9, #0963a0);
+      color: white;
+    }
+    .btn-open:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(11, 114, 185, 0.3);
+    }
+    .btn-save {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+    }
+    .btn-save:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    .btn-saved {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    @media(max-width:900px){
+      .layout{padding:0 10px}
+      .topbar .search-wrap input{width:160px}
+      .book-card img{height:180px}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <img class="logo" src="assets/logo.png" alt="logo">
+    <h1>Online Library</h1>
+
+    <div class="search-wrap">
+      <input id="globalSearch" type="text" placeholder="Search for books" aria-label="Search books">
+    </div>
+
+    <nav>
+      <a href="personal.html" id="nav-mybooks-link" style="display:none">My Books</a>
+      <a id="nav-login-link" href="login.html" style="display:none">Login</a>
+      <button id="profile-btn-explorer" class="profile-btn-explorer hidden" title="View Profile">👤</button>
+    </nav>
+  </header>
+
+  <!-- Profile Modal -->
+  <div id="profile-modal-explorer" class="profile-modal">
+    <div class="profile-content">
+      <button class="profile-close" id="profile-close-explorer">✕</button>
+      <div class="profile-header">
+        <div class="profile-avatar" id="profile-avatar-explorer">👤</div>
+        <div>
+          <h3 class="profile-name" id="profile-name-explorer">Loading...</h3>
+          <p class="profile-email" id="profile-email-explorer"></p>
+        </div>
+      </div>
+      <div class="profile-divider"></div>
+      <div class="profile-item">
+        <span class="profile-label">Status</span>
+        <span class="profile-value" id="profile-status-explorer">Active</span>
+      </div>
+      <div class="profile-item">
+        <span class="profile-label">Member Since</span>
+        <span class="profile-value" id="profile-joined-explorer"></span>
+      </div>
+      <div class="profile-item">
+        <span class="profile-label">Last Login</span>
+        <span class="profile-value" id="profile-lastlogin-explorer"></span>
+      </div>
+      <div class="profile-divider"></div>
+      <div class="profile-actions">
+        <button id="profile-edit-explorer">Edit Profile</button>
+        <button id="profile-settings-explorer">Settings</button>
+        <button id="profile-logout-explorer">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <section class="content" aria-label="Books content">
+      <h2 style="margin:0 0 6px 8px">📝 English Stories</h2>
+
+      <div class="category-links">
+        <a class="category-link" href="explorer.html">🔍 Explorer</a>
+        <a class="category-link" href="knowledgebooks.html">📚 Knowledge Books</a>
+        <a class="category-link" href="devotional.html">🕉️ Devotional</a>
+        <a class="category-link" href="course_books.html">📖 Course Books</a>
+        <a class="category-link" href="telugu_novels.html">📕 Telugu Novels</a>
+      </div>
+
+      <div id="bookGrid" class="book-grid" aria-live="polite">
+        <!-- Books will be loaded here -->
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function(){
+      const searchInput = document.getElementById('globalSearch');
+      if (!searchInput) return;
+      searchInput.addEventListener('input', function(e){
+        const q = (e.target.value || '').trim().toLowerCase();
+        const cards = document.querySelectorAll('.book-card');
+        cards.forEach(card => {
+          const text = (card.innerText || '').toLowerCase();
+          card.style.display = q === '' || text.indexOf(q) !== -1 ? '' : 'none';
+        });
+      });
+    })();
+  </script>
+
+  <script>
+    (function(){
+      function isLogged() {
+        return localStorage.getItem('loggedIn') === 'true';
+      }
+
+      function formatDate(dateString) {
+        if (!dateString) return 'Never';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+      }
+
+      function loadProfileData() {
+        if (typeof AuthService !== 'undefined') {
+          const userData = AuthService.getCurrentUser();
+          if (userData) {
+            const user = typeof userData === 'string' ? { email: userData } : userData;
+            document.getElementById('profile-name-explorer').textContent = user.name || user.email.split('@')[0];
+            document.getElementById('profile-email-explorer').textContent = user.email;
+            document.getElementById('profile-joined-explorer').textContent = formatDate(user.createdAt);
+            document.getElementById('profile-lastlogin-explorer').textContent = formatDate(user.lastLogin);
+            const initial = (user.name || user.email).charAt(0).toUpperCase();
+            document.getElementById('profile-avatar-explorer').textContent = initial;
+          }
+        }
+      }
+
+      function updateProfileUI() {
+        const profileBtn = document.getElementById('profile-btn-explorer');
+        const navLoginLink = document.getElementById('nav-login-link');
+        const navMyBooksLink = document.getElementById('nav-mybooks-link');
+        
+        if (isLogged()) {
+          if (navLoginLink) navLoginLink.style.display = 'none';
+          if (profileBtn) profileBtn.classList.remove('hidden');
+          if (navMyBooksLink) navMyBooksLink.style.display = '';
+          loadProfileData();
+        } else {
+          if (navLoginLink) navLoginLink.style.display = '';
+          if (profileBtn) profileBtn.classList.add('hidden');
+          if (navMyBooksLink) navMyBooksLink.style.display = 'none';
+        }
+      }
+
+      const profileBtn = document.getElementById('profile-btn-explorer');
+      const profileModal = document.getElementById('profile-modal-explorer');
+      const profileClose = document.getElementById('profile-close-explorer');
+      
+      if (profileBtn) {
+        profileBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          loadProfileData();
+          profileModal.classList.add('show');
+        });
+      }
+
+      if (profileClose) {
+        profileClose.addEventListener('click', () => {
+          profileModal.classList.remove('show');
+        });
+      }
+
+      if (profileModal) {
+        profileModal.addEventListener('click', (e) => {
+          if (e.target === profileModal) {
+            profileModal.classList.remove('show');
+          }
+        });
+      }
+
+      document.getElementById('profile-edit-explorer').addEventListener('click', () => {
+        alert('Edit profile feature coming soon!');
+        profileModal.classList.remove('show');
+      });
+
+      document.getElementById('profile-settings-explorer').addEventListener('click', () => {
+        alert('Settings feature coming soon!');
+        profileModal.classList.remove('show');
+      });
+
+      document.getElementById('profile-logout-explorer').addEventListener('click', () => {
+        if (typeof AuthService !== 'undefined') {
+          AuthService.logout();
+        } else {
+          localStorage.removeItem('loggedIn');
+          localStorage.removeItem('currentUser');
+        }
+        profileModal.classList.remove('show');
+        updateProfileUI();
+        location.href = 'main.html';
+      });
+
+      updateProfileUI();
+      window.addEventListener('storage', function(e){
+        if (e.key === 'loggedIn' || e.key === 'currentUser') updateProfileUI();
+      }, false);
+    })();
+  </script>
+
+  <script>
+    const storyBooks = [
+      { id: 'es1', title: 'The Little Fox', author: 'Easy reader with illustrations', book_cover: 'https://via.placeholder.com/220x240?text=The+Little+Fox' },
+      { id: 'es2', title: 'Comic Pack', author: 'Short comics to build vocabulary', book_cover: 'https://via.placeholder.com/220x240?text=Comic+Pack' },
+      { id: 'es3', title: 'Fairy Tales', author: 'Classic stories retold', book_cover: 'https://via.placeholder.com/220x240?text=Fairy+Tales' },
+      { id: 'es4', title: 'Adventure Series', author: 'Graded readers for learning', book_cover: 'https://via.placeholder.com/220x240?text=Adventure' },
+      { id: 'es5', title: 'Short Stories Collection', author: 'Oxford Bookworms', book_cover: 'https://via.placeholder.com/220x240?text=Short+Stories' },
+      { id: 'es6', title: 'Modern Tales', author: 'Contemporary English writing', book_cover: 'https://via.placeholder.com/220x240?text=Modern+Tales' }
+    ];
+
+    function loadBooks() {
+      const bookGrid = document.getElementById('bookGrid');
+      bookGrid.innerHTML = storyBooks.map(book => `
+        <article class="book-card">
+          <figure>
+            <a href="english_book.html?id=${book.id}">
+              <img src="${book.book_cover}" alt="${book.title}" style="cursor:pointer;">
+            </a>
+          </figure>
+          <div class="meta">
+            <h3>${book.title}</h3>
+            <p>${book.author}</p>
+          </div>
+          <div class="book-actions">
+            <button class="btn-open" onclick="window.location.href='english_book.html?id=${book.id}'">Open</button>
+            <button class="btn-save" onclick="event.stopPropagation(); saveBook(${JSON.stringify(book).replace(/"/g, '&quot;')})" id="save-${book.id}">Save</button>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function saveBook(book) {
+      const email = localStorage.getItem('currentUser');
+      if (!email) {
+        alert('Please login first');
+        window.location.href = 'login.html';
+        return;
+      }
+      const key = 'saved_' + email;
+      const raw = localStorage.getItem(key);
+      const arr = raw ? JSON.parse(raw) : [];
+      const existing = arr.find(b => b.id === book.id);
+      if (existing) {
+        alert('Already saved');
+        const btn = document.getElementById('save-' + book.id);
+        if (btn) {
+          btn.textContent = '✓ Saved';
+          btn.classList.add('btn-saved');
+          btn.disabled = true;
+        }
+        return;
+      }
+      arr.push(book);
+      localStorage.setItem(key, JSON.stringify(arr));
+      const btn = document.getElementById('save-' + book.id);
+      if (btn) {
+        btn.textContent = '✓ Saved';
+        btn.classList.add('btn-saved');
+        btn.disabled = true;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadBooks);
+  </script>
+  
+</body>
+</html>

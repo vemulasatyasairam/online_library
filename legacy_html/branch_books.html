@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Branch Books</title>
+  <style>
+    :root{
+      --accent:#0b72b9;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --bg:#f3f6f8;
+      --radius:10px;
+      --shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    html,body{height:100%;margin:0;font-family:system-ui,Arial;background:var(--bg);color:#0f1724}
+    .topbar{
+      display:flex;
+      align-items:center;
+      gap:18px;
+      padding:12px 20px;
+      background:linear-gradient(90deg,var(--accent),#0963a0);
+      color:#fff;
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+    .topbar img.logo{height:48px;width:48px;border-radius:8px;object-fit:cover}
+    .topbar h1{margin:0;font-size:18px}
+    .search-wrap{margin-left:auto}
+    .search-wrap input{
+      height:36px;border-radius:8px;border:0;padding:6px 10px;width:300px;
+      font-size:14px;
+    }
+    .topbar nav { display:flex; gap:16px; align-items:center; }
+    .topbar a, .topbar button{color:#fff;text-decoration:none;border:none;background:transparent;cursor:pointer;margin-left:0;white-space:nowrap;padding:8px 14px;border-radius:6px;transition:all 0.3s ease;position:relative;font-weight:500;letter-spacing:0.5px}
+    .topbar a:hover, .topbar button:hover { background:rgba(255,255,255,0.15); transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.2); }
+    .profile-btn-explorer { 
+      width:44px; 
+      height:44px; 
+      border-radius:50%; 
+      background:linear-gradient(135deg,#FFD700,#FFA500);
+      border:2px solid #FFE55C;
+      color:#0b72b9; 
+      font-size:20px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all 0.3s ease;
+      padding:0;
+      flex-shrink:0;
+      box-shadow:0 4px 15px rgba(255,165,0,0.4),inset 0 1px 2px rgba(255,255,255,0.5);
+      position:relative;
+      overflow:hidden;
+      font-weight:bold;
+    }
+    .profile-btn-explorer:hover { 
+      background:linear-gradient(135deg,#FFE55C,#FFB84D);
+      transform:scale(1.15);
+      border-color:#FFEB3B;
+      box-shadow:0 6px 20px rgba(255,165,0,0.5),inset 0 1px 2px rgba(255,255,255,0.6),0 0 15px rgba(255,215,0,0.5);
+    }
+    .profile-btn-explorer:active { transform:scale(0.95); }
+    .profile-btn-explorer.hidden { display:none; }
+    .profile-modal { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; }
+    .profile-modal.show { display:flex; }
+    .profile-content { background:white; border-radius:16px; padding:32px; max-width:400px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3); animation:slideDown 0.3s ease; position:relative; }
+    @keyframes slideDown { from { transform:translateY(-30px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+    .profile-header { display:flex; align-items:center; gap:16px; margin-bottom:24px; }
+    .profile-avatar { width:60px; height:60px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:28px; color:white; }
+    .profile-name { margin:0; font-size:18px; font-weight:700; color:#0f1724; }
+    .profile-email { margin:4px 0 0 0; font-size:13px; color:var(--muted); }
+    .profile-divider { height:1px; background:#e5e7eb; margin:16px 0; }
+    .profile-item { display:flex; justify-content:space-between; padding:10px 0; font-size:14px; color:#0f1724; }
+    .profile-label { color:var(--muted); }
+    .profile-value { font-weight:600; }
+    .profile-actions { display:flex; gap:10px; margin-top:20px; }
+    .profile-actions button { flex:1; padding:10px; border:1px solid #e5e7eb; border-radius:8px; background:transparent; color:#0f1724; cursor:pointer; transition:all 0.3s ease; }
+    .profile-actions button:hover { background:var(--accent); color:white; border-color:var(--accent); }
+    .profile-close { position:absolute; top:16px; right:16px; background:transparent; border:none; color:#0f1724; font-size:24px; cursor:pointer; }
+
+    .category-links {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:20px;
+      padding:0 8px;
+    }
+    .category-link {
+      padding:10px 18px;
+      background:linear-gradient(135deg,#0b72b9,#0963a0);
+      color:white;
+      text-decoration:none;
+      border-radius:8px;
+      font-weight:600;
+      font-size:14px;
+      transition:all 0.3s ease;
+      box-shadow:0 3px 10px rgba(11,114,185,0.25);
+      border:1px solid rgba(255,255,255,0.2);
+    }
+    .category-link:hover {
+      transform:translateY(-2px);
+      box-shadow:0 5px 15px rgba(11,114,185,0.4);
+      background:linear-gradient(135deg,#0963a0,#085089);
+    }
+    
+    .layout{display:flex;gap:20px;max-width:1200px;margin:20px auto;padding:0 16px;box-sizing:border-box}
+    aside.sidebar{
+      width:250px;
+      background:var(--card);
+      padding:12px 12px 12px 4px;border-radius:var(--radius);
+      box-shadow:var(--shadow);height:fit-content;
+      order:-1;
+    }
+    aside h4{margin:0 0 10px 0;text-align:left;padding-left:20px;margin-left:-4px}
+    details{margin-bottom:8px;margin-left:-4px;padding-left:20px;}
+    details summary{
+      cursor:pointer;
+      padding:8px 8px 8px 0;
+      border-radius:8px;
+      font-weight:700;
+      text-align:left;
+      margin-left:0;
+      transition:all 0.3s ease;
+      position:relative;
+      display:inline-block;
+    }
+    details summary:hover {
+      background:linear-gradient(90deg,rgba(11,114,185,0.15),rgba(11,114,185,0.08));
+      color:#0b72b9;
+      transform:translateX(5px);
+      text-shadow:0 0 15px rgba(11,114,185,0.4);
+      box-shadow:0 2px 8px rgba(11,114,185,0.2);
+      border-left:3px solid #0b72b9;
+      padding-left:5px;
+    }
+    details summary::before {
+      content:'';
+      position:absolute;
+      left:0;
+      bottom:-2px;
+      width:0;
+      height:2px;
+      background:linear-gradient(90deg,#0b72b9,#0963a0);
+      transition:width 0.3s ease;
+    }
+    details summary:hover::before {
+      width:calc(100% - 12px);
+    }
+    details[open] summary {
+      background:rgba(11,114,185,0.1);
+      color:#0b72b9;
+    }
+    details[open] summary::before {
+      width:calc(100% - 12px);
+    }
+    .year-list{margin-top:8px;display:flex;flex-direction:column;gap:6px;padding-left:4px}
+    .year-list a{display:inline-block;padding:8px;border-radius:6px;text-decoration:none;color:var(--accent);background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid rgba(0,0,0,0.04)}
+    .content{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+    .book-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+      gap:16px;
+    }
+    .book-card{
+      background:var(--card);
+      border-radius:12px;
+      padding:10px;
+      box-shadow:var(--shadow);
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      align-items:stretch;
+    }
+    .book-card figure{margin:0}
+    .book-card img{
+      width:100%;
+      height:220px;
+      object-fit:cover;
+      border-radius:8px;
+      display:block;
+      cursor:pointer;
+    }
+    .book-card .meta{padding:6px 2px}
+    .book-card h3{margin:6px 0;font-size:16px}
+    .book-card p{margin:0;color:var(--muted);font-size:13px}
+    .book-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .book-actions button {
+      flex: 1;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .btn-open {
+      background: linear-gradient(135deg, #0b72b9, #0963a0);
+      color: white;
+    }
+    .btn-open:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(11, 114, 185, 0.3);
+    }
+    .btn-save {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+    }
+    .btn-save:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    .btn-saved {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    .filter-section {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      padding: 0 8px;
+      margin-bottom: 10px;
+    }
+    .filter-btn {
+      padding: 8px 16px;
+      background: linear-gradient(135deg, #0b72b9, #0963a0);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 10px rgba(11,114,185,0.25);
+    }
+    .filter-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(11,114,185,0.4);
+      background: linear-gradient(135deg, #0963a0, #085089);
+    }
+    .filter-btn.active {
+      background: linear-gradient(135deg, #FFA500, #FFD700);
+      color: #0b72b9;
+      box-shadow: 0 3px 10px rgba(255,165,0,0.25);
+    }
+
+    .mode-section {
+      display: flex;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 16px;
+    }
+    .mode-btn {
+      padding: 10px 24px;
+      background: white;
+      color: var(--accent);
+      border: 2px solid var(--accent);
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .mode-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(11,114,185,0.3);
+    }
+    .mode-btn.active {
+      background: linear-gradient(135deg, #0b72b9, #0963a0);
+      color: white;
+      border-color: #0b72b9;
+    }
+    .mode-btn.previous-mode.active {
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-color: #10b981;
+    }
+
+    @media(max-width:900px){
+      .layout{padding:0 10px}
+      aside.sidebar{width:100%}
+      .topbar .search-wrap input{width:160px}
+      .book-card img{height:180px}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <img class="logo" src="assets/logo.png" alt="logo">
+    <h1>Online Library</h1>
+
+    <div class="search-wrap">
+      <input id="globalSearch" type="text" placeholder="Search for books" aria-label="Search books">
+    </div>
+
+    <nav>
+      <a href="personal.html" id="nav-mybooks-link" style="display:none">My Books</a>
+      <a id="nav-login-link" href="login.html" style="display:none">Login</a>
+      <button id="profile-btn-explorer" class="profile-btn-explorer hidden" title="View Profile">👤</button>
+    </nav>
+  </header>
+
+  <!-- Profile Modal -->
+  <div id="profile-modal-explorer" class="profile-modal">
+    <div class="profile-content">
+      <button class="profile-close" id="profile-close-explorer">✕</button>
+      <div class="profile-header">
+        <div class="profile-avatar" id="profile-avatar-explorer">👤</div>
+        <div>
+          <h3 class="profile-name" id="profile-name-explorer">Loading...</h3>
+          <p class="profile-email" id="profile-email-explorer"></p>
+        </div>
+      </div>
+      <div class="profile-divider"></div>
+      <div class="profile-item">
+        <span class="profile-label">Status</span>
+        <span class="profile-value" id="profile-status-explorer">Active</span>
+      </div>
+      <div class="profile-item">
+        <span class="profile-label">Member Since</span>
+        <span class="profile-value" id="profile-joined-explorer"></span>
+      </div>
+      <div class="profile-item">
+        <span class="profile-label">Last Login</span>
+        <span class="profile-value" id="profile-lastlogin-explorer"></span>
+      </div>
+      <div class="profile-divider"></div>
+      <div class="profile-actions">
+        <button id="profile-view-explorer" onclick="window.location.href='profile.html'">View Full Profile</button>
+        <button id="profile-logout-explorer">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar" aria-label="Branches">
+      <h4>Branches</h4>
+
+      <details>
+        <summary>CSE — Computer Science Engineering</summary>
+      </details>
+
+      <details>
+        <summary>ECE — Electrical & Electronics Communication</summary>
+      </details>
+
+      <details>
+        <summary>EEE — Electrical & Electronical Engineering</summary>
+      </details>
+
+      <details>
+        <summary>Mechanical</summary>
+      </details>
+
+      <details>
+        <summary>CSM — Computer Science And Artificial Intelligence With Machine Learning</summary>
+      </details>
+
+      <details>
+        <summary>AIML — Artificial Intelligence With Machine Learning</summary>
+      </details>
+
+      <details>
+        <summary>CST — Computer Science Engineering</summary>
+      </details>
+
+      <details>
+        <summary>CSD — Computer Science Engineering</summary>
+      </details>
+
+      <details>
+        <summary>CIVIL — Computer Science Engineering</summary>
+      </details>
+
+      <details>
+        <summary>IT — Computer Science Engineering</summary>
+      </details>
+    </aside>
+
+    <section class="content" aria-label="Books content">
+      <h2 id="branchTitle" style="margin:0 0 6px 8px">Branch Books</h2>
+
+      <div class="mode-section">
+        <button class="mode-btn active" data-mode="books">📚 Books</button>
+        <button class="mode-btn previous-mode" data-mode="previous">📄 Previous Papers</button>
+      </div>
+
+      <div class="filter-section" id="filterSection">
+        <button class="filter-btn" data-year="1st Year">1st Year</button>
+        <button class="filter-btn" data-year="2nd Year">2nd Year</button>
+        <button class="filter-btn" data-year="3rd Year">3rd Year</button>
+        <button class="filter-btn" data-year="4th Year">4th Year</button>
+      </div>
+
+      <div id="bookGrid" class="book-grid" aria-live="polite">
+        <!-- Books will be loaded here -->
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function(){
+      const searchInput = document.getElementById('globalSearch');
+      if (!searchInput) return;
+      searchInput.addEventListener('input', function(e){
+        const q = (e.target.value || '').trim().toLowerCase();
+        const cards = document.querySelectorAll('.book-card');
+        cards.forEach(card => {
+          const text = (card.innerText || '').toLowerCase();
+          card.style.display = q === '' || text.indexOf(q) !== -1 ? '' : 'none';
+        });
+      });
+    })();
+  </script>
+
+  <script>
+    (function(){
+      // Show profile when logged in, otherwise show Login link.
+      function isLogged() {
+        return localStorage.getItem('loggedIn') === 'true';
+      }
+
+      function formatDate(dateString) {
+        if (!dateString) return 'Never';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+      }
+
+      function loadProfileData() {
+        if (typeof AuthService !== 'undefined') {
+          const userData = AuthService.getCurrentUser();
+          if (userData) {
+            const user = typeof userData === 'string' ? { email: userData } : userData;
+            document.getElementById('profile-name-explorer').textContent = user.name || user.email.split('@')[0];
+            document.getElementById('profile-email-explorer').textContent = user.email;
+            document.getElementById('profile-joined-explorer').textContent = formatDate(user.createdAt);
+            document.getElementById('profile-lastlogin-explorer').textContent = formatDate(user.lastLogin);
+            const initial = (user.name || user.email).charAt(0).toUpperCase();
+            document.getElementById('profile-avatar-explorer').textContent = initial;
+          }
+        }
+      }
+
+      function updateProfileUI() {
+        const profileBtn = document.getElementById('profile-btn-explorer');
+        const navLoginLink = document.getElementById('nav-login-link');
+        const navMyBooksLink = document.getElementById('nav-mybooks-link');
+        
+        if (isLogged()) {
+          if (navLoginLink) navLoginLink.style.display = 'none';
+          if (profileBtn) profileBtn.classList.remove('hidden');
+          if (navMyBooksLink) navMyBooksLink.style.display = '';
+          loadProfileData();
+        } else {
+          if (navLoginLink) navLoginLink.style.display = '';
+          if (profileBtn) profileBtn.classList.add('hidden');
+          if (navMyBooksLink) navMyBooksLink.style.display = 'none';
+        }
+      }
+
+      // Profile modal handlers
+      const profileBtn = document.getElementById('profile-btn-explorer');
+      const profileModal = document.getElementById('profile-modal-explorer');
+      const profileClose = document.getElementById('profile-close-explorer');
+      
+      if (profileBtn) {
+        profileBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          window.location.href = 'profile.html';
+      }
+
+      if (profileModal) {
+        profileModal.addEventListener('click', (e) => {
+          if (e.target === profileModal) {
+            profileModal.classList.remove('show');
+          }
+        });
+      }
+
+      document.getElementById('profile-logout-explorer').addEventListener('click', () => {
+        if (typeof AuthService !== 'undefined') {
+          AuthService.logout();
+        } else {
+          localStorage.removeItem('loggedIn');
+          localStorage.removeItem('currentUser');
+        }
+        profileModal.classList.remove('show');
+        updateProfileUI();
+        location.href = 'main.html';
+      });
+
+      updateProfileUI();
+      window.addEventListener('storage', function(e){
+        if (e.key === 'loggedIn' || e.key === 'currentUser') updateProfileUI();
+      }, false);
+    })();
+  </script>
+
+  <script>
+    (function() {
+      document.querySelectorAll('aside.sidebar details summary').forEach(summary => {
+        summary.addEventListener('click', function(e) {
+          e.preventDefault();
+          const branchText = this.textContent.trim();
+          const branchId = branchText.split('—')[0].trim();
+          window.location.href = `branch_books.html?branch=${branchId}`;
+        });
+      });
+    })();
+  </script>
+
+  <script>
+    // Branch books data
+    const branchBooks = {
+      'CSE': {
+        name: 'Computer Science Engineering',
+        books: [
+          { id: 'cse1', title: 'Data Structures & Algorithms', author: 'Thomas H. Cormen', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/dsa.pdf', type: 'book' },
+          { id: 'cse2', title: 'Programming in C', author: 'Dennis Ritchie', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/c-programming.pdf', type: 'book' },
+          { id: 'cse1_pp1', title: 'DSA Previous Paper 2023', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/previous/dsa-2023.pdf', type: 'previous' },
+          { id: 'cse1_pp2', title: 'C Programming Previous Paper 2023', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/previous/c-2023.pdf', type: 'previous' },
+          { id: 'cse1_pp3', title: 'DSA Previous Paper 2022', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/previous/dsa-2022.pdf', type: 'previous' },
+          { id: 'cse1_pp4', title: 'C Programming Previous Paper 2022', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/previous/c-2022.pdf', type: 'previous' },
+          { id: 'cse3', title: 'Operating Systems', author: 'Abraham Silberschatz', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/os.pdf', type: 'book' },
+          { id: 'cse4', title: 'Database Management Systems', author: 'Henry Korth', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/dbms.pdf', type: 'book' },
+          { id: 'cse2_pp1', title: 'OS Previous Paper 2023', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/previous/os-2023.pdf', type: 'previous' },
+          { id: 'cse2_pp2', title: 'DBMS Previous Paper 2023', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/previous/dbms-2023.pdf', type: 'previous' },
+          { id: 'cse2_pp3', title: 'OS Previous Paper 2022', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/previous/os-2022.pdf', type: 'previous' },
+          { id: 'cse2_pp4', title: 'DBMS Previous Paper 2022', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/previous/dbms-2022.pdf', type: 'previous' },
+          { id: 'cse5', title: 'Computer Networks', author: 'Andrew Tanenbaum', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/networks.pdf', type: 'book' },
+          { id: 'cse6', title: 'Software Engineering', author: 'Ian Sommerville', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/se.pdf', type: 'book' },
+          { id: 'cse3_pp1', title: 'CN Previous Paper 2023', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/previous/cn-2023.pdf', type: 'previous' },
+          { id: 'cse3_pp2', title: 'SE Previous Paper 2023', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/previous/se-2023.pdf', type: 'previous' },
+          { id: 'cse3_pp3', title: 'CN Previous Paper 2022', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/previous/cn-2022.pdf', type: 'previous' },
+          { id: 'cse3_pp4', title: 'SE Previous Paper 2022', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/previous/se-2022.pdf', type: 'previous' },
+          { id: 'cse7', title: 'Machine Learning', author: 'Tom Mitchell', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/ml.pdf', type: 'book' },
+          { id: 'cse8', title: 'Artificial Intelligence', author: 'Stuart Russell', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/ai.pdf', type: 'book' },
+          { id: 'cse4_pp1', title: 'ML Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/previous/ml-2023.pdf', type: 'previous' },
+          { id: 'cse4_pp2', title: 'AI Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/previous/ai-2023.pdf', type: 'previous' },
+          { id: 'cse4_pp3', title: 'ML Previous Paper 2022', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/previous/ml-2022.pdf', type: 'previous' },
+          { id: 'cse4_pp4', title: 'AI Previous Paper 2022', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cse/previous/ai-2022.pdf', type: 'previous' }
+        ]
+      },
+      'ECE': {
+        name: 'Electronics & Communication Engineering',
+        books: [
+          { id: 'ece1', title: 'Electronic Devices & Circuits', author: 'Thomas Floyd', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/ece/edc.pdf', type: 'book' },
+          { id: 'ece2', title: 'Network Analysis', author: 'Van Valkenburg', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/ece/network.pdf', type: 'book' },
+          { id: 'ece1_pp1', title: 'EDC Previous Paper 2023', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/ece/previous/edc-2023.pdf', type: 'previous' },
+          { id: 'ece1_pp2', title: 'Network Analysis Previous Paper 2023', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/ece/previous/network-2023.pdf', type: 'previous' },
+          { id: 'ece1_pp3', title: 'EDC Previous Paper 2022', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/ece/previous/edc-2022.pdf', type: 'previous' },
+          { id: 'ece3', title: 'Digital Electronics', author: 'Morris Mano', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/ece/digital.pdf', type: 'book' },
+          { id: 'ece4', title: 'Signals & Systems', author: 'Alan Oppenheim', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/ece/signals.pdf', type: 'book' },
+          { id: 'ece2_pp1', title: 'Digital Electronics Previous Paper 2023', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/ece/previous/digital-2023.pdf', type: 'previous' },
+          { id: 'ece2_pp2', title: 'Signals & Systems Previous Paper 2023', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/ece/previous/signals-2023.pdf', type: 'previous' },
+          { id: 'ece5', title: 'Communication Systems', author: 'Simon Haykin', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/ece/communications.pdf', type: 'book' },
+          { id: 'ece6', title: 'Microprocessors & Microcontrollers', author: 'Krishna Kant', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/ece/microprocessor.pdf', type: 'book' },
+          { id: 'ece3_pp1', title: 'Communication Systems Previous Paper 2023', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/ece/previous/comm-2023.pdf', type: 'previous' },
+          { id: 'ece3_pp2', title: 'Microprocessors Previous Paper 2023', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/ece/previous/micro-2023.pdf', type: 'previous' },
+          { id: 'ece7', title: 'VLSI Design', author: 'Neil Weste', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/ece/vlsi.pdf', type: 'book' },
+          { id: 'ece8', title: 'Embedded Systems', author: 'Rajkamal', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/ece/embedded.pdf', type: 'book' },
+          { id: 'ece4_pp1', title: 'VLSI Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/ece/previous/vlsi-2023.pdf', type: 'previous' },
+          { id: 'ece4_pp2', title: 'Embedded Systems Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/ece/previous/embedded-2023.pdf', type: 'previous' }
+        ]
+      },
+      'EEE': {
+        name: 'Electrical & Electronics Engineering',
+        books: [
+          { id: 'eee1', title: 'Circuit Theory', author: 'Charles Alexander', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/eee/circuit.pdf', type: 'book' },
+          { id: 'eee2', title: 'Electromagnetic Field Theory', author: 'Mathew Sadiku', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/eee/emft.pdf', type: 'book' },
+          { id: 'eee1_pp1', title: 'Circuit Theory Previous Paper 2023', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/eee/previous/circuit-2023.pdf', type: 'previous' },
+          { id: 'eee1_pp2', title: 'EMFT Previous Paper 2023', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/eee/previous/emft-2023.pdf', type: 'previous' },
+          { id: 'eee3', title: 'Power Systems', author: 'D.P. Kothari', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/eee/power.pdf', type: 'book' },
+          { id: 'eee4', title: 'Electrical Measurements', author: 'A.K. Sawhney', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/eee/measurements.pdf', type: 'book' },
+          { id: 'eee2_pp1', title: 'Power Systems Previous Paper 2023', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/eee/previous/power-2023.pdf', type: 'previous' },
+          { id: 'eee2_pp2', title: 'Electrical Measurements Previous Paper 2023', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/eee/previous/measurements-2023.pdf', type: 'previous' },
+          { id: 'eee5', title: 'Control Systems', author: 'Katsuhiko Ogata', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/eee/control.pdf', type: 'book' },
+          { id: 'eee6', title: 'Power Electronics', author: 'M.H. Rashid', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/eee/power-electronics.pdf', type: 'book' },
+          { id: 'eee3_pp1', title: 'Control Systems Previous Paper 2023', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/eee/previous/control-2023.pdf', type: 'previous' },
+          { id: 'eee3_pp2', title: 'Power Electronics Previous Paper 2023', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/eee/previous/pe-2023.pdf', type: 'previous' },
+          { id: 'eee7', title: 'Electrical Machines', author: 'I.J. Nagrath', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/eee/machines.pdf', type: 'book' },
+          { id: 'eee8', title: 'High Voltage Engineering', author: 'M.S. Naidu', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/eee/hv.pdf', type: 'book' },
+          { id: 'eee4_pp1', title: 'Electrical Machines Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/eee/previous/machines-2023.pdf', type: 'previous' },
+          { id: 'eee4_pp2', title: 'HV Engineering Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/eee/previous/hv-2023.pdf', type: 'previous' }
+        ]
+      },
+      'Mechanical': {
+        name: 'Mechanical Engineering',
+        books: [
+          { id: 'mech1', title: 'Engineering Mechanics', author: 'J.L. Meriam', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/mech/mechanics.pdf', type: 'book' },
+          { id: 'mech2', title: 'Engineering Drawing', author: 'N.D. Bhatt', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/mech/drawing.pdf', type: 'book' },
+          { id: 'mech1_pp1', title: 'Engineering Mechanics Previous Paper 2023', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/mech/previous/mechanics-2023.pdf', type: 'previous' },
+          { id: 'mech1_pp2', title: 'Engineering Drawing Previous Paper 2023', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/mech/previous/drawing-2023.pdf', type: 'previous' },
+          { id: 'mech3', title: 'Thermodynamics', author: 'Yunus Cengel', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/mech/thermo.pdf', type: 'book' },
+          { id: 'mech4', title: 'Strength of Materials', author: 'R.K. Bansal', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/mech/som.pdf', type: 'book' },
+          { id: 'mech2_pp1', title: 'Thermodynamics Previous Paper 2023', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/mech/previous/thermo-2023.pdf', type: 'previous' },
+          { id: 'mech2_pp2', title: 'SOM Previous Paper 2023', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/mech/previous/som-2023.pdf', type: 'previous' },
+          { id: 'mech5', title: 'Fluid Mechanics', author: 'Frank White', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/mech/fluid.pdf', type: 'book' },
+          { id: 'mech6', title: 'Machine Design', author: 'V.B. Bhandari', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/mech/machine-design.pdf', type: 'book' },
+          { id: 'mech3_pp1', title: 'Fluid Mechanics Previous Paper 2023', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/mech/previous/fluid-2023.pdf', type: 'previous' },
+          { id: 'mech3_pp2', title: 'Machine Design Previous Paper 2023', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/mech/previous/md-2023.pdf', type: 'previous' },
+          { id: 'mech7', title: 'Heat Transfer', author: 'J.P. Holman', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/mech/heat.pdf', type: 'book' },
+          { id: 'mech8', title: 'Manufacturing Technology', author: 'P.N. Rao', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/mech/manufacturing.pdf', type: 'book' },
+          { id: 'mech4_pp1', title: 'Heat Transfer Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/mech/previous/heat-2023.pdf', type: 'previous' },
+          { id: 'mech4_pp2', title: 'Manufacturing Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/mech/previous/mfg-2023.pdf', type: 'previous' }
+        ]
+      }
+    };
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const branch = urlParams.get('branch');
+    const year = urlParams.get('year');
+
+    let currentBranch = branch || 'CSE';
+    let currentYear = year || '1st Year';
+    let currentMode = 'books'; // 'books' or 'previous'
+
+    function init() {
+      if (!branchBooks[currentBranch]) {
+        document.getElementById('bookGrid').innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--muted);">Invalid branch selected</p>';
+        return;
+      }
+
+      document.getElementById('branchTitle').textContent = branchBooks[currentBranch].name;
+
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.year === currentYear);
+      });
+
+      loadBooks();
+
+      // Mode button listeners
+      document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          currentMode = this.dataset.mode;
+          loadBooks();
+        });
+      });
+
+      // Year filter button listeners
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          currentYear = this.dataset.year;
+          loadBooks();
+        });
+      });
+    }
+
+    function loadBooks() {
+      const bookGrid = document.getElementById('bookGrid');
+      const books = branchBooks[currentBranch].books;
+
+      const filteredBooks = currentYear === 'all' 
+        ? books 
+        : books.filter(book => book.year === currentYear);
+
+      // Filter based on current mode
+      let displayBooks;
+      if (currentMode === 'books') {
+        displayBooks = filteredBooks.filter(book => book.type === 'book' || !book.type);
+      } else if (currentMode === 'previous') {
+        displayBooks = filteredBooks.filter(book => book.type === 'previous');
+      }
+
+      if (displayBooks.length === 0) {
+        const message = currentMode === 'previous' 
+          ? 'No previous papers available for this year' 
+          : 'No books available for this selection';
+        bookGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--muted);">' + message + '</p>';
+        return;
+      }
+
+      // Helper function to render book cards
+      function renderBookCard(book, isPreviousPaper = false) {
+        return `
+        <article class="book-card" style="position: relative;">
+          ${isPreviousPaper ? '<span style="position: absolute; top: 8px; right: 8px; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; z-index: 1;">PREVIOUS PAPER</span>' : ''}
+          <figure>
+            <a href="branch_book.html?id=${book.id}">
+              <img src="${book.book_cover}" alt="${book.title}" loading="lazy"
+                   onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22300%22%3E%3Crect fill=%22%230a1628%22 width=%22220%22 height=%22300%22/%3E%3Ctext x=%22110%22 y=%22140%22 font-size=%2224%22 fill=%22%2300d4ff%22 text-anchor=%22middle%22 font-family=%22Arial%22%3ESASI%3C/text%3E%3Ctext x=%22110%22 y=%22170%22 font-size=%2214%22 fill=%22%2300d4ff%22 text-anchor=%22middle%22 font-family=%22Arial%22%3EBooks%3C/text%3E%3C/svg%3E'" 
+                   style="cursor:pointer;">
+            </a>
+          </figure>
+          <div class="meta">
+            <h3>${book.title}</h3>
+            <p>${book.author}</p>
+          </div>
+          <div class="book-actions">
+            <button class="btn-open" onclick="window.location.href='branch_book.html?id=${book.id}'">Open</button>
+            <button class="btn-save" onclick="event.stopPropagation(); saveBook(${JSON.stringify(book).replace(/"/g, '&quot;')})" id="save-${book.id}">Save</button>
+          </div>
+        </article>
+        `;
+      }
+
+      // Build HTML
+      const isPreviousMode = currentMode === 'previous';
+      const html = displayBooks.map(book => renderBookCard(book, isPreviousMode)).join('');
+
+      bookGrid.innerHTML = html;
+    }
+
+    function saveBook(book) {
+      const email = localStorage.getItem('currentUser');
+      if (!email) {
+        alert('Please login first');
+        window.location.href = 'login.html';
+        return;
+      }
+      const key = 'saved_' + email;
+      const raw = localStorage.getItem(key);
+      const arr = raw ? JSON.parse(raw) : [];
+      const existing = arr.find(b => b.id === book.id);
+      if (existing) {
+        alert('Already saved');
+        const btn = document.getElementById('save-' + book.id);
+        if (btn) {
+          btn.textContent = '✓ Saved';
+          btn.classList.add('btn-saved');
+          btn.disabled = true;
+        }
+        return;
+      }
+      arr.push(book);
+      localStorage.setItem(key, JSON.stringify(arr));
+      const btn = document.getElementById('save-' + book.id);
+      if (btn) {
+        btn.textContent = '✓ Saved';
+        btn.classList.add('btn-saved');
+        btn.disabled = true;
+      }
+    }
+
+    init();
+  </script>
+
+</body>
+</html>
