@@ -32,6 +32,13 @@ router.get('/', bookController.getAllBooks);
 router.get('/search', bookController.searchBooks);
 
 /**
+ * GET /api/books/most-viewed
+ * Get most viewed books
+ * Query params: ?limit=10
+ */
+router.get('/most-viewed', bookController.getMostViewedBooks);
+
+/**
  * GET /api/books/branch/:branch
  * Get all books in a specific branch
  */
@@ -54,6 +61,12 @@ router.get('/:id/download', bookController.downloadPDF);
  * View PDF in browser
  */
 router.get('/:id/view', bookController.viewPDF);
+
+/**
+ * POST /api/books/:id/track-view
+ * Track book view (increment view count)
+ */
+router.post('/:id/track-view', bookController.trackBookView);
 
 /**
  * PUT /api/books/:id

@@ -58,12 +58,14 @@ const authRoutes = require('./src/routes/auth');
 const userRoutes = require('./src/routes/users');
 const savedRoutes = require('./src/routes/saved');
 const bookRoutes = require('./src/routes/books');
+const pdfRoutes = require('./src/routes/pdf');
 
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/saved', savedRoutes);
 app.use('/api/books', bookRoutes);
+app.use('/api/pdf', pdfRoutes);
 
 // Legacy endpoints for compatibility
 app.use('/api/login', (req, res) => authRoutes.handle(req, res, 'login'));

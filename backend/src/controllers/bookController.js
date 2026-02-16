@@ -418,6 +418,67 @@ const searchBooks = async (req, res) => {
   }
 };
 
+/**
+ * Track book view (increment view count)
+ */
+const trackBookView = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const book = await Book.findById(id);
+    
+    if (!book) {
+      return res.status(404).json({
+        ok: false,
+        error: 'Book not found'
+      });
+    }
+
+    // Increment views
+    await book.incrementViews();
+
+    res.json({
+      ok: true,
+      message: 'Book view tracked successfully',
+      views: book.views
+    });
+
+  } catch (error) {
+    console.error('Error tracking book view:', error);
+    res.status(500).json({
+      ok: false,
+      error: error.message || 'Error tracking book view'
+    });
+  }
+};
+
+/**
+ * Get most viewed books
+ */
+const getMostViewedBooks = async (req, res) => {
+  try {
+    const { limit = 10 } = req.query;
+    
+    const books = await Book.find()
+      .select('-pdf.data')
+      .sort({ views: -1 })
+      .limit(parseInt(limit));
+
+    res.json({
+      ok: true,
+      books,
+      count: books.length
+    });
+
+  } catch (error) {
+    console.error('Error getting most viewed books:', error);
+    res.status(500).json({
+      ok: false,
+      error: error.message || 'Error fetching most viewed books'
+    });
+  }
+};
+
 module.exports = {
   uploadBook,
   getAllBooks,
@@ -427,5 +488,7 @@ module.exports = {
   updateBook,
   deleteBook,
   getBooksByBranch,
-  searchBooks
+  searchBooks,
+  trackBookView,
+  getMostViewedBooks
 };
