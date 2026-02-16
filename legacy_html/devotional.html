@@ -365,12 +365,102 @@
 
   <script>
     const devotionalBooks = [
-      { id: 'dev1', title: 'Ramayanam', author: 'Valmiki', book_cover: 'https://via.placeholder.com/220x240?text=Ramayanam' },
-      { id: 'dev2', title: 'Mahabharatam', author: 'Vyasa', book_cover: 'https://via.placeholder.com/220x240?text=Mahabharatam' },
-      { id: 'dev3', title: 'Bhagavad Gita', author: 'Lord Krishna', book_cover: 'https://via.placeholder.com/220x240?text=Bhagavad+Gita' },
-      { id: 'dev4', title: 'Upanishads', author: 'Vedic Texts', book_cover: 'https://via.placeholder.com/220x240?text=Upanishads' },
-      { id: 'dev5', title: 'Puranas', author: 'Hindu Scripture', book_cover: 'https://via.placeholder.com/220x240?text=Puranas' },
-      { id: 'dev6', title: 'Vedas', author: 'Rigveda, Yajurveda, Samaveda', book_cover: 'https://via.placeholder.com/220x240?text=Vedas' }
+      { 
+        id: 'dev1', 
+        title: 'Ramayanam', 
+        author: 'Valmiki',
+        subject: 'Ancient Epic',
+        publisher: 'Penguin Books India',
+        year: 2006,
+        edition: 'First Edition',
+        pages: 864,
+        language: 'Hindi',
+        isbn: '978-0144000640',
+        book_cover: 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=400&fit=crop',
+        description: 'One of the two major Sanskrit epics of ancient India, the Ramayana depicts the life of Prince Rama and his adventures. This timeless spiritual classic teaches about dharma (righteousness), duty, and devotion.',
+        features: ['Complete narrative of Lord Rama\'s life', 'Lessons on virtue and righteousness', 'Philosophical teachings', 'Cultural and historical significance', 'Beautiful poetic language', 'Spiritual guidance'],
+        toc: ['Book One - Childhood of Rama', 'Book Two - Youth and Marriage', 'Book Three - Exile in Forest', 'Book Four - Search for Sita', 'Book Five - War and Victory', 'Book Six - Return and Coronation']
+      },
+      { 
+        id: 'dev2', 
+        title: 'Mahabharatam', 
+        author: 'Vyasa',
+        subject: 'Ancient Epic',
+        publisher: 'Penguin Books India',
+        year: 2007,
+        edition: 'Abridged Edition',
+        pages: 736,
+        language: 'Hindi',
+        isbn: '978-0143039945',
+        book_cover: 'https://images.unsplash.com/photo-150784272343-583f20270319?w=400&h=400&fit=crop',
+        description: 'The Mahabharata is the world\'s longest epic poem, depicting the great war between two royal families. It contains the Bhagavad Gita and teaches about karma, dharma, and human nature.',
+        features: ['Epic war narrative', 'Bhagavad Gita included', 'Multiple story arcs', 'Character studies', 'Moral and ethical teachings', 'Ancient wisdom'],
+        toc: ['Book One - Origins', 'Book Two - War Preparations', 'Book Three - First Day Battle', 'Book Four - Middle Days', 'Book Five - Final Battle', 'Book Six - Epilogue']
+      },
+      { 
+        id: 'dev3', 
+        title: 'Bhagavad Gita', 
+        author: 'Lord Krishna',
+        subject: 'Spiritual Philosophy',
+        publisher: 'Dover Publications',
+        year: 2018,
+        edition: 'Revised Edition',
+        pages: 320,
+        language: 'Hindi',
+        isbn: '978-0486812044',
+        book_cover: 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=400&h=400&fit=crop',
+        description: 'The Bhagavad Gita is a 700-verse Hindu scripture that presents a conversation between Prince Arjuna and Lord Krishna. It teaches the path to spiritual enlightenment and understanding of life\'s purpose.',
+        features: ['Core spiritual teachings', 'Yoga and meditation guidance', 'Path to liberation', 'Divine knowledge', 'Life wisdom', 'Practical spirituality'],
+        toc: ['Chapter 1 - Arjuna\'s Dilemma', 'Chapter 2 - Sankhya Yoga', 'Chapter 3 - Karma Yoga', 'Chapter 4 - Jnana Yoga', 'Chapter 5 - Renunciation', 'Chapter 6-18 - Advanced Teachings']
+      },
+      { 
+        id: 'dev4', 
+        title: 'Upanishads', 
+        author: 'Vedic Texts',
+        subject: 'Vedantic Philosophy',
+        publisher: 'Oxford University Press',
+        year: 2010,
+        edition: 'Collected Volume',
+        pages: 512,
+        language: 'Sanskrit',
+        isbn: '978-0195388022',
+        book_cover: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=400&h=400&fit=crop',
+        description: 'The Upanishads are the philosophical texts that form the foundation of Hindu spiritual thought. They explore the nature of Brahman (ultimate reality) and atman (soul).',
+        features: ['Core Vedantic philosophy', 'Concept of Brahman', 'Self-realization teachings', 'Meditation practices', 'Metaphysical insights', 'Spiritual inquiry'],
+        toc: ['Isha Upanishad', 'Kena Upanishad', 'Katha Upanishad', 'Mundaka Upanishad', 'Mandukya Upanishad', 'Taittiriya Upanishad']
+      },
+      { 
+        id: 'dev5', 
+        title: 'Puranas', 
+        author: 'Hindu Scripture',
+        subject: 'Mythological Literature',
+        publisher: 'American Gita Society',
+        year: 2012,
+        edition: 'Complete Collection',
+        pages: 896,
+        language: 'Hindi',
+        isbn: '978-0964184169',
+        book_cover: 'https://images.unsplash.com/photo-1507842664226-c0b60445f9f2?w=400&h=400&fit=crop',
+        description: 'The Puranas are collections of Hindu mythological stories, legends, and devotional teachings. They contain accounts of gods, goddesses, and ancient civilizations.',
+        features: ['Divine stories and legends', 'Mythology and history', 'Devotional narratives', 'Cultural traditions', 'Moral teachings', 'Goddess worship'],
+        toc: ['Brahmanda Purana', 'Bhagavata Purana', 'Devi Bhagavata', 'Markandeya Purana', 'Skanda Purana', 'Other Major Puranas']
+      },
+      { 
+        id: 'dev6', 
+        title: 'Vedas - Complete Collection', 
+        author: 'Rigveda, Yajurveda, Samaveda, Atharvaveda',
+        subject: 'Vedic Literature',
+        publisher: 'Motilal Banarsidass',
+        year: 2015,
+        edition: 'Scholarly Edition',
+        pages: 1280,
+        language: 'Sanskrit',
+        isbn: '978-8120809871',
+        book_cover: 'https://images.unsplash.com/photo-1507842660631-08d87e60f1af?w=400&h=400&fit=crop',
+        description: 'The Vedas are the oldest sacred texts of Hinduism, consisting of four Vedas containing hymns, rituals, and philosophical knowledge. They form the foundation of Hindu spiritual tradition.',
+        features: ['All four Vedas included', 'Sacred hymns and mantras', 'Ritual procedures', 'Philosophical insights', 'Ancient wisdom', 'Spiritual knowledge'],
+        toc: ['Rigveda - Poetry and Creation', 'Yajurveda - Rituals and Sacrifices', 'Samaveda - Melodies and Songs', 'Atharvaveda - Practical Knowledge']
+      }
     ];
 
     function loadBooks() {

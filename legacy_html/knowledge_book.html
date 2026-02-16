@@ -446,7 +446,7 @@
     }
 
     .reader-warning-list li:before {
-      content: "✓";
+      content: "\2713";
       position: absolute;
       left: 0;
       font-weight: bold;
@@ -494,6 +494,68 @@
       color: #2d3748;
       font-weight: 500;
       margin-top: 4px;
+    }
+
+    .reader-features {
+      background: #f0f9ff;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .reader-features h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #2d3748;
+      margin: 0 0 12px 0;
+    }
+
+    .reader-features ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .reader-features li {
+      padding: 6px 0 6px 24px;
+      position: relative;
+      font-size: 14px;
+      color: #4a5568;
+      line-height: 1.6;
+    }
+
+    .reader-features li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+      color: #0b72b9;
+    }
+
+    .reader-toc {
+      background: #fef3c7;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .reader-toc h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #2d3748;
+      margin: 0 0 12px 0;
+    }
+
+    .reader-toc ol {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .reader-toc li {
+      padding: 4px 0;
+      font-size: 13px;
+      color: #4a5568;
+      line-height: 1.5;
     }
 
     .reader-pdf-action {
@@ -621,7 +683,25 @@
                   <label>Pages</label>
                   <value id="pages">Not Available</value>
                 </div>
+                <div class=\"detail-item\">
+                  <label>Language</label>
+                  <value id=\"language\">Not Available</value>
+                </div>
+                <div class=\"detail-item\">
+                  <label>ISBN</label>
+                  <value id=\"isbn\">Not Available</value>
+                </div>
               </div>
+            </div>
+
+            <div class=\"details-section\" id=\"featuresSection\" style=\"display:none;\">
+              <h3>✨ Key Features</h3>
+              <div class=\"details-list\" id=\"featuresList\"></div>
+            </div>
+
+            <div class=\"details-section\" id=\"tocSection\" style=\"display:none;\">
+              <h3>📝 Table of Contents</h3>
+              <div class=\"details-list\" id=\"tocList\"></div>
             </div>
 
             <!-- Warning Banner -->
@@ -683,7 +763,7 @@
 
         <!-- Book Information -->
         <div class="reader-book-info">
-          <h3>Book Information</h3>
+          <h3>📚 Book Information</h3>
           <div class="reader-book-meta">
             <div class="reader-meta-item">
               <span class="reader-meta-label">Author</span>
@@ -701,9 +781,38 @@
               <span class="reader-meta-label">Year</span>
               <span class="reader-meta-value" id="readerYear">-</span>
             </div>
+            <div class="reader-meta-item">
+              <span class="reader-meta-label">Edition</span>
+              <span class="reader-meta-value" id="readerEdition">-</span>
+            </div>
+            <div class="reader-meta-item">
+              <span class="reader-meta-label">Pages</span>
+              <span class="reader-meta-value" id="readerPages">-</span>
+            </div>
+            <div class="reader-meta-item">
+              <span class="reader-meta-label">Language</span>
+              <span class="reader-meta-value" id="readerLanguage">-</span>
+            </div>
+            <div class="reader-meta-item">
+              <span class="reader-meta-label">ISBN</span>
+              <span class="reader-meta-value" id="readerISBN">-</span>
+            </div>
           </div>
-          <button class="reader-pdf-action" id="openPdfExternal">📄 Open PDF in New Window</button>
         </div>
+
+        <!-- Key Features -->
+        <div class="reader-features" id="readerFeaturesSection" style="display:none;">
+          <h3>✨ Key Features</h3>
+          <ul id="readerFeaturesList"></ul>
+        </div>
+
+        <!-- Table of Contents -->
+        <div class="reader-toc" id="readerTocSection" style="display:none;">
+          <h3>📝 Table of Contents</h3>
+          <ol id="readerTocList"></ol>
+        </div>
+
+        <button class="reader-pdf-action" id="openPdfExternal">📄 Open PDF in New Window</button>
       </div>
     </div>
   </div>
@@ -711,33 +820,113 @@
   <script>
     // Book database with detailed information
     const booksDatabase = {
-      book1: {
-        id: 'book1',
-        title: 'IAS Examination Guide',
-        author: 'Dr. M. Laxmikanth',
-        subject: 'Government & Politics',
-        branch: 'General Knowledge',
+      kb1: {
+        id: 'kb1',
+        title: 'Polity & Governance',
+        author: 'M. Laxmikanth',
+        subject: 'Political Science',
+        branch: 'Knowledge Books',
         publisher: 'McGraw Hill Education',
         year: 2023,
-        edition: '8th Edition',
-        pages: 1200,
-        book_cover: 'https://sp-ao.shortpixel.ai/client/to_auto,q_glossy,ret_img,w_1024/https://shop.chanakyamandal.org/wp-content/uploads/2021/11/WhatsApp-Image-2021-11-19-at-3.06.30-PM-1-1024x1024.jpeg',
-        description: 'Comprehensive guide for IAS examination covering all important topics and current affairs relevant to civil services examination. This book is a must-have for aspirants.',
-        pdf: 'pdfs/ias-guide.pdf'
+        edition: '7th Edition',
+        pages: 850,
+        language: 'English',
+        isbn: '978-9389432398',
+        book_cover: 'https://images.unsplash.com/photo-1589998059171-988d887df646?w=400&h=400&fit=crop',
+        description: 'Comprehensive guide to Indian Polity and Governance covering constitutional framework, political institutions, governance mechanisms, and current affairs related to polity. This authoritative textbook is essential reading for UPSC Civil Services, State PSC, and other competitive exams.',
+        features: ['Complete coverage of Indian Constitution', 'Detailed analysis of political institutions', 'Current affairs and developments', 'Practice questions and papers', 'Simplified language for clarity', 'Latest constitutional changes'],
+        toc: ['Historical Background', 'Constitution Features', 'Preamble', 'Union and Territory', 'Citizenship', 'Fundamental Rights', 'Directive Principles', 'Parliament', 'Executive', 'Judiciary', 'Local Government'],
+        pdf: 'pdfs/polity-governance.pdf'
       },
-      book2: {
-        id: 'book2',
-        title: 'Indian Economy',
-        author: 'Ramesh Singh',
-        subject: 'Economics',
-        branch: 'CSE/Commerce',
-        publisher: 'Pearson',
+      kb2: {
+        id: 'kb2',
+        title: 'Current Affairs 2024-2025',
+        author: 'Editorial Team',
+        subject: 'Current Affairs',
+        branch: 'Knowledge Books',
+        publisher: 'Monthly Briefings Publishing',
+        year: 2024,
+        edition: 'Latest Edition',
+        pages: 450,
+        language: 'English',
+        isbn: '978-9389876543',
+        book_cover: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=400&fit=crop',
+        description: 'Monthly compilation covering national and international events, economic updates, science and technology developments, and important government schemes.',
+        features: ['Monthly updates', 'Economic survey analysis', 'Science and technology advances', 'Government schemes explained', 'Awards and honors', 'Sports current affairs', 'Environment updates', 'Practice MCQs included'],
+        toc: ['National Affairs', 'International Relations', 'Economic Developments', 'Science & Technology', 'Environment & Ecology', 'Government Schemes', 'Sports Updates', 'Awards & Honours', 'Books & Authors', 'Important Days & Dates'],
+        pdf: 'pdfs/current-affairs.pdf'
+      },
+      kb3: {
+        id: 'kb3',
+        title: 'Environment & Ecology',
+        author: 'Environmental Studies Team',
+        subject: 'Environmental Science',
+        branch: 'Knowledge Books',
+        publisher: 'Green Earth Publications',
         year: 2023,
-        edition: '14th Edition',
-        pages: 720,
-        book_cover: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEA...',
-        description: 'Comprehensive coverage of Indian economic policies, growth, inflation, poverty, and development. Perfect for competitive exams and academic study.',
-        pdf: 'pdfs/indian-economy.pdf'
+        edition: '5th Edition',
+        pages: 520,
+        language: 'English',
+        isbn: '978-9389234567',
+        book_cover: 'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=400&h=400&fit=crop',
+        description: 'Detailed study of environment and ecology including ecosystems, biodiversity, climate change, pollution, and conservation efforts.',
+        features: ['Ecosystems and biodiversity coverage', 'Climate change and global warming', 'Pollution types and control', 'Environmental laws and agreements', 'Conservation strategies', 'Sustainable development goals', 'Wildlife protection methods', 'Diagrams and illustrations'],
+        toc: ['Environment Introduction', 'Ecosystems and Biodiversity', 'Natural Resources', 'Climate Change', 'Environmental Pollution', 'Waste Management', 'Environmental Laws', 'Biodiversity Conservation', 'Sustainable Development', 'International Agreements'],
+        pdf: 'pdfs/environment-ecology.pdf'
+      },
+      kb4: {
+        id: 'kb4',
+        title: 'Geography - Physical & Political',
+        author: 'Dr. Khullar',
+        subject: 'Geography',
+        branch: 'Knowledge Books',
+        publisher: 'Kalyani Publishers',
+        year: 2023,
+        edition: '8th Edition',
+        pages: 680,
+        language: 'English',
+        isbn: '978-9389345678',
+        book_cover: 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=400&h=400&fit=crop',
+        description: 'Comprehensive guide covering physical and political geography with topography, climate patterns, resources, and geopolitical aspects.',
+        features: ['Physical geography with detailed maps', 'Political geography and geopolitics', 'Climate and weather patterns', 'Natural resources distribution', 'Population and settlement', 'Economic geography', 'Regional geography', 'World geography focus', 'UPSC exam preparation'],
+        toc: ['Geography Introduction', 'Physical Features of Earth', 'Climate and Weather', 'Vegetation and Wildlife', 'Natural Resources', 'Agriculture and Industries', 'Population Geography', 'Human Settlements', 'Transport and Communication', 'India - Physical Features', 'India - Political Geography', 'World Geography'],
+        pdf: 'pdfs/geography.pdf'
+      },
+      kb5: {
+        id: 'kb5',
+        title: 'Indian History - Ancient to Modern',
+        author: 'Bipan Chandra',
+        subject: 'History',
+        branch: 'Knowledge Books',
+        publisher: 'Orient BlackSwan',
+        year: 2022,
+        edition: '6th Edition',
+        pages: 920,
+        language: 'English',
+        isbn: '978-9389456789',
+        book_cover: 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=400&fit=crop',
+        description: 'Complete overview from ancient civilizations through independence movement. Covers major dynasties, cultural developments, freedom struggle, and nation-building.',
+        features: ['Ancient to modern India coverage', 'Dynasties and empires analysis', 'Cultural and social developments', 'Economic history', 'Freedom struggle details', 'Post-independence analysis', 'Chronological timelines and charts', 'Maps and illustrations', 'Critical historical analysis'],
+        toc: ['Prehistoric and Harappan Civilization', 'Vedic Period', 'Mauryan Empire', 'Post-Mauryan Period', 'Gupta Empire', 'Medieval Delhi Sultanate', 'Mughal Empire', 'Vijayanagara Empire', 'Maratha Empire', 'British India Period', 'Freedom Struggle', 'Post-Independence India'],
+        pdf: 'pdfs/indian-history.pdf'
+      },
+      kb6: {
+        id: 'kb6',
+        title: 'General Knowledge Encyclopedia',
+        author: 'Knowledge Research Team',
+        subject: 'General Knowledge',
+        branch: 'Knowledge Books',
+        publisher: 'Universal Knowledge Press',
+        year: 2024,
+        edition: 'Latest Edition 2024',
+        pages: 750,
+        language: 'English',
+        isbn: '978-9389567890',
+        book_cover: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=400&fit=crop',
+        description: 'Comprehensive GK guide covering science, technology, sports, awards, and important dates. Perfect for competitive exams and general knowledge enhancement.',
+        features: ['GK coverage for all exams', 'Science and technology updates', 'Sports achievements and records', 'Awards and honors', 'Important national and international days', 'World organizations guide', 'Indian states and UTs facts', 'Revision notes for exams', 'Practice questions with answers', 'Updated with 2024 information'],
+        toc: ['Indian Polity and Constitution', 'Indian Economy', 'Geography of India and World', 'Indian History', 'Science and Technology', 'Environment and Ecology', 'Sports', 'Awards and Honors', 'Books and Authors', 'Important Days and Dates', 'International Organizations', 'Indian States and UTs'],
+        pdf: 'pdfs/general-knowledge.pdf'
       }
     };
 
@@ -761,6 +950,8 @@
     const yearEl = document.getElementById('year');
     const editionEl = document.getElementById('edition');
     const pagesEl = document.getElementById('pages');
+    const languageEl = document.getElementById('language');
+    const isbnEl = document.getElementById('isbn');
     const bookImageEl = document.getElementById('bookImage');
     const openBtn = document.getElementById('openPdf');
     const saveBtn = document.getElementById('saveBook');
@@ -774,6 +965,10 @@
     const readerSubject = document.getElementById('readerSubject');
     const readerPublisher = document.getElementById('readerPublisher');
     const readerYear = document.getElementById('readerYear');
+    const readerEdition = document.getElementById('readerEdition');
+    const readerPages = document.getElementById('readerPages');
+    const readerLanguage = document.getElementById('readerLanguage');
+    const readerISBN = document.getElementById('readerISBN');
     const openPdfExternal = document.getElementById('openPdfExternal');
 
     if (!book) {
@@ -794,18 +989,61 @@
       publisherEl.textContent = book.publisher || 'Not Available';
       yearEl.textContent = book.year || 'Not Available';
       editionEl.textContent = book.edition || 'Not Available';
-      pagesEl.textContent = book.pages || 'Not Available';
+      pagesEl.textContent = book.pages ? `${book.pages} Pages` : 'Not Available';
+      languageEl.textContent = book.language || 'English';
+      isbnEl.textContent = book.isbn || 'Not Available';
       bookImageEl.src = book.book_cover;
       saveBtn.setAttribute('data-id', book.id);
+      
+      // Populate features
+      if (book.features && book.features.length > 0) {
+        const featuresList = document.getElementById('featuresList');
+        featuresList.innerHTML = book.features.map(feature => `<div class=\"detail-item\"><li style=\"color:#0b72b9; font-weight:600; display:inline;\">✓</li><span style=\"margin-left:10px;\">${feature}</span></div>`).join('');
+        document.getElementById('featuresSection').style.display = 'block';
+      } else {
+        document.getElementById('featuresSection').style.display = 'none';
+      }
+      
+      // Populate table of contents
+      if (book.toc && book.toc.length > 0) {
+        const tocList = document.getElementById('tocList');
+        tocList.innerHTML = book.toc.map((chapter, idx) => `<div class=\"detail-item\"><span style=\"font-weight:700; color:#0b72b9; display:inline-block; width:30px;\">${idx + 1}.</span><span>${chapter}</span></div>`).join('');
+        document.getElementById('tocSection').style.display = 'block';
+      } else {
+        document.getElementById('tocSection').style.display = 'none';
+      }
 
       // Open PDF button - Show Reader Modal
       openBtn.addEventListener('click', function() {
         if (book.pdf && book.pdf !== '#') {
           readerTitle.textContent = book.title;
           readerAuthor.textContent = book.author;
-          readerSubject.textContent = book.subject;
+          readerSubject.textContent = book.subject || '-';
           readerPublisher.textContent = book.publisher || 'Not Available';
           readerYear.textContent = book.year || 'Not Available';
+          readerEdition.textContent = book.edition || 'Not Available';
+          readerPages.textContent = book.pages ? `${book.pages} Pages` : 'Not Available';
+          readerLanguage.textContent = book.language || 'English';
+          readerISBN.textContent = book.isbn || 'Not Available';
+          
+          // Populate features
+          if (book.features && book.features.length > 0) {
+            const featuresList = document.getElementById('readerFeaturesList');
+            featuresList.innerHTML = book.features.map(feature => `<li>${feature}</li>`).join('');
+            document.getElementById('readerFeaturesSection').style.display = 'block';
+          } else {
+            document.getElementById('readerFeaturesSection').style.display = 'none';
+          }
+          
+          // Populate table of contents
+          if (book.toc && book.toc.length > 0) {
+            const tocList = document.getElementById('readerTocList');
+            tocList.innerHTML = book.toc.map(chapter => `<li>${chapter}</li>`).join('');
+            document.getElementById('readerTocSection').style.display = 'block';
+          } else {
+            document.getElementById('readerTocSection').style.display = 'none';
+          }
+          
           openPdfExternal.setAttribute('data-pdf', book.pdf);
           readerModal.classList.add('active');
         } else {
@@ -871,3 +1109,4 @@
   </script>
 </body>
 </html>
+

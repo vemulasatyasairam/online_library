@@ -376,6 +376,12 @@
     <section class="content" aria-label="Books content">
       <h2 style="margin:0 0 6px 8px">Books</h2>
 
+      <!-- Most Viewed Books Section -->
+      <div id="mostViewedSection" style="margin-bottom:24px;display:none;">
+        <h3 style="margin:0 0 12px 8px;color:var(--accent);font-size:18px">📊 Most Viewed Books</h3>
+        <div id="mostViewedGrid" class="book-grid"></div>
+      </div>
+
       <div class="category-links">
         <a class="category-link" href="knowledgebooks.html">📚 Knowledge Books</a>
         <a class="category-link" href="devotional.html">🕉️ Devotional</a>
@@ -591,72 +597,164 @@
     })();
   </script>
 
-  <!-- Book View Tracking Script -->
+  <!-- Book View Tracking and Most Viewed Books Script -->
   <script>
     (function() {
-      // Track book views when user clicks on book cards
-      function trackBookView(bookCard) {
+      const API_URL = 'http://localhost:5000/api';
+
+      // Fetch and display most viewed books
+      async function loadMostViewedBooks() {
+        try {
+          const response = await fetch(`${API_URL}/books/most-viewed?limit=8`);
+          const data = await response.json();
+
+          if (data.ok && data.books && data.books.length > 0) {
+            const mostViewedGrid = document.getElementById('mostViewedGrid');
+            const mostViewedSection = document.getElementById('mostViewedSection');
+            
+            mostViewedGrid.innerHTML = '';
+
+            data.books.forEach(book => {
+              const bookCard = createBookCard(book);
+              mostViewedGrid.appendChild(bookCard);
+            });
+
+            mostViewedSection.style.display = 'block';
+            
+            // Add click tracking to dynamically loaded books
+            attachClickTracking();
+          }
+        } catch (error) {
+          console.error('Error loading most viewed books:', error);
+        }
+      }
+
+      // Create book card element
+      function createBookCard(book) {
+        const article = document.createElement('article');
+        article.className = 'book-card';
+        article.setAttribute('data-book-id', book._id || book.id);
+
+        const figure = document.createElement('figure');
+        const link = document.createElement('a');
+        link.href = `book.html?id=${book._id || book.id}`;
+
+        const img = document.createElement('img');
+        img.src = book.coverImage || 'https://via.placeholder.com/180x220?text=No+Cover';
+        img.alt = book.title;
+        img.style.width = '100%';
+        img.style.height = '220px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '8px';
+
+        link.appendChild(img);
+        figure.appendChild(link);
+
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+
+        const title = document.createElement('h3');
+        title.textContent = book.title;
+
+        const details = document.createElement('p');
+        details.textContent = `${book.author || 'Unknown'} — ${book.branch || book.subject || 'General'}`;
+
+        const viewCount = document.createElement('p');
+        viewCount.style.fontSize = '12px';
+        viewCount.style.color = 'var(--muted)';
+        viewCount.textContent = `👁 ${book.views || 0} views`;
+
+        meta.appendChild(title);
+        meta.appendChild(details);
+        meta.appendChild(viewCount);
+
+        article.appendChild(figure);
+        article.appendChild(meta);
+
+        return article;
+      }
+
+      // Track book view via API
+      async function trackBookView(bookCard) {
         const userData = localStorage.getItem('currentUser');
         if (!userData) return;
         
-        const user = typeof userData === 'string' ? 
-          (userData.startsWith('{') ? JSON.parse(userData) : { email: userData }) : 
-          userData;
-        
-        // Get book details from the card
         const bookId = bookCard.getAttribute('data-book-id');
-        const titleElement = bookCard.querySelector('h3');
-        const metaElement = bookCard.querySelector('p');
-        
-        const title = titleElement ? titleElement.textContent.trim() : 'Unknown';
-        let author = 'Unknown';
-        let category = 'General';
-        
-        if (metaElement && metaElement.textContent.includes('—')) {
-          const parts = metaElement.textContent.split('—');
-          author = parts[0].trim();
-          category = parts[1].trim();
+        if (!bookId) return;
+
+        try {
+          // Track in backend
+          await fetch(`${API_URL}/books/${bookId}/track-view`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+
+          // Also store locally for offline tracking
+          const user = typeof userData === 'string' ? 
+            (userData.startsWith('{') ? JSON.parse(userData) : { email: userData }) : 
+            userData;
+          
+          const titleElement = bookCard.querySelector('h3');
+          const metaElement = bookCard.querySelector('p');
+          
+          const title = titleElement ? titleElement.textContent.trim() : 'Unknown';
+          let author = 'Unknown';
+          let category = 'General';
+          
+          if (metaElement && metaElement.textContent.includes('—')) {
+            const parts = metaElement.textContent.split('—');
+            author = parts[0].trim();
+            category = parts[1].trim();
+          }
+          
+          const viewedBooks = JSON.parse(localStorage.getItem('viewedBooks') || '[]');
+          
+          viewedBooks.push({
+            userId: user.email,
+            bookId: bookId,
+            title: title,
+            author: author,
+            category: category,
+            viewedAt: new Date().toISOString()
+          });
+          
+          if (viewedBooks.length > 1000) {
+            viewedBooks.splice(0, viewedBooks.length - 1000);
+          }
+          localStorage.setItem('viewedBooks', JSON.stringify(viewedBooks));
+        } catch (error) {
+          console.error('Error tracking book view:', error);
         }
-        
-        // Get existing viewed books
-        const viewedBooks = JSON.parse(localStorage.getItem('viewedBooks') || '[]');
-        
-        // Add new view
-        viewedBooks.push({
-          userId: user.email,
-          bookId: bookId,
-          title: title,
-          author: author,
-          category: category,
-          viewedAt: new Date().toISOString()
-        });
-        
-        // Save back to localStorage (keep last 1000 entries to avoid storage issues)
-        if (viewedBooks.length > 1000) {
-          viewedBooks.splice(0, viewedBooks.length - 1000);
-        }
-        localStorage.setItem('viewedBooks', JSON.stringify(viewedBooks));
       }
-      
-      // Add click listeners to all book card links
-      document.querySelectorAll('.book-card a').forEach(link => {
-        link.addEventListener('click', function(e) {
-          const bookCard = this.closest('.book-card');
-          if (bookCard) {
-            trackBookView(bookCard);
-          }
+
+      // Attach click tracking to all book cards
+      function attachClickTracking() {
+        document.querySelectorAll('.book-card a').forEach(link => {
+          link.addEventListener('click', function(e) {
+            const bookCard = this.closest('.book-card');
+            if (bookCard) {
+              trackBookView(bookCard);
+            }
+          });
         });
-      });
-      
-      // Also track when book cards themselves are clicked
-      document.querySelectorAll('.book-card').forEach(card => {
-        card.addEventListener('click', function(e) {
-          // Only track if not clicking a button or already clicking a link
-          if (!e.target.closest('button') && !e.target.closest('a')) {
-            trackBookView(this);
-          }
+        
+        document.querySelectorAll('.book-card').forEach(card => {
+          card.addEventListener('click', function(e) {
+            if (!e.target.closest('button') && !e.target.closest('a')) {
+              trackBookView(this);
+            }
+          });
         });
-      });
+      }
+
+      // Initialize
+      loadMostViewedBooks();
+      attachClickTracking();
+
+      // Refresh most viewed books every 5 minutes
+      setInterval(loadMostViewedBooks, 5 * 60 * 1000);
     })();
   </script>
   </body>

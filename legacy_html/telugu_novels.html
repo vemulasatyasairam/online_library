@@ -365,12 +365,102 @@
 
   <script>
     const teluguBooks = [
-      { id: 'tl1', title: 'ప్రజా కథలు', author: 'Popular contemporary stories', book_cover: 'https://via.placeholder.com/220x240?text=Praja+Kathalu' },
-      { id: 'tl2', title: 'గ్రామ్య కథలు', author: 'Rural narratives & classics', book_cover: 'https://via.placeholder.com/220x240?text=Gramya+Kathalu' },
-      { id: 'tl3', title: 'చారిత్ర నవలలు', author: 'Historical novels', book_cover: 'https://via.placeholder.com/220x240?text=Charitra+Navalu' },
-      { id: 'tl4', title: 'ప్రేమ కథలు', author: 'Love stories', book_cover: 'https://via.placeholder.com/220x240?text=Prema+Kathalu' },
-      { id: 'tl5', title: 'సాహిత్య కృతులు', author: 'Literary classics', book_cover: 'https://via.placeholder.com/220x240?text=Sahitya+Krutulu' },
-      { id: 'tl6', title: 'సంక్షిప్త కథలు', author: 'Short stories collection', book_cover: 'https://via.placeholder.com/220x240?text=Short+Stories' }
+      { 
+        id: 'tl1', 
+        title: 'చందమామ కథలు', 
+        author: 'ఆ. మాధవయ్య',
+        subject: 'Short Stories',
+        publisher: 'విజయ పబ్లిషర్‌లు',
+        year: 2008,
+        edition: 'Second Edition',
+        pages: 240,
+        language: 'Telugu',
+        isbn: '978-8171637893',
+        book_cover: 'https://images.unsplash.com/photo-1507842664226-c0b60445f9f2?w=400&h=400&fit=crop',
+        description: 'చందమామ కథలు విజయవాడ నుండి ప్రచురితమైన లుకుసూసు ఆ. మాధవయ్య రచన. వివిధ విషయాలపై ఆసక్తికరమైన కథల సంకలనం.',
+        features: ['ఆసక్తికరమైన కథలు', 'సాధారణ భాష', 'జీవన సంబంధ అనుభవాలు', 'నైతిక శిక్ష', 'చదువుకు ఉపయోగకరం', 'ఆనందకరమైన చదువు'],
+        toc: ['మొదటి కథ - చందమామ', 'రెండవ కథ - నక్క కందర', 'మూడవ కథ - జీవిత సూత్రాలు', 'నాలుగవ కథ - ప్రేమ కథ', 'ఐదవ కథ - జ్ఞానం', 'ఆరవ కథ - నిర్ణయం']
+      },
+      { 
+        id: 'tl2', 
+        title: 'గ్రామ్య వర్ణనలు', 
+        author: 'ఉప్పిరాలు ఉందిరెడ్డి',
+        subject: 'Rural Narratives',
+        publisher: 'విశ్వ నిర्मാణ కమిటీ',
+        year: 2010,
+        edition: 'First Edition',
+        pages: 320,
+        language: 'Telugu',
+        isbn: '978-8171637909',
+        book_cover: 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=400&h=400&fit=crop',
+        description: 'గ్రామీణ పరిసరాల ఆధారిత రచనలు. గpueblolo జీవితం, సంస్కృతి, మరియు సామాజిక సన్నివేశాల వర్ణన.',
+        features: ['గ్రామీణ జీవితం', 'సాంస్కృతిక విషయాలు', 'సామాజిక సంदేశ', 'స్థానీయ ఐతిహ్యం', 'ఆధ్యాత్మిక ఆలోచనలు', 'నిర్ధార్ధక రచన'],
+        toc: ['అధ్యాయం 1 - గ్రామం', 'అధ్యాయం 2 - సంస్కృతి', 'అధ్యాయం 3 - ఐతిహ్యం', 'అధ్యాయం 4 - సమాజం', 'అధ్యాయం 5 - రీతిరుவాగులు', 'అధ్యాయం 6 - ముగింపు']
+      },
+      { 
+        id: 'tl3', 
+        title: 'చారిత్ర నవలలు', 
+        author: 'కందుకూరి సీతారామశర్మ',
+        subject: 'Historical Novels',
+        publisher: 'సరస్వతి సదనం',
+        year: 2009,
+        edition: 'Revised Edition',
+        pages: 400,
+        language: 'Telugu',
+        isbn: '978-8180301859',
+        book_cover: 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=400&fit=crop',
+        description: 'టెలుగు చరిత్ర ఆధారిత నవలలు. రాజు, సమ్రాట్‌ల కథలు మరియు చారిత్రక సంఘటనలు.',
+        features: ['చారిత్రక ఖచ్చితత్వం', 'రాజ కథలు', 'సంఘటనలకు నిర్ధారణ', 'లేఖన కళ', 'చరిత్ర జ్ఞానం', 'శృంగార నవల'],
+        toc: ['భాగం 1 - శాసన కాలం', 'భాగం 2 - సంఘటన కాలం', 'భాగం 3 - రాజ్య నిర్మాణం', 'భాగం 4 - సంఘర్ష', 'భాగం 5 - విజయం', 'భాగం 6 - పరిణామం']
+      },
+      { 
+        id: 'tl4', 
+        title: 'ప్రేమ కథలు', 
+        author: 'రన్గయ్య',
+        subject: 'Love Stories',
+        publisher: 'కాళిందీ పబ్లిషర్‌లు',
+        year: 2011,
+        edition: 'Popular Edition',
+        pages: 280,
+        language: 'Telugu',
+        isbn: '978-8187530930',
+        book_cover: 'https://images.unsplash.com/photo-1507842664226-c0b60445f9f2?w=400&h=400&fit=crop',
+        description: 'తెలుగు సాహిత్యంలో ప్రేమ కథల సంకలనం. కుటుంబ సంబంధాలు, రోమాంచక వర్ణనలు మరియు హృదయ స్పర్శ కథలు.',
+        features: ['ప్రేమ వర్ణన', 'సంబంధ విశ్లేషణ', 'భావనాత్మক లఘువృత్తాలు', 'బిందువులతో నిర్ణయం', 'హృదయ స్పర్శక', 'జీవన సత్్యం'],
+        toc: ['కథ 1 - మొదటి చూపు', 'కథ 2 - వ్యవహార సంబంధం', 'కథ 3 - కుటుంబ విరోధం', 'కథ 4 - సమ్మతి', 'కథ 5 - సఖ్య బంధం', 'కథ 6 - చివరి కఠిన సిద్ధాంతం']
+      },
+      { 
+        id: 'tl5', 
+        title: 'సాహిత్య కృతులు', 
+        author: 'దేవుళ్ల',
+        subject: 'Literary Classics',
+        publisher: 'విజయ నీడ',
+        year: 2012,
+        edition: 'Collectors Edition',
+        pages: 450,
+        language: 'Telugu',
+        isbn: '978-8180307288',
+        book_cover: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=400&fit=crop',
+        description: 'తెలుగు సాహిత్యం యొక్క అప్పుటి నిరూపణ, ఆధ్యాత్మిక ఆలోచనలు మరియు ఆనందకర కలా రూపం.',
+        features: ['కాव్య కలా', 'సాహిత్యిక ప్రయోగం', 'ఆధ్యాత్మిక ఆంశాలు', 'మానవ సంబంధాలు', 'సాংస్కృతిక సిద్ధాంతం', 'సర్వకాల విషయాలు'],
+        toc: ['అధ్యాయం 1 - కాव్య సూత్రం', 'అధ్యాయం 2 - ప్రస్థానం', 'అధ్యాయం 3 - అభ్యాసం', 'అధ్యాయం 4 - మరియు అర్థం', 'అధ్యాయం 5 - ఎదుమకోసం', 'అధ్యాయం 6 - అంతిమ విశ్లేషణ']
+      },
+      { 
+        id: 'tl6', 
+        title: 'సంక్షిప్త కథల సంకలనం', 
+        author: 'మట్ట వెంకట్‌లక్ష్మీ',
+        subject: 'Short Stories Collection',
+        publisher: 'రమేశయ్య పబ్లిషర్‌లు',
+        year: 2013,
+        edition: 'New Edition',
+        pages: 320,
+        language: 'Telugu',
+        isbn: '978-8180306531',
+        book_cover: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=400&fit=crop',
+        description: 'ఈ సంకలనం ఆర్థిక, సామాజిక మరియు కుటుంబ సంబంధాల ఆధారిత సంక్షిప్త కథలను కలిగి ఉంది.',
+        features: ['సంక్షిప్తతర కథలు', 'సరళ ఆలోచనలు', 'జీవన సంబంధ అభిజ్ఞానం', 'నిరీక్షణీయ చివరులు', 'భాషా సరళత', 'చదువు ఉపయోగకరమైన'],
+        toc: ['కథ 1 - ప్రారంభం', 'కథ 2 - ఎదుమ', 'కథ 3 - సంఘర్ష', 'కథ 4 - సమాధానం', 'కథ 5 - జ్ఞానం', 'కథ 6 - ముగింపు']
+      }
     ];
 
     function loadBooks() {

@@ -365,12 +365,102 @@
 
   <script>
     const storyBooks = [
-      { id: 'es1', title: 'The Little Fox', author: 'Easy reader with illustrations', book_cover: 'https://via.placeholder.com/220x240?text=The+Little+Fox' },
-      { id: 'es2', title: 'Comic Pack', author: 'Short comics to build vocabulary', book_cover: 'https://via.placeholder.com/220x240?text=Comic+Pack' },
-      { id: 'es3', title: 'Fairy Tales', author: 'Classic stories retold', book_cover: 'https://via.placeholder.com/220x240?text=Fairy+Tales' },
-      { id: 'es4', title: 'Adventure Series', author: 'Graded readers for learning', book_cover: 'https://via.placeholder.com/220x240?text=Adventure' },
-      { id: 'es5', title: 'Short Stories Collection', author: 'Oxford Bookworms', book_cover: 'https://via.placeholder.com/220x240?text=Short+Stories' },
-      { id: 'es6', title: 'Modern Tales', author: 'Contemporary English writing', book_cover: 'https://via.placeholder.com/220x240?text=Modern+Tales' }
+      { 
+        id: 'es1', 
+        title: 'The Little Fox', 
+        author: 'Classic Children\'s Tales',
+        subject: 'Children\'s Stories',
+        publisher: 'Oxford University Press',
+        year: 2020,
+        edition: 'Illustrated Edition',
+        pages: 96,
+        language: 'English',
+        isbn: '978-0194234889',
+        book_cover: 'https://images.unsplash.com/photo-1503527013474-95f7e32f310d?w=400&h=400&fit=crop',
+        description: 'A delightful children\'s story about a clever little fox with wonderful illustrations. Perfect for early readers and language learning with simple vocabulary.',
+        features: ['Easy vocabulary', 'Beautiful illustrations', 'Engaging story', 'Language learning', 'Vocabulary building', 'Reading comprehension'],
+        toc: ['Chapter 1 - Meeting the Fox', 'Chapter 2 - The Adventure Begins', 'Chapter 3 - Forest Friends', 'Chapter 4 - The Mystery', 'Chapter 5 - Happy Ending']
+      },
+      { 
+        id: 'es2', 
+        title: 'Comic Collection Pack', 
+        author: 'Various Illustrators',
+        subject: 'Comics & Graphic Novels',
+        publisher: 'Pearson',
+        year: 2021,
+        edition: 'First Edition',
+        pages: 128,
+        language: 'English',
+        isbn: '978-0194588935',
+        book_cover: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=400&fit=crop',
+        description: 'Entertaining comic stories to build vocabulary and reading confidence. Features colorful illustrations, humor, and relatable characters for language learners.',
+        features: ['Visual storytelling', 'Comic format', 'Humor and fun', 'Vocabulary building', 'Easy English', 'Engaging visuals'],
+        toc: ['Story 1 - The Adventure', 'Story 2 - The Secret', 'Story 3 - New Friends', 'Story 4 - The Challenge', 'Story 5 - Victory', 'Story 6 - The Party']
+      },
+      { 
+        id: 'es3', 
+        title: 'Classic Fairy Tales', 
+        author: 'Hans Christian Andersen & Brothers Grimm',
+        subject: 'Folk Tales',
+        publisher: 'Dover Publications',
+        year: 2022,
+        edition: 'Collector\'s Edition',
+        pages: 256,
+        language: 'English',
+        isbn: '978-0486814551',
+        book_cover: 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=400&fit=crop',
+        description: 'Timeless fairy tales retold in modern English. Includes classics like Cinderella, Snow White, and Sleeping Beauty with engaging narratives.',
+        features: ['Classic stories', 'Modern retelling', 'Fairy tale themes', 'Moral lessons', 'Imaginative narratives', 'Universal themes'],
+        toc: ['Cinderella', 'Snow White and the Seven Dwarfs', 'Sleeping Beauty', 'The Little Red Riding Hood', 'Hansel and Gretel', 'The Ugly Duckling']
+      },
+      { 
+        id: 'es4', 
+        title: 'Adventure Series', 
+        author: 'Graded Reading Program',
+        subject: 'Adventure Stories',
+        publisher: 'Macmillan Readers',
+        year: 2023,
+        edition: '2nd Edition',
+        pages: 208,
+        language: 'English',
+        isbn: '978-0230402935',
+        book_cover: 'https://images.unsplash.com/photo-1507842664226-c0b60445f9f2?w=400&h=400&fit=crop',
+        description: 'A series of graded adventure stories for English learners. Features action-packed narratives with vocabulary progression for intermediate students.',
+        features: ['Graded difficulty', 'Adventure themes', 'Progressive vocabulary', 'Action-packed', 'Learning activities', 'Glossaries included'],
+        toc: ['Story 1 - The Lost City', 'Story 2 - Mountain Challenge', 'Story 3 - Ocean Mystery', 'Story 4 - Desert Quest', 'Story 5 - Jungle Adventure', 'Story 6 - Final Victory']
+      },
+      { 
+        id: 'es5', 
+        title: 'Short Stories Collection', 
+        author: 'Oxford Bookworms',
+        subject: 'Short Stories',
+        publisher: 'Oxford University Press',
+        year: 2021,
+        edition: 'Student Edition',
+        pages: 176,
+        language: 'English',
+        isbn: '978-0194792615',
+        book_cover: 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=400&h=400&fit=crop',
+        description: 'Collection of award-winning short stories using controlled vocabulary for English learners. Perfect for building reading skills and cultural understanding.',
+        features: ['Short stories', 'Controlled vocabulary', 'Cultural themes', 'Reading comprehension', 'Cultural insights', 'Discussion questions'],
+        toc: ['Story 1 - Love and Loyalty', 'Story 2 - The Wish', 'Story 3 - Justice', 'Story 4 - Courage', 'Story 5 - Discovery', 'Story 6 - Change']
+      },
+      { 
+        id: 'es6', 
+        title: 'Modern English Tales', 
+        author: 'Contemporary Writers',
+        subject: 'Contemporary Fiction',
+        publisher: 'Penguin Readers',
+        year: 2022,
+        edition: 'First Edition',
+        pages: 240,
+        language: 'English',
+        isbn: '978-0143333197',
+        book_cover: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=400&fit=crop',
+        description: 'Modern English stories featuring today\'s world and contemporary themes. Written in accessible English with relatable characters and situations for learners.',
+        features: ['Modern themes', 'Contemporary setting', 'Relatable characters', 'Current issues', 'Natural dialogue', 'Real-world context'],
+        toc: ['Story 1 - City Dreams', 'Story 2 - Digital Love', 'Story 3 - Career Change', 'Story 4 - Family Secrets', 'Story 5 - New Beginnings', 'Story 6 - Life Lessons']
+      }
     ];
 
     function loadBooks() {

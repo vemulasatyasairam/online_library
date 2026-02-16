@@ -365,12 +365,102 @@
 
   <script>
     const knowledgeBooks = [
-      { id: 'kb1', title: 'Polity & Governance', author: 'M. Laxmikanth', book_cover: 'https://via.placeholder.com/220x240?text=Polity' },
-      { id: 'kb2', title: 'Current Affairs', author: 'Monthly briefings', book_cover: 'https://via.placeholder.com/220x240?text=Current+Affairs' },
-      { id: 'kb3', title: 'Environment', author: 'Case studies & diagrams', book_cover: 'https://via.placeholder.com/220x240?text=Environment' },
-      { id: 'kb4', title: 'Geography', author: 'Physical & Political', book_cover: 'https://via.placeholder.com/220x240?text=Geography' },
-      { id: 'kb5', title: 'History', author: 'Ancient to Modern India', book_cover: 'https://via.placeholder.com/220x240?text=History' },
-      { id: 'kb6', title: 'General Knowledge', author: 'Comprehensive guide', book_cover: 'https://via.placeholder.com/220x240?text=GK' }
+      { 
+        id: 'kb1', 
+        title: 'Polity & Governance', 
+        author: 'M. Laxmikanth',
+        subject: 'Political Science',
+        publisher: 'McGraw Hill Education',
+        year: 2023,
+        edition: '7th Edition',
+        pages: 850,
+        language: 'English',
+        isbn: '978-9389432398',
+        book_cover: 'https://images.unsplash.com/photo-1589998059171-988d887df646?w=400&h=400&fit=crop',
+        description: 'Comprehensive guide to Indian Polity and Governance covering constitutional framework, political institutions, governance mechanisms, and current affairs related to polity.',
+        features: ['Complete coverage of Indian Constitution', 'Political institutions and governance', 'Current affairs and developments', 'Practice questions', 'Simplified language', 'Latest constitutional changes'],
+        toc: ['Historical Background', 'Constitution Features', 'Preamble', 'Union Territory', 'Citizenship', 'Fundamental Rights', 'Directive Principles', 'Parliament', 'Executive', 'Judiciary', 'Local Government']
+      },
+      { 
+        id: 'kb2', 
+        title: 'Current Affairs 2024-2025', 
+        author: 'Editorial Team',
+        subject: 'Current Affairs',
+        publisher: 'Monthly Briefings Publishing',
+        year: 2024,
+        edition: 'Latest Edition',
+        pages: 450,
+        language: 'English',
+        isbn: '978-9389876543',
+        book_cover: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=400&fit=crop',
+        description: 'Monthly compilation covering national and international events, economic updates, science and technology developments.',
+        features: ['Monthly updates', 'Economic survey analysis', 'Science advances', 'Government schemes', 'Awards and honors', 'Sports affairs', 'Environment updates', 'Practice MCQs'],
+        toc: ['National Affairs', 'International Relations', 'Economic Developments', 'Science & Technology', 'Environment', 'Government Schemes', 'Sports', 'Awards', 'Books & Authors', 'Important Days']
+      },
+      { 
+        id: 'kb3', 
+        title: 'Environment & Ecology', 
+        author: 'Environmental Studies Team',
+        subject: 'Environmental Science',
+        publisher: 'Green Earth Publications',
+        year: 2023,
+        edition: '5th Edition',
+        pages: 520,
+        language: 'English',
+        isbn: '978-9389234567',
+        book_cover: 'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=400&h=400&fit=crop',
+        description: 'Detailed study of environment and ecology including ecosystems, biodiversity, climate change, pollution, and conservation efforts.',
+        features: ['Ecosystems and biodiversity', 'Climate change analysis', 'Pollution control', 'Environmental laws', 'Conservation strategies', 'Sustainable development', 'Wildlife protection', 'Illustrations and diagrams'],
+        toc: ['Environment Introduction', 'Ecosystems', 'Natural Resources', 'Climate Change', 'Pollution', 'Waste Management', 'Environmental Laws', 'Biodiversity Conservation', 'Sustainable Development', 'International Agreements']
+      },
+      { 
+        id: 'kb4', 
+        title: 'Geography - Physical & Political', 
+        author: 'Dr. Khullar',
+        subject: 'Geography',
+        publisher: 'Kalyani Publishers',
+        year: 2023,
+        edition: '8th Edition',
+        pages: 680,
+        language: 'English',
+        isbn: '978-9389345678',
+        book_cover: 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=400&h=400&fit=crop',
+        description: 'Comprehensive guide covering physical and political geography with topography, climate patterns, resources, and geopolitical aspects.',
+        features: ['Physical geography with maps', 'Political geography', 'Climate and weather', 'Natural resources', 'Population patterns', 'Economic geography', 'Regional geography', 'World geography', 'UPSC exam focused'],
+        toc: ['Geography Introduction', 'Earth Features', 'Climate and Weather', 'Vegetation and Wildlife', 'Natural Resources', 'Agriculture and Industries', 'Population', 'Human Settlements', 'Transport', 'India Physical', 'India Political', 'World Geography']
+      },
+      { 
+        id: 'kb5', 
+        title: 'Indian History - Ancient to Modern', 
+        author: 'Bipan Chandra',
+        subject: 'History',
+        publisher: 'Orient BlackSwan',
+        year: 2022,
+        edition: '6th Edition',
+        pages: 920,
+        language: 'English',
+        isbn: '978-9389456789',
+        book_cover: 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=400&fit=crop',
+        description: 'Complete overview from ancient civilizations through independence movement. Covers dynasties, cultural developments, freedom struggle, and nation-building.',
+        features: ['Ancient to modern India', 'Dynasties and empires', 'Cultural developments', 'Economic history', 'Freedom struggle', 'Post-independence', 'Timelines and charts', 'Maps and illustrations', 'Critical analysis'],
+        toc: ['Prehistoric Civilization', 'Vedic Period', 'Mauryan Empire', 'Post-Mauryan', 'Gupta Empire', 'Delhi Sultanate', 'Mughal Empire', 'Vijayanagara', 'Maratha Empire', 'British India', 'Freedom Struggle', 'Independence']
+      },
+      { 
+        id: 'kb6', 
+        title: 'General Knowledge Encyclopedia', 
+        author: 'Knowledge Research Team',
+        subject: 'General Knowledge',
+        publisher: 'Universal Knowledge Press',
+        year: 2024,
+        edition: 'Latest Edition 2024',
+        pages: 750,
+        language: 'English',
+        isbn: '978-9389567890',
+        book_cover: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=400&fit=crop',
+        description: 'Comprehensive GK guide covering science, technology, sports, awards, dates, and organizations. Perfect for competitive exams.',
+        features: ['GK for all exams', 'Science and technology', 'Sports records', 'Awards and honors', 'Important dates', 'World organizations', 'Indian states facts', 'Revision notes', 'Practice questions', '2024 updates'],
+        toc: ['Indian Polity', 'Indian Economy', 'Geography', 'Indian History', 'Science & Technology', 'Environment', 'Sports', 'Awards', 'Books & Authors', 'Important Dates', 'Organizations', 'Indian States']
+      }
     ];
 
     function loadBooks() {

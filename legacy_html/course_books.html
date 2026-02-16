@@ -365,12 +365,102 @@
 
   <script>
     const courseBooks = [
-      { id: 'py1', title: 'Python Basics', author: 'Beginner to intermediate projects', book_cover: 'https://via.placeholder.com/220x240?text=Python+Basics' },
-      { id: 'py2', title: 'Advanced Python', author: 'Advanced techniques and patterns', book_cover: 'https://via.placeholder.com/220x240?text=Advanced+Python' },
-      { id: 'web1', title: 'Web Development', author: 'HTML, CSS, JavaScript hands-on', book_cover: 'https://via.placeholder.com/220x240?text=Web+Dev' },
-      { id: 'web2', title: 'React Fundamentals', author: 'Learn React from scratch', book_cover: 'https://via.placeholder.com/220x240?text=React' },
-      { id: 'java1', title: 'Java Programming', author: 'Object-oriented programming', book_cover: 'https://via.placeholder.com/220x240?text=Java' },
-      { id: 'db1', title: 'Database Design', author: 'SQL and NoSQL fundamentals', book_cover: 'https://via.placeholder.com/220x240?text=Databases' }
+      { 
+        id: 'py1', 
+        title: 'Python Basics', 
+        author: 'Mark Lutz',
+        subject: 'Programming',
+        publisher: 'O\'Reilly Media',
+        year: 2023,
+        edition: '5th Edition',
+        pages: 768,
+        language: 'English',
+        isbn: '978-1491954936',
+        book_cover: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=400&fit=crop',
+        description: 'Comprehensive guide to Python programming from basics to intermediate level. Covers variables, data types, functions, loops, and object-oriented programming with practical examples.',
+        features: ['Variables and data types', 'Control flow statements', 'Functions and modules', 'File handling', 'Error handling', 'Practical projects'],
+        toc: ['Chapter 1 - Getting Started', 'Chapter 2 - Variables and Types', 'Chapter 3 - Operators', 'Chapter 4 - Control Structures', 'Chapter 5 - Functions', 'Chapter 6-10 - Advanced Topics']
+      },
+      { 
+        id: 'py2', 
+        title: 'Advanced Python', 
+        author: 'Luciano Ramalho',
+        subject: 'Advanced Programming',
+        publisher: 'O\'Reilly Media',
+        year: 2022,
+        edition: '2nd Edition',
+        pages: 744,
+        language: 'English',
+        isbn: '978-1492056348',
+        book_cover: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=400&fit=crop',
+        description: 'Deep dive into Python\'s advanced features. Covers decorators, metaclasses, async/await, type hints, and performance optimization techniques.',
+        features: ['Decorators and closures', 'Metaclasses', 'Async/Await patterns', 'Type hints', 'Performance optimization', 'Design patterns'],
+        toc: ['Chapter 1 - Data Structures', 'Chapter 2 - Functions', 'Chapter 3 - Classes and Objects', 'Chapter 4 - Decorators', 'Chapter 5 - Async Programming', 'Chapter 6-8 - Advanced Patterns']
+      },
+      { 
+        id: 'web1', 
+        title: 'Web Development Fundamentals', 
+        author: 'Jon Duckett',
+        subject: 'Web Development',
+        publisher: 'Wiley',
+        year: 2023,
+        edition: '1st Edition',
+        pages: 624,
+        language: 'English',
+        isbn: '978-1119398684',
+        book_cover: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=400&fit=crop',
+        description: 'Complete guide to web development with HTML, CSS, and JavaScript. Includes responsive design, accessibility, and modern web standards with hands-on practice.',
+        features: ['HTML structure and semantics', 'CSS styling and layouts', 'JavaScript interactivity', 'Responsive design', 'Accessibility standards', 'Web performance'],
+        toc: ['Chapter 1 - Introduction', 'Chapter 2 - HTML Basics', 'Chapter 3 - CSS Styling', 'Chapter 4 - JavaScript Basics', 'Chapter 5 - DOM Manipulation', 'Chapter 6-8 - Advanced Topics']
+      },
+      { 
+        id: 'web2', 
+        title: 'React Fundamentals', 
+        author: 'David Ceddia',
+        subject: 'JavaScript Framework',
+        publisher: 'Gumroad',
+        year: 2022,
+        edition: '3rd Edition',
+        pages: 400,
+        language: 'English',
+        isbn: '978-1492051220',
+        book_cover: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=400&fit=crop',
+        description: 'Learn React from scratch. Covers components, hooks, state management, and building modern single-page applications with practical projects.',
+        features: ['React components', 'Hooks and state', 'Event handling', 'Conditional rendering', 'Forms and validation', 'API integration'],
+        toc: ['Chapter 1 - Getting Started', 'Chapter 2 - Components', 'Chapter 3 - JSX', 'Chapter 4 - State and Props', 'Chapter 5 - Hooks', 'Chapter 6-8 - Advanced React']
+      },
+      { 
+        id: 'java1', 
+        title: 'Java Programming', 
+        author: 'Herbert Schildt',
+        subject: 'Object-Oriented Programming',
+        publisher: 'McGraw Hill',
+        year: 2023,
+        edition: '11th Edition',
+        pages: 1088,
+        language: 'English',
+        isbn: '978-1260440232',
+        book_cover: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=400&fit=crop',
+        description: 'Comprehensive Java programming guide covering OOP concepts, multithreading, generics, and Java API. Includes real-world applications and best practices.',
+        features: ['OOP concepts', 'Data types and operators', 'Control structures', 'Arrays and strings', 'Collections framework', 'Multithreading'],
+        toc: ['Chapter 1 - Introduction', 'Chapter 2 - Data Types', 'Chapter 3 - Operations', 'Chapter 4 - Classes and Objects', 'Chapter 5 - Inheritance', 'Chapter 6-12 - Advanced Topics']
+      },
+      { 
+        id: 'db1', 
+        title: 'Database Design & SQL', 
+        author: 'C.J. Date',
+        subject: 'Database Management',
+        publisher: 'Addison-Wesley',
+        year: 2022,
+        edition: '9th Edition',
+        pages: 480,
+        language: 'English',
+        isbn: '978-0136685722',
+        book_cover: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=400&fit=crop',
+        description: 'Learn database design principles and SQL. Covers relational databases, normalization, queries, and NoSQL fundamentals for practical database management.',
+        features: ['Relational concepts', 'SQL queries', 'Database design', 'Normalization', 'Indexes and optimization', 'NoSQL basics'],
+        toc: ['Chapter 1 - Database Basics', 'Chapter 2 - SQL Fundamentals', 'Chapter 3 - Queries and Joins', 'Chapter 4 - Database Design', 'Chapter 5 - Performance', 'Chapter 6-8 - Advanced Topics']
+      }
     ];
 
     function loadBooks() {
