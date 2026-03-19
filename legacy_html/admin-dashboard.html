@@ -967,7 +967,10 @@
         tbody.innerHTML = books.map((book) => {
             const rawUrl = book?.pdf?.url || '';
             const backendOrigin = window.AppConfig?.getBackendOrigin?.() || `${window.location.protocol}//${window.location.hostname}:3000`;
-            const fileUrl = rawUrl.startsWith('http') ? rawUrl : (rawUrl ? `${backendOrigin}${rawUrl}` : '#');
+            const normalizedRawUrl = window.AppConfig?.rewriteApiUrl?.(rawUrl) || rawUrl;
+            const fileUrl = normalizedRawUrl
+                ? (normalizedRawUrl.startsWith('http') ? normalizedRawUrl : `${backendOrigin}${normalizedRawUrl}`)
+                : '#';
             const bookId = book?._id || book?.id || '';
             const hasFile = fileUrl !== '#';
             const coverInputId = `coverInput-${bookId}`;
@@ -1330,7 +1333,13 @@
             const booksUrl = `${API_BASE_URL}/books?page=1&limit=500`;
             console.log('[LOAD_BOOKS] Fetching from:', booksUrl);
             const response = await fetch(booksUrl);
-            const data = await response.json();
+            const rawBody = await response.text();
+            let data = {};
+            try {
+                data = rawBody ? JSON.parse(rawBody) : {};
+            } catch (_parseError) {
+                data = { error: rawBody || 'Invalid JSON response from API' };
+            }
             
             console.log('[LOAD_BOOKS] Response OK:', response.ok);
             console.log('[LOAD_BOOKS] Data structure:', {
@@ -1345,11 +1354,17 @@
                 url: data.books[0]?.pdf?.url
               });
             }
-            
-            allBooks = (response.ok && data.ok && Array.isArray(data.books)) ? data.books : [];
+
+                        if (!response.ok || !data.ok || !Array.isArray(data.books)) {
+                                throw new Error(data.error || `Failed to load books (status ${response.status})`);
+                        }
+
+                        allBooks = data.books;
+                        clearMessage();
         } catch (error) {
             console.error('[LOAD_BOOKS] Error:', error);
             allBooks = [];
+                        showMessage(`Unable to load books from API. ${error.message || 'Unknown error'}`, 'error');
         }
 
         renderBooksTable(allBooks);
