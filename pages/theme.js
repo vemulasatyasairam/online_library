@@ -2,6 +2,79 @@
   const THEME_STORAGE_KEY = 'appTheme';
   const RESPONSIVE_STYLE_ID = 'app-global-responsive-style';
 
+  function normalizeBaseUrl(value) {
+    if (!value || typeof value !== 'string') return '';
+    return value.trim().replace(/\/+$/, '');
+  }
+
+  function getBackendOrigin() {
+    const explicitBase = normalizeBaseUrl(window.BACKEND_API_BASE || localStorage.getItem('backend_api_base'));
+    if (explicitBase) {
+      return explicitBase.replace(/\/api$/i, '');
+    }
+
+    const host = window.location.hostname || 'localhost';
+    const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return `${protocol}//${host}:3000`;
+    }
+
+    return `${protocol}//${host}:3000`;
+  }
+
+  function getApiBase() {
+    return `${getBackendOrigin()}/api`;
+  }
+
+  function rewriteApiUrl(url) {
+    if (typeof url !== 'string' || !url) return url;
+
+    const backendOrigin = getBackendOrigin();
+    const apiBase = `${backendOrigin}/api`;
+
+    if (url.startsWith('http://localhost:3000')) {
+      return `${backendOrigin}${url.slice('http://localhost:3000'.length)}`;
+    }
+
+    if (url.startsWith('http://127.0.0.1:3000')) {
+      return `${backendOrigin}${url.slice('http://127.0.0.1:3000'.length)}`;
+    }
+
+    if (url.startsWith('/api/')) {
+      return `${apiBase}${url.slice('/api'.length)}`;
+    }
+
+    if (url.startsWith('/uploads/') || url.startsWith('/books/')) {
+      return `${backendOrigin}${url}`;
+    }
+
+    return url;
+  }
+
+  function installFetchRewrite() {
+    if (window.__APP_FETCH_REWRITE_INSTALLED || typeof window.fetch !== 'function') {
+      return;
+    }
+
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = function (input, init) {
+      if (typeof input === 'string') {
+        return originalFetch(rewriteApiUrl(input), init);
+      }
+
+      if (input && typeof Request !== 'undefined' && input instanceof Request) {
+        const rewritten = rewriteApiUrl(input.url);
+        if (rewritten !== input.url) {
+          return originalFetch(new Request(rewritten, input), init);
+        }
+      }
+
+      return originalFetch(input, init);
+    };
+
+    window.__APP_FETCH_REWRITE_INSTALLED = true;
+  }
+
   function ensureViewportMeta() {
     let viewportMeta = document.querySelector('meta[name="viewport"]');
     if (!viewportMeta) {
@@ -212,11 +285,13 @@
   applyTheme();
   ensureViewportMeta();
   injectResponsiveStyles();
+  installFetchRewrite();
 
   document.addEventListener('DOMContentLoaded', function () {
     applyTheme();
     ensureViewportMeta();
     injectResponsiveStyles();
+    installFetchRewrite();
   });
 
   window.AppTheme = {
@@ -225,4 +300,9 @@
     applyTheme: applyTheme,
     getCurrentUserEmail: getCurrentUserEmail
   };
+
+  window.AppConfig = window.AppConfig || {};
+  window.AppConfig.getBackendOrigin = getBackendOrigin;
+  window.AppConfig.getApiBase = getApiBase;
+  window.AppConfig.rewriteApiUrl = rewriteApiUrl;
 })();

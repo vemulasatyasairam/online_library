@@ -966,7 +966,8 @@
 
         tbody.innerHTML = books.map((book) => {
             const rawUrl = book?.pdf?.url || '';
-            const fileUrl = rawUrl.startsWith('http') ? rawUrl : (rawUrl ? `http://localhost:3000${rawUrl}` : '#');
+            const backendOrigin = window.AppConfig?.getBackendOrigin?.() || `${window.location.protocol}//${window.location.hostname}:3000`;
+            const fileUrl = rawUrl.startsWith('http') ? rawUrl : (rawUrl ? `${backendOrigin}${rawUrl}` : '#');
             const bookId = book?._id || book?.id || '';
             const hasFile = fileUrl !== '#';
             const coverInputId = `coverInput-${bookId}`;
