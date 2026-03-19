@@ -71,21 +71,16 @@
       : 'http://localhost:3000';
     const current = normalizeBaseUrl(localStorage.getItem(BACKEND_API_STORAGE_KEY));
     const defaultValue = current || suggested;
-    const errorText = error && error.message ? `\nReason: ${error.message}` : '';
-    const failedUrlText = failedUrl ? `\nFailed URL: ${failedUrl}` : '';
-    const input = window.prompt(
-      `Unable to connect to backend API from this device.${failedUrlText}${errorText}\n\nEnter your laptop/backend URL (example: http://192.168.1.10:3000):`,
-      defaultValue
-    );
-
-    if (!input) {
-      return;
-    }
-
-    const saved = setBackendApiBase(input);
-    if (saved) {
-      window.location.reload();
-    }
+    const errorText = error && error.message ? `Reason: ${error.message}` : '';
+    const failedUrlText = failedUrl ? `Failed URL: ${failedUrl}` : '';
+    
+    showBackendModal(`Unable to connect to backend API from this device.${failedUrlText ? '\n\n' + failedUrlText : ''}${errorText ? '\n' + errorText : ''}`, defaultValue, (input) => {
+      if (!input) return;
+      const saved = setBackendApiBase(input);
+      if (saved) {
+        window.location.reload();
+      }
+    });
   }
 
   function promptForBackendOnNetlifyLoad() {
@@ -97,19 +92,222 @@
     const saved = normalizeBaseUrl(localStorage.getItem(BACKEND_API_STORAGE_KEY));
     if (saved) return;
 
-    const input = window.prompt(
-      'This app is deployed on Netlify but needs your laptop backend to load books.\n\nEnter your backend URL (example: http://192.168.1.10:3000 or http://YOUR-LAPTOP-IP:3000):',
-      'http://'
-    );
+    showBackendModal('This app is deployed on Netlify but needs your laptop backend to load books.\n\nEnter your backend URL (example: http://192.168.1.10:3000 or http://YOUR-LAPTOP-IP:3000):', 'http://', (input) => {
+      if (!input) return;
+      const saved_url = setBackendApiBase(input);
+      if (saved_url) {
+        window.location.reload();
+      }
+    });
+  }
 
-    if (!input) {
+  function showBackendModal(message, defaultValue, onSubmit) {
+    if (document.getElementById('backend-modal-overlay')) {
       return;
     }
 
-    const saved_url = setBackendApiBase(input);
-    if (saved_url) {
-      window.location.reload();
-    }
+    const overlay = document.createElement('div');
+    overlay.id = 'backend-modal-overlay';
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    `;
+
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      background: linear-gradient(135deg, #0b72b9 0%, #095d97 100%);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      color: white;
+      animation: slideUp 0.3s ease-out;
+    `;
+
+    const title = document.createElement('h2');
+    title.style.cssText = `
+      margin: 0 0 12px 0;
+      font-size: 22px;
+      font-weight: 600;
+      color: white;
+    `;
+    title.textContent = 'Backend Configuration';
+
+    const messageEl = document.createElement('p');
+    messageEl.style.cssText = `
+      margin: 0 0 24px 0;
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.95);
+      white-space: pre-wrap;
+      word-break: break-word;
+    `;
+    messageEl.textContent = message;
+
+    const inputLabel = document.createElement('label');
+    inputLabel.style.cssText = `
+      display: block;
+      margin-bottom: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.9);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    `;
+    inputLabel.textContent = 'Backend URL';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = defaultValue;
+    input.style.cssText = `
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 14px;
+      box-sizing: border-box;
+      font-family: monospace;
+      transition: all 0.2s;
+    `;
+    input.placeholder = 'http://192.168.1.10:3000';
+
+    input.addEventListener('focus', function() {
+      this.style.background = 'rgba(255, 255, 255, 0.15)';
+      this.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+    });
+
+    input.addEventListener('blur', function() {
+      this.style.background = 'rgba(255, 255, 255, 0.1)';
+      this.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+    });
+
+    const buttonsContainer = document.createElement('div');
+    buttonsContainer.style.cssText = `
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 24px;
+    `;
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.style.cssText = `
+      padding: 12px 24px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    `;
+    cancelBtn.addEventListener('mouseenter', function() {
+      this.style.background = 'rgba(255, 255, 255, 0.2)';
+    });
+    cancelBtn.addEventListener('mouseleave', function() {
+      this.style.background = 'rgba(255, 255, 255, 0.1)';
+    });
+    cancelBtn.addEventListener('click', function() {
+      overlay.remove();
+    });
+
+    const okBtn = document.createElement('button');
+    okBtn.textContent = 'Connect';
+    okBtn.style.cssText = `
+      padding: 12px 24px;
+      border: none;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    `;
+    okBtn.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-2px)';
+      this.style.boxShadow = '0 8px 20px rgba(16, 185, 129, 0.3)';
+    });
+    okBtn.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0)';
+      this.style.boxShadow = 'none';
+    });
+    okBtn.addEventListener('click', function() {
+      onSubmit(input.value);
+      overlay.remove();
+    });
+
+    input.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        okBtn.click();
+      }
+    });
+
+    buttonsContainer.appendChild(cancelBtn);
+    buttonsContainer.appendChild(okBtn);
+
+    modal.appendChild(title);
+    modal.appendChild(messageEl);
+    modal.appendChild(inputLabel);
+    modal.appendChild(input);
+    modal.appendChild(buttonsContainer);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @media (max-width: 640px) {
+        #backend-modal-overlay {
+          padding: 12px !important;
+        }
+        #backend-modal-overlay > div {
+          padding: 24px !important;
+        }
+        #backend-modal-overlay h2 {
+          font-size: 18px !important;
+        }
+        #backend-modal-overlay p {
+          font-size: 13px !important;
+        }
+        #backend-modal-overlay input {
+          font-size: 13px !important;
+          padding: 10px 12px !important;
+        }
+        #backend-modal-overlay button {
+          font-size: 13px !important;
+          padding: 10px 16px !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    input.focus();
+    input.select();
   }
 
   function rewriteApiUrl(url) {
