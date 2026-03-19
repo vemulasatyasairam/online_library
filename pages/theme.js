@@ -61,6 +61,133 @@
     return url.indexOf('/api/') !== -1 || url.indexOf(':3000') !== -1;
   }
 
+  function showCustomModal(title, message, defaultValue, onSubmit) {
+    if (document.getElementById('app-custom-modal')) {
+      return;
+    }
+
+    const modalId = 'app-custom-modal';
+    const modal = document.createElement('div');
+    modal.id = modalId;
+    modal.innerHTML = `
+      <div id="app-modal-backdrop" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        padding: 20px;
+        overflow-y: auto;
+      ">
+        <div id="app-modal-content" style="
+          background: linear-gradient(135deg, #1a2f4a 0%, #0f1a2e 100%);
+          border-radius: 16px;
+          padding: 28px;
+          max-width: 500px;
+          width: 100%;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          max-height: 90vh;
+          overflow-y: auto;
+          box-sizing: border-box;
+        ">
+          <h2 style="
+            margin: 0 0 12px 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+            font-family: system-ui, -apple-system, sans-serif;
+          ">${title}</h2>
+          
+          <p style="
+            margin: 0 0 16px 0;
+            font-size: 14px;
+            color: #b0c4de;
+            line-height: 1.5;
+            font-family: system-ui, -apple-system, sans-serif;
+          ">${message}</p>
+          
+          <input id="app-modal-input" type="text" placeholder="Enter URL" value="${defaultValue || ''}" style="
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid rgba(100, 200, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            font-size: 14px;
+            font-family: system-ui, -apple-system, sans-serif;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+          "/>
+          
+          <div style="
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+          ">
+            <button id="app-modal-ok" style="
+              flex: 1;
+              min-width: 100px;
+              padding: 12px 20px;
+              background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+              color: #ffffff;
+              border: none;
+              border-radius: 8px;
+              font-size: 14px;
+              font-weight: 600;
+              cursor: pointer;
+              font-family: system-ui, -apple-system, sans-serif;
+              transition: transform 0.2s, box-shadow 0.2s;
+            ">OK</button>
+            
+            <button id="app-modal-cancel" style="
+              flex: 1;
+              min-width: 100px;
+              padding: 12px 20px;
+              background: rgba(100, 180, 220, 0.2);
+              color: #64b5f6;
+              border: 1px solid rgba(100, 180, 220, 0.4);
+              border-radius: 8px;
+              font-size: 14px;
+              font-weight: 600;
+              cursor: pointer;
+              font-family: system-ui, -apple-system, sans-serif;
+              transition: transform 0.2s, box-shadow 0.2s;
+            ">Cancel</button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    const input = document.getElementById('app-modal-input');
+    const okBtn = document.getElementById('app-modal-ok');
+    const cancelBtn = document.getElementById('app-modal-cancel');
+    const backdrop = document.getElementById('app-modal-backdrop');
+    
+    function close(value) {
+      if (modal.parentNode) modal.parentNode.removeChild(modal);
+      onSubmit(value);
+    }
+    
+    okBtn.addEventListener('click', () => close(input.value));
+    cancelBtn.addEventListener('click', () => close(null));
+    backdrop.addEventListener('click', (e) => {
+      if (e.target === backdrop) close(null);
+    });
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') close(input.value);
+    });
+    
+    setTimeout(() => input.focus(), 100);
+  }
+
   function promptForBackendApiBase(failedUrl, error) {
     if (window.__APP_API_PROMPT_SHOWN) return;
     window.__APP_API_PROMPT_SHOWN = true;
@@ -71,16 +198,27 @@
       : 'http://localhost:3000';
     const current = normalizeBaseUrl(localStorage.getItem(BACKEND_API_STORAGE_KEY));
     const defaultValue = current || suggested;
+    
     const errorText = error && error.message ? `Reason: ${error.message}` : '';
     const failedUrlText = failedUrl ? `Failed URL: ${failedUrl}` : '';
     
-    showBackendModal(`Unable to connect to backend API from this device.${failedUrlText ? '\n\n' + failedUrlText : ''}${errorText ? '\n' + errorText : ''}`, defaultValue, (input) => {
-      if (!input) return;
-      const saved = setBackendApiBase(input);
-      if (saved) {
-        window.location.reload();
+    let message = 'Unable to connect to backend API from this device.\n\n';
+    if (failedUrlText) message += failedUrlText + '\n';
+    if (errorText) message += errorText + '\n\n';
+    message += 'Enter your laptop/backend URL (example: http://192.168.1.10:3000 or http://YOUR-LAPTOP-IP:3000):';
+
+    showCustomModal(
+      `${window.location.hostname || 'student-online-library.netlify.app'} says`,
+      message,
+      defaultValue,
+      function(input) {
+        if (!input) return;
+        const saved = setBackendApiBase(input);
+        if (saved) {
+          window.location.reload();
+        }
       }
-    });
+    );
   }
 
   function promptForBackendOnNetlifyLoad() {
@@ -92,222 +230,18 @@
     const saved = normalizeBaseUrl(localStorage.getItem(BACKEND_API_STORAGE_KEY));
     if (saved) return;
 
-    showBackendModal('This app is deployed on Netlify but needs your laptop backend to load books.\n\nEnter your backend URL (example: http://192.168.1.10:3000 or http://YOUR-LAPTOP-IP:3000):', 'http://', (input) => {
-      if (!input) return;
-      const saved_url = setBackendApiBase(input);
-      if (saved_url) {
-        window.location.reload();
-      }
-    });
-  }
-
-  function showBackendModal(message, defaultValue, onSubmit) {
-    if (document.getElementById('backend-modal-overlay')) {
-      return;
-    }
-
-    const overlay = document.createElement('div');
-    overlay.id = 'backend-modal-overlay';
-    overlay.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 99999;
-      padding: 16px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    `;
-
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-      background: linear-gradient(135deg, #0b72b9 0%, #095d97 100%);
-      border-radius: 16px;
-      padding: 32px;
-      max-width: 500px;
-      width: 100%;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      color: white;
-      animation: slideUp 0.3s ease-out;
-    `;
-
-    const title = document.createElement('h2');
-    title.style.cssText = `
-      margin: 0 0 12px 0;
-      font-size: 22px;
-      font-weight: 600;
-      color: white;
-    `;
-    title.textContent = 'Backend Configuration';
-
-    const messageEl = document.createElement('p');
-    messageEl.style.cssText = `
-      margin: 0 0 24px 0;
-      font-size: 14px;
-      line-height: 1.6;
-      color: rgba(255, 255, 255, 0.95);
-      white-space: pre-wrap;
-      word-break: break-word;
-    `;
-    messageEl.textContent = message;
-
-    const inputLabel = document.createElement('label');
-    inputLabel.style.cssText = `
-      display: block;
-      margin-bottom: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.9);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    `;
-    inputLabel.textContent = 'Backend URL';
-
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = defaultValue;
-    input.style.cssText = `
-      width: 100%;
-      padding: 12px 14px;
-      margin-bottom: 20px;
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-      font-size: 14px;
-      box-sizing: border-box;
-      font-family: monospace;
-      transition: all 0.2s;
-    `;
-    input.placeholder = 'http://192.168.1.10:3000';
-
-    input.addEventListener('focus', function() {
-      this.style.background = 'rgba(255, 255, 255, 0.15)';
-      this.style.borderColor = 'rgba(255, 255, 255, 0.4)';
-    });
-
-    input.addEventListener('blur', function() {
-      this.style.background = 'rgba(255, 255, 255, 0.1)';
-      this.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-    });
-
-    const buttonsContainer = document.createElement('div');
-    buttonsContainer.style.cssText = `
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 24px;
-    `;
-
-    const cancelBtn = document.createElement('button');
-    cancelBtn.textContent = 'Cancel';
-    cancelBtn.style.cssText = `
-      padding: 12px 24px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    `;
-    cancelBtn.addEventListener('mouseenter', function() {
-      this.style.background = 'rgba(255, 255, 255, 0.2)';
-    });
-    cancelBtn.addEventListener('mouseleave', function() {
-      this.style.background = 'rgba(255, 255, 255, 0.1)';
-    });
-    cancelBtn.addEventListener('click', function() {
-      overlay.remove();
-    });
-
-    const okBtn = document.createElement('button');
-    okBtn.textContent = 'Connect';
-    okBtn.style.cssText = `
-      padding: 12px 24px;
-      border: none;
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: white;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    `;
-    okBtn.addEventListener('mouseenter', function() {
-      this.style.transform = 'translateY(-2px)';
-      this.style.boxShadow = '0 8px 20px rgba(16, 185, 129, 0.3)';
-    });
-    okBtn.addEventListener('mouseleave', function() {
-      this.style.transform = 'translateY(0)';
-      this.style.boxShadow = 'none';
-    });
-    okBtn.addEventListener('click', function() {
-      onSubmit(input.value);
-      overlay.remove();
-    });
-
-    input.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        okBtn.click();
-      }
-    });
-
-    buttonsContainer.appendChild(cancelBtn);
-    buttonsContainer.appendChild(okBtn);
-
-    modal.appendChild(title);
-    modal.appendChild(messageEl);
-    modal.appendChild(inputLabel);
-    modal.appendChild(input);
-    modal.appendChild(buttonsContainer);
-    overlay.appendChild(modal);
-    document.body.appendChild(overlay);
-
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes slideUp {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
+    showCustomModal(
+      `${window.location.hostname || 'student-online-library.netlify.app'} says`,
+      'This app is deployed on Netlify but needs your laptop backend to load books.\n\nEnter your backend URL (example: http://192.168.1.10:3000 or http://YOUR-LAPTOP-IP:3000):',
+      'http://',
+      function(input) {
+        if (!input) return;
+        const saved_url = setBackendApiBase(input);
+        if (saved_url) {
+          window.location.reload();
         }
       }
-      @media (max-width: 640px) {
-        #backend-modal-overlay {
-          padding: 12px !important;
-        }
-        #backend-modal-overlay > div {
-          padding: 24px !important;
-        }
-        #backend-modal-overlay h2 {
-          font-size: 18px !important;
-        }
-        #backend-modal-overlay p {
-          font-size: 13px !important;
-        }
-        #backend-modal-overlay input {
-          font-size: 13px !important;
-          padding: 10px 12px !important;
-        }
-        #backend-modal-overlay button {
-          font-size: 13px !important;
-          padding: 10px 16px !important;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-
-    input.focus();
-    input.select();
+    );
   }
 
   function rewriteApiUrl(url) {
