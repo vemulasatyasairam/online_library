@@ -214,7 +214,7 @@
 
     function escapeHtml(text) {
       const div = document.createElement('div');
-      div.textContent = text ?? '-';
+      div.textContent = text == null ? '-' : text;
       return div.innerHTML;
     }
 
@@ -251,8 +251,8 @@
         console.log('[FETCH_BOOKS] Response OK:', response.ok);
         console.log('[FETCH_BOOKS] Data structure:', {
           ok: data.ok,
-          booksCount: data.books?.length,
-          firstBookKeys: data.books?.[0] ? Object.keys(data.books[0]) : []
+          booksCount: data.books && data.books.length,
+          firstBookKeys: data.books && data.books[0] ? Object.keys(data.books[0]) : []
         });
 
         if (!response.ok || !data.ok) {
@@ -267,7 +267,7 @@
         if (books.length > 0) {
           console.log('[FETCH_BOOKS] First book PDF object:', {
             pdfObject: books[0].pdf,
-            pdfUrl: books[0]?.pdf?.url
+            pdfUrl: (books[0] && books[0].pdf && books[0].pdf.url) || ''
           });
         }
 
@@ -278,9 +278,9 @@
 
         clearStatus();
         bookGrid.innerHTML = books.map(book => {
-          const pdfUrl = book?.pdfUrl || book?.pdf?.url || book?.viewUrl || '#';
-          const viewUrl = book?.viewUrl || pdfUrl;
-          const downloadUrl = book?.downloadUrl || pdfUrl;
+          const pdfUrl = (book && book.pdfUrl) || (book && book.pdf && book.pdf.url) || (book && book.viewUrl) || '#';
+          const viewUrl = (book && book.viewUrl) || pdfUrl;
+          const downloadUrl = (book && book.downloadUrl) || pdfUrl;
           console.log('[RENDER_BOOK]', book.title, '-> PDF URL:', pdfUrl);
           return `
             <article class="card">

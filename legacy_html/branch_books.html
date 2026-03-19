@@ -872,13 +872,13 @@
         }
 
         return data.books.map((book) => {
-          const openUrl = book.viewUrl || book.pdfUrl || book?.pdf?.url || '#';
+          const openUrl = book.viewUrl || book.pdfUrl || (book.pdf && book.pdf.url) || '#';
           return {
             id: String(book._id || book.id || `${book.title || 'book'}-${book.author || 'author'}`),
             title: book.title || 'Untitled Book',
             author: book.author || 'Unknown Author',
             year: book.year || '-',
-            book_cover: book.book_cover || book.coverImage || book?.coverImage?.url || 'images/book_cover.jpeg',
+            book_cover: book.book_cover || book.coverImage || (book.coverImage && book.coverImage.url) || 'images/book_cover.jpeg',
             rating: book.rating || { average: 0, count: 0, total: 0 },
             pdf: openUrl,
             type: 'book',
@@ -923,7 +923,7 @@
       // Helper function to render book cards
       function renderBookCard(book, isPreviousPaper = false) {
         const serializedBook = JSON.stringify(book).replace(/"/g, '&quot;');
-        const avgRating = Number(book?.rating?.average || 0).toFixed(1);
+        const avgRating = Number((book.rating && book.rating.average) || 0).toFixed(1);
         return `
         <article class="book-card" style="position: relative;">
           ${isPreviousPaper ? '<span style="position: absolute; top: 8px; right: 8px; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; z-index: 1;">PREVIOUS PAPER</span>' : ''}
