@@ -519,9 +519,9 @@
           id: String(book._id || book.id || `${book.title || 'book'}-${book.author || 'author'}`),
           title: book.title || 'Untitled Book',
           author: book.author || 'Unknown Author',
-          book_cover: book.book_cover || book.coverImage || book?.coverImage?.url || 'images/book_cover.jpeg',
+          book_cover: book.book_cover || book.coverImage || ((book.coverImage && book.coverImage.url) ? book.coverImage.url : '') || 'images/book_cover.jpeg',
           rating: book.rating || { average: 0, count: 0, total: 0 },
-          pdf: book.viewUrl || book.pdfUrl || book?.pdf?.url || '#',
+          pdf: book.viewUrl || book.pdfUrl || ((book.pdf && book.pdf.url) ? book.pdf.url : '') || '#',
           _isDynamic: true
         }));
       } catch (error) {
@@ -544,7 +544,7 @@
 
       bookGrid.innerHTML = booksToRender.map(book => {
         const serializedBook = JSON.stringify(book).replace(/"/g, '&quot;');
-        const avgRating = Number(book?.rating?.average || 0).toFixed(1);
+        const avgRating = Number((book.rating && book.rating.average) || 0).toFixed(1);
         return `
         <article class="book-card">
           <figure>
@@ -571,7 +571,7 @@
       if (!host) return;
 
       const covers = [...new Set((books || [])
-        .map((book) => String(book?.book_cover || '').trim())
+        .map((book) => String((book && book.book_cover) || '').trim())
         .filter(Boolean))];
 
       if (!covers.length) {
