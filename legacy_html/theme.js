@@ -3,6 +3,17 @@
   const RESPONSIVE_STYLE_ID = 'app-global-responsive-style';
   const BACKEND_API_STORAGE_KEY = 'backend_api_base';
 
+  function setBackendApiBase(value) {
+    const normalized = normalizeBaseUrl(value);
+    if (/^https?:\/\//i.test(normalized)) {
+      localStorage.setItem(BACKEND_API_STORAGE_KEY, normalized);
+      return normalized;
+    }
+
+    localStorage.removeItem(BACKEND_API_STORAGE_KEY);
+    return '';
+  }
+
   function hydrateBackendApiBaseFromQuery() {
     try {
       const params = new URLSearchParams(window.location.search || '');
@@ -38,6 +49,37 @@
 
   function getApiBase() {
     return `${getBackendOrigin()}/api`;
+  }
+
+  function looksLikeApiRequest(url) {
+    if (typeof url !== 'string' || !url) return false;
+    return url.indexOf('/api/') !== -1 || url.indexOf(':3000') !== -1;
+  }
+
+  function promptForBackendApiBase(failedUrl, error) {
+    if (window.__APP_API_PROMPT_SHOWN) return;
+    window.__APP_API_PROMPT_SHOWN = true;
+
+    const host = window.location.hostname || 'localhost';
+    const suggested = host && host !== 'localhost' && host !== '127.0.0.1'
+      ? `http://${host}:3000`
+      : 'http://localhost:3000';
+    const current = normalizeBaseUrl(localStorage.getItem(BACKEND_API_STORAGE_KEY));
+    const defaultValue = current || suggested;
+    const errorText = error && error.message ? `\nReason: ${error.message}` : '';
+    const input = window.prompt(
+      `Unable to connect to backend API from this device.\nFailed URL: ${failedUrl}${errorText}\n\nEnter backend URL (example: http://192.168.1.10:3000):`,
+      defaultValue
+    );
+
+    if (!input) {
+      return;
+    }
+
+    const saved = setBackendApiBase(input);
+    if (saved) {
+      window.location.reload();
+    }
   }
 
   function rewriteApiUrl(url) {
@@ -83,17 +125,33 @@
     const originalFetch = window.fetch.bind(window);
     window.fetch = function (input, init) {
       if (typeof input === 'string') {
-        return originalFetch(rewriteApiUrl(input), init);
+        const rewrittenUrl = rewriteApiUrl(input);
+        return originalFetch(rewrittenUrl, init).catch(function (error) {
+          if (looksLikeApiRequest(rewrittenUrl)) {
+            promptForBackendApiBase(rewrittenUrl, error);
+          }
+          throw error;
+        });
       }
 
       if (input && typeof Request !== 'undefined' && input instanceof Request) {
         const rewritten = rewriteApiUrl(input.url);
         if (rewritten !== input.url) {
-          return originalFetch(new Request(rewritten, input), init);
+          return originalFetch(new Request(rewritten, input), init).catch(function (error) {
+            if (looksLikeApiRequest(rewritten)) {
+              promptForBackendApiBase(rewritten, error);
+            }
+            throw error;
+          });
         }
       }
 
-      return originalFetch(input, init);
+      return originalFetch(input, init).catch(function (error) {
+        if (input && typeof input === 'string' && looksLikeApiRequest(input)) {
+          promptForBackendApiBase(input, error);
+        }
+        throw error;
+      });
     };
 
     window.__APP_FETCH_REWRITE_INSTALLED = true;
@@ -343,5 +401,6 @@
   window.AppConfig = window.AppConfig || {};
   window.AppConfig.getBackendOrigin = getBackendOrigin;
   window.AppConfig.getApiBase = getApiBase;
+  window.AppConfig.setApiBase = setBackendApiBase;
   window.AppConfig.rewriteApiUrl = rewriteApiUrl;
 })();
