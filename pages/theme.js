@@ -32,6 +32,11 @@
     return value.trim().replace(/\/+$/, '');
   }
 
+  function isRemoteDeployment() {
+    const host = window.location.hostname || 'localhost';
+    return host !== 'localhost' && host !== '127.0.0.1';
+  }
+
   function getBackendOrigin() {
     const explicitBase = normalizeBaseUrl(window.BACKEND_API_BASE || localStorage.getItem(BACKEND_API_STORAGE_KEY));
     if (explicitBase) {
@@ -67,8 +72,9 @@
     const current = normalizeBaseUrl(localStorage.getItem(BACKEND_API_STORAGE_KEY));
     const defaultValue = current || suggested;
     const errorText = error && error.message ? `\nReason: ${error.message}` : '';
+    const failedUrlText = failedUrl ? `\nFailed URL: ${failedUrl}` : '';
     const input = window.prompt(
-      `Unable to connect to backend API from this device.\nFailed URL: ${failedUrl}${errorText}\n\nEnter backend URL (example: http://192.168.1.10:3000):`,
+      `Unable to connect to backend API from this device.${failedUrlText}${errorText}\n\nEnter your laptop/backend URL (example: http://192.168.1.10:3000):`,
       defaultValue
     );
 
@@ -78,6 +84,30 @@
 
     const saved = setBackendApiBase(input);
     if (saved) {
+      window.location.reload();
+    }
+  }
+
+  function promptForBackendOnNetlifyLoad() {
+    if (window.__APP_NETLIFY_PROMPT_CHECKED) return;
+    window.__APP_NETLIFY_PROMPT_CHECKED = true;
+
+    if (!isRemoteDeployment()) return;
+
+    const saved = normalizeBaseUrl(localStorage.getItem(BACKEND_API_STORAGE_KEY));
+    if (saved) return;
+
+    const input = window.prompt(
+      'This app is deployed on Netlify but needs your laptop backend to load books.\n\nEnter your backend URL (example: http://192.168.1.10:3000 or http://YOUR-LAPTOP-IP:3000):',
+      'http://'
+    );
+
+    if (!input) {
+      return;
+    }
+
+    const saved_url = setBackendApiBase(input);
+    if (saved_url) {
       window.location.reload();
     }
   }
@@ -379,6 +409,7 @@
 
   localStorage.setItem(THEME_STORAGE_KEY, 'light');
   hydrateBackendApiBaseFromQuery();
+  promptForBackendOnNetlifyLoad();
   applyTheme();
   ensureViewportMeta();
   injectResponsiveStyles();
