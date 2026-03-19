@@ -1,6 +1,20 @@
 (function () {
   const THEME_STORAGE_KEY = 'appTheme';
   const RESPONSIVE_STYLE_ID = 'app-global-responsive-style';
+  const BACKEND_API_STORAGE_KEY = 'backend_api_base';
+
+  function hydrateBackendApiBaseFromQuery() {
+    try {
+      const params = new URLSearchParams(window.location.search || '');
+      const fromQuery = params.get('apiBase') || params.get('api') || '';
+      const normalized = normalizeBaseUrl(fromQuery);
+      if (/^https?:\/\//i.test(normalized)) {
+        localStorage.setItem(BACKEND_API_STORAGE_KEY, normalized);
+      }
+    } catch (_error) {
+      // Ignore query parsing issues.
+    }
+  }
 
   function normalizeBaseUrl(value) {
     if (!value || typeof value !== 'string') return '';
@@ -8,7 +22,7 @@
   }
 
   function getBackendOrigin() {
-    const explicitBase = normalizeBaseUrl(window.BACKEND_API_BASE || localStorage.getItem('backend_api_base'));
+    const explicitBase = normalizeBaseUrl(window.BACKEND_API_BASE || localStorage.getItem(BACKEND_API_STORAGE_KEY));
     if (explicitBase) {
       return explicitBase.replace(/\/api$/i, '');
     }
@@ -46,6 +60,16 @@
 
     if (url.startsWith('/uploads/') || url.startsWith('/books/')) {
       return `${backendOrigin}${url}`;
+    }
+
+    if (url.startsWith('file://') && url.includes(':3000/')) {
+      const cutIndex = url.indexOf(':3000/');
+      return `${backendOrigin}${url.slice(cutIndex + ':3000'.length)}`;
+    }
+
+    if (url.includes('//:3000/')) {
+      const cutIndex = url.indexOf(':3000/');
+      return `${backendOrigin}${url.slice(cutIndex + ':3000'.length)}`;
     }
 
     return url;
@@ -296,6 +320,7 @@
   }
 
   localStorage.setItem(THEME_STORAGE_KEY, 'light');
+  hydrateBackendApiBaseFromQuery();
   applyTheme();
   ensureViewportMeta();
   injectResponsiveStyles();
