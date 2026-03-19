@@ -1,0 +1,1056 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>Book Details</title>
+	<style>
+		:root {
+			--bg: #f0f3ff;
+			--text: #1b2d4a;
+			--muted: #6f819c;
+			--primary: #3b82f6;
+			--primary-2: #1d4ed8;
+			--card: #ffffff;
+			--danger: #dc2626;
+			--danger-2: #b91c1c;
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			margin: 0;
+			font-family: "Segoe UI", Arial, sans-serif;
+			color: var(--text);
+			background:
+				radial-gradient(900px 520px at -10% -5%, rgba(59, 130, 246, 0.25), transparent 58%),
+				radial-gradient(900px 520px at 110% 0%, rgba(76, 29, 149, 0.2), transparent 58%),
+				var(--bg);
+		}
+
+		.page { max-width: 1100px; margin: 0 auto; padding: 14px; }
+
+		.head {
+			background: linear-gradient(100deg, #1e2d45, #172235);
+			border-radius: 14px;
+			color: #fff;
+			display: flex;
+			align-items: center;
+			gap: 14px;
+			padding: 18px 22px;
+			margin-bottom: 18px;
+			box-shadow: 0 14px 28px rgba(14, 27, 44, 0.28);
+		}
+
+		.back {
+			text-decoration: none;
+			color: #fff;
+			font-size: 30px;
+			line-height: 1;
+			margin-right: 8px;
+			opacity: 0.95;
+		}
+
+		.head h1 {
+			margin: 0;
+			font-size: 42px;
+			font-weight: 800;
+			letter-spacing: 0.3px;
+			line-height: 1;
+		}
+
+		.status {
+			background: rgba(255, 255, 255, 0.88);
+			border: 1px solid rgba(116, 141, 183, 0.25);
+			border-radius: 12px;
+			padding: 14px;
+			color: var(--muted);
+			box-shadow: 0 8px 20px rgba(21, 44, 86, 0.12);
+		}
+
+		.container {
+			background: rgba(255, 255, 255, 0.95);
+			border-radius: 10px;
+			border: 1px solid rgba(113, 141, 186, 0.22);
+			box-shadow: 0 10px 24px rgba(35, 55, 95, 0.18);
+			padding: 14px;
+		}
+
+		.hero {
+			display: grid;
+			grid-template-columns: 280px 1fr;
+			gap: 20px;
+			align-items: start;
+			margin-bottom: 18px;
+		}
+
+		.cover {
+			width: 100%;
+			height: 440px;
+			object-fit: cover;
+			border-radius: 12px;
+			border: 1px solid rgba(99, 122, 157, 0.3);
+			box-shadow: 0 14px 24px rgba(24, 40, 74, 0.26);
+			background: #e6edf7;
+			position: sticky;
+			top: 14px;
+		}
+
+		.hero-right {
+			overflow-y: auto;
+		}
+
+		.title {
+			margin: 0 0 14px;
+			font-size: 42px;
+			line-height: 1.05;
+			color: #122947;
+		}
+
+		.meta {
+			display: flex;
+			gap: 34px;
+			flex-wrap: wrap;
+			margin-bottom: 16px;
+		}
+
+		.meta b {
+			display: block;
+			font-size: 18px;
+			color: var(--muted);
+			text-transform: uppercase;
+			letter-spacing: 0.3px;
+			margin-bottom: 4px;
+		}
+
+		.meta span { font-size: 28px; color: #1b365d; }
+
+		.divider { border: 0; border-top: 1px solid #d7dfec; margin: 12px 0 18px; }
+
+		.desc {
+			margin: 0;
+			font-size: 18px;
+			color: #334e74;
+			line-height: 1.55;
+		}
+
+		.section { margin-top: 26px; }
+		.section h2 { margin: 0 0 10px; font-size: 28px; color: #1d365b; }
+
+		.grid-two {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 8px;
+		}
+
+		.tile {
+			background: #edf2f9;
+			border-left: 4px solid #24364e;
+			border-radius: 8px;
+			padding: 8px 10px;
+		}
+
+		.tile b {
+			display: block;
+			font-size: 11px;
+			color: #7b8da8;
+			margin-bottom: 3px;
+			text-transform: uppercase;
+		}
+
+		.tile span {
+			font-size: 20px;
+			color: #1f3658;
+			line-height: 1.25;
+		}
+
+		.rating-box {
+			margin-top: 16px;
+			background: #f4f7fd;
+			border: 1px solid #d8e2f1;
+			border-radius: 10px;
+			padding: 12px;
+		}
+
+		.rating-title {
+			font-size: 14px;
+			font-weight: 700;
+			margin-bottom: 8px;
+			color: #1b365d;
+		}
+
+		.star-row {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			flex-wrap: wrap;
+		}
+
+		.star-btn {
+			border: 0;
+			background: transparent;
+			font-size: 28px;
+			line-height: 1;
+			cursor: pointer;
+			color: #c3d2ea;
+			padding: 0;
+		}
+
+		.star-btn.active,
+		.star-btn:hover,
+		.star-btn:hover ~ .star-btn {
+			color: #f59e0b;
+		}
+
+		.rating-meta {
+			font-size: 12px;
+			color: #4b647f;
+		}
+
+		.rate-submit {
+			border: none;
+			background: #1d4ed8;
+			color: #fff;
+			border-radius: 7px;
+			padding: 8px 12px;
+			font-weight: 700;
+			cursor: pointer;
+			font-size: 12px;
+		}
+
+		.warning {
+			margin-top: 14px;
+			background: linear-gradient(135deg, var(--danger), var(--danger-2));
+			color: #fff;
+			border-radius: 8px;
+			padding: 10px 14px;
+			box-shadow: 0 6px 16px rgba(185, 28, 28, 0.28);
+		}
+
+		.warning h3 { margin: 0 0 6px; font-size: 15px; }
+		.warning p { margin: 0 0 5px; font-size: 12px; line-height: 1.35; }
+
+		.warning ul { margin: 6px 0 0; padding-left: 18px; }
+		.warning li { margin: 3px 0; font-size: 12px; }
+
+		.actions {
+			margin-top: 12px;
+			display: flex;
+			gap: 10px;
+			flex-wrap: wrap;
+		}
+
+		.btn {
+			border: none;
+			border-radius: 8px;
+			padding: 10px 16px;
+			color: #fff;
+			font-weight: 700;
+			text-decoration: none;
+			cursor: pointer;
+			font-size: 14px;
+			min-width: 140px;
+			box-shadow: 0 6px 14px rgba(33, 62, 107, 0.22);
+		}
+
+		.btn-open { background: linear-gradient(135deg, #22314a, #1a2538); }
+		.btn-save { background: linear-gradient(135deg, #14b87a, #0ea46d); }
+
+		/* ── PDF Book Viewer Modal ── */
+		.pdf-overlay {
+			display: none;
+			position: fixed;
+			inset: 0;
+			z-index: 9999;
+			background: #1a1f2e;
+			flex-direction: column;
+			user-select: none;
+		}
+		.pdf-overlay.open { display: flex; }
+
+		.pdf-topbar {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			background: #111827;
+			padding: 10px 20px;
+			color: #fff;
+			font-size: 14px;
+			font-weight: 700;
+			gap: 14px;
+			flex-shrink: 0;
+			border-bottom: 1px solid rgba(255,255,255,0.08);
+		}
+
+		.pdf-close {
+			border: none;
+			background: rgba(220,38,38,0.8);
+			color: #fff;
+			border-radius: 6px;
+			padding: 6px 14px;
+			cursor: pointer;
+			font-size: 13px;
+			font-weight: 700;
+			transition: background 0.2s;
+		}
+		.pdf-close:hover { background: rgba(185,28,28,1); }
+
+		.pdf-nav {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+		}
+		.pdf-nav-btn {
+			border: none;
+			background: rgba(255,255,255,0.1);
+			color: #fff;
+			border-radius: 6px;
+			padding: 6px 16px;
+			cursor: pointer;
+			font-size: 13px;
+			font-weight: 700;
+			transition: background 0.2s;
+		}
+		.pdf-nav-btn:hover:not(:disabled) { background: rgba(255,255,255,0.2); }
+		.pdf-nav-btn:disabled { opacity: 0.35; cursor: default; }
+		.pdf-page-info {
+			color: #cbd5e1;
+			font-size: 13px;
+			min-width: 90px;
+			text-align: center;
+		}
+
+		/* Stage – the reading area */
+		.pdf-stage {
+			flex: 1;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			perspective: 1800px;
+			overflow: hidden;
+			padding: 24px 16px;
+			background: radial-gradient(ellipse at center, #2a2f45 0%, #1a1f2e 100%);
+		}
+
+		/* Shadow under the page */
+		.pdf-book-shadow {
+			position: relative;
+			margin: 0 auto;
+		}
+		.pdf-book-shadow::after {
+			content: '';
+			position: absolute;
+			bottom: -18px;
+			left: 5%;
+			width: 90%;
+			height: 20px;
+			background: rgba(0,0,0,0.55);
+			filter: blur(10px);
+			border-radius: 50%;
+		}
+
+		/* The flip card */
+		.pdf-flip-card {
+			position: relative;
+			transform-style: preserve-3d;
+			transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+		}
+		.pdf-flip-card.flip-fwd  { transform: rotateY(-180deg); }
+		.pdf-flip-card.flip-bwd  { transform: rotateY(180deg); }
+		.pdf-flip-card.no-anim  { transition: none !important; }
+
+		.pdf-canvas-face {
+			backface-visibility: hidden;
+			-webkit-backface-visibility: hidden;
+			display: block;
+			max-height: none;
+			width: auto;
+			max-width: min(95vw, 1100px);
+			image-rendering: auto;
+			border-radius: 4px;
+			box-shadow: 4px 0 20px rgba(0,0,0,0.6), -2px 0 10px rgba(0,0,0,0.3);
+		}
+		.pdf-canvas-face.back-face {
+			position: absolute;
+			top: 0;
+			left: 0;
+			transform: rotateY(180deg);
+		}
+
+		/* Loading spinner inside modal */
+		.pdf-loading {
+			position: absolute;
+			inset: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: #94a3b8;
+			font-size: 15px;
+			pointer-events: none;
+		}
+		.pdf-loading.hidden { display: none; }
+
+		/* Spine crease line in the center */
+		.pdf-spine {
+			position: absolute;
+			top: 0; bottom: 0;
+			width: 3px;
+			left: 50%;
+			transform: translateX(-50%);
+			background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.4), transparent);
+			pointer-events: none;
+		}
+
+		@media (max-width: 980px) {
+			.page { padding: 12px; }
+			.head h1 { font-size: 30px; }
+			.hero { grid-template-columns: 1fr; }
+			.cover { height: 320px; position: static; }
+			.title { font-size: 34px; }
+			.meta b { font-size: 14px; }
+			.meta span { font-size: 22px; }
+			.section h2 { font-size: 24px; }
+			.tile span { font-size: 14px; }
+			.warning h3 { font-size: 14px; }
+			.warning p { font-size: 11px; }
+			.warning li { font-size: 11px; }
+		}
+	</style>
+
+	<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+	<script src="theme.js"></script>
+</head>
+<body>
+	<div class="page">
+		<header class="head">
+			<a class="back" href="javascript:history.back()">&larr;</a>
+			<h1 id="headTitle">Book Details</h1>
+		</header>
+
+		<div id="status" class="status">Loading book details...</div>
+
+		<main id="bookView" style="display:none;" class="container">
+			<section class="hero">
+				<img id="bookImage" class="cover" src="images/book_cover.jpeg" alt="Book cover" />
+				<div class="hero-right">
+					<h2 id="bookTitle" class="title">Untitled Book</h2>
+					<div class="meta">
+						<div><b>Author</b><span id="bookAuthor">Unknown</span></div>
+						<div><b>Subject</b><span id="bookSubject">General</span></div>
+						<div><b>Branch</b><span id="bookBranch">General</span></div>
+					</div>
+					<hr class="divider" />
+					<p id="bookDesc" class="desc">No description available.</p>
+
+					<section class="section">
+						<h2>Publication Details</h2>
+						<div class="grid-two">
+							<div class="tile"><b>Publisher</b><span id="bookPublisher">Not Available</span></div>
+							<div class="tile"><b>Year Of Publication</b><span id="bookYear">Not Available</span></div>
+							<div class="tile"><b>Edition</b><span id="bookEdition">Not Available</span></div>
+							<div class="tile"><b>Pages</b><span id="bookPages">Not Available</span></div>
+							<div class="tile"><b>Language</b><span id="bookLanguage">English</span></div>
+							<div class="tile"><b>ISBN</b><span id="bookIsbn">Not Available</span></div>
+						</div>
+					</section>
+
+					<section id="featuresSection" class="section" style="display:none;">
+						<h2>Key Features</h2>
+						<div id="featuresList" class="grid-two"></div>
+					</section>
+
+					<section id="chaptersSection" class="section" style="display:none;">
+						<h2>Table Of Contents</h2>
+						<div id="chaptersList" class="grid-two"></div>
+					</section>
+
+					<div class="rating-box">
+						<div class="rating-title">Feedback: Rate this book out of 5</div>
+						<div class="star-row" id="starRow">
+							<button type="button" class="star-btn" data-value="1">★</button>
+							<button type="button" class="star-btn" data-value="2">★</button>
+							<button type="button" class="star-btn" data-value="3">★</button>
+							<button type="button" class="star-btn" data-value="4">★</button>
+							<button type="button" class="star-btn" data-value="5">★</button>
+							<button id="rateSubmitBtn" type="button" class="rate-submit">Submit Rating</button>
+						</div>
+						<div id="ratingMeta" class="rating-meta">No ratings yet</div>
+					</div>
+
+					<section class="warning">
+						<h3>IMPORTANT: Educational Use Only</h3>
+						<p><b>This book is NOT FOR COMMERCIAL PURPOSE.</b> Provided exclusively for educational and study purposes only.</p>
+						<ul>
+							<li>Use is restricted to personal study and learning</li>
+							<li>DO NOT sell, distribute, or republish this content</li>
+							<li>DO NOT use for commercial purposes or profit</li>
+							<li>Respect intellectual property rights and copyright</li>
+							<li>For educational institutions and individual learners only</li>
+						</ul>
+					</section>
+
+					<div class="actions">
+						<button id="openPdfBtn" type="button" class="btn btn-open">Open PDF</button>
+						<button id="saveBtn" type="button" class="btn btn-save">Save to My Books</button>
+					</div>
+				</div>
+			</section>
+		</main>
+	</div>
+
+	<!-- PDF Book Viewer Modal -->
+	<div id="pdfOverlay" class="pdf-overlay" oncontextmenu="return false;">
+		<div class="pdf-topbar">
+			<button class="pdf-close" onclick="closePdfModal()">&#10005; Close</button>
+			<span id="pdfModalTitle" style="flex:1;text-align:center;">Book PDF</span>
+			<div class="pdf-nav">
+				<button class="pdf-nav-btn" id="btnPrev" onclick="flipPrev()" disabled>&#8592; Prev</button>
+				<button class="pdf-nav-btn" id="btnZoomOut" onclick="adjustZoom(-0.1)" disabled>-</button>
+				<button class="pdf-nav-btn" id="btnZoomReset" onclick="resetZoom()" disabled>Fit</button>
+				<button class="pdf-nav-btn" id="btnZoomIn" onclick="adjustZoom(0.1)" disabled>+</button>
+				<span class="pdf-page-info" id="pageInfo">Loading...</span>
+				<button class="pdf-nav-btn" id="btnNext" onclick="flipNext()" disabled>Next &#8594;</button>
+			</div>
+		</div>
+		<div class="pdf-stage">
+			<div class="pdf-book-shadow">
+				<div class="pdf-flip-card" id="flipCard">
+					<canvas id="canvasFront" class="pdf-canvas-face"></canvas>
+					<canvas id="canvasBack"  class="pdf-canvas-face back-face"></canvas>
+				</div>
+			</div>
+			<div class="pdf-loading" id="pdfLoading">&#8987; Loading PDF...</div>
+		</div>
+	</div>
+
+	<script>
+		const API_BASE = 'http://localhost:3000/api';
+
+		function text(id, value, fallback) {
+			document.getElementById(id).textContent = value || fallback;
+		}
+
+		function getLocalBook() {
+			try {
+				const raw = sessionStorage.getItem('selectedBook');
+				return raw ? JSON.parse(raw) : null;
+			} catch (error) {
+				return null;
+			}
+		}
+
+		function resolveSubject(book) {
+			return book.subject || book.category || book.branch || 'General';
+		}
+
+		function resolvePdfUrl(book) {
+			const id = book?._id || book?.id;
+			if (id && book?._isDynamic) {
+				return `${API_BASE}/books/${encodeURIComponent(id)}/view`;
+			}
+			return book?.pdf || book?.pdfUrl || book?.viewUrl || '#';
+		}
+
+		function renderFeatures(features) {
+			const section = document.getElementById('featuresSection');
+			const list = document.getElementById('featuresList');
+			if (!Array.isArray(features) || !features.length) {
+				section.style.display = 'none';
+				return;
+			}
+			list.innerHTML = features.map((item) => `<div class="tile"><span>✓ ${item}</span></div>`).join('');
+			section.style.display = 'block';
+		}
+
+		function renderChapters(chapters) {
+			const section = document.getElementById('chaptersSection');
+			const list = document.getElementById('chaptersList');
+			if (!Array.isArray(chapters) || !chapters.length) {
+				section.style.display = 'none';
+				return;
+			}
+			list.innerHTML = chapters.map((item, idx) => `<div class="tile"><span>${idx + 1}. ${item}</span></div>`).join('');
+			section.style.display = 'block';
+		}
+
+		// ── PDF.js Book Viewer ──────────────────────────────────────
+		const PDFJS_CDN  = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+		const PDFJS_WORKER = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+		let _pdfDoc       = null;
+		let _currentPage  = 1;
+		let _totalPages   = 0;
+		let _isFlipping   = false;
+		let _currentPdfUrl = '#';
+		let _zoomFactor   = 1;
+		let _selectedRating = 0;
+		let _currentBook = null;
+		const LOCAL_RATINGS_KEY = 'bookRatings';
+
+		function loadPdfJs() {
+			return new Promise((resolve, reject) => {
+				if (window.pdfjsLib) { resolve(); return; }
+				const s = document.createElement('script');
+				s.src = PDFJS_CDN;
+				s.onload = () => { window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER; resolve(); };
+				s.onerror = reject;
+				document.head.appendChild(s);
+			});
+		}
+
+		async function renderPage(pageNum, canvas) {
+			const page = await _pdfDoc.getPage(pageNum);
+			const stage = document.querySelector('.pdf-stage');
+			const stageW = Math.max(320, (stage?.clientWidth || window.innerWidth) - 60);
+			const stageH = Math.max(300, (stage?.clientHeight || window.innerHeight) - 80);
+
+			const unscaled = page.getViewport({ scale: 1 });
+			// Fit to viewport by default so users see a clean full-page view without vertical scrolling.
+			const fitWidthScale = stageW / unscaled.width;
+			const fitHeightScale = stageH / unscaled.height;
+			const baseFitScale = Math.min(fitWidthScale, fitHeightScale);
+			const displayScale = Math.max(0.5, Math.min(baseFitScale * _zoomFactor, 3));
+			const qualityBoost = 1.2;
+			const effectiveScale = Math.min(displayScale * qualityBoost, 4);
+			const vp = page.getViewport({ scale: effectiveScale });
+			const displayWidth = vp.width / qualityBoost;
+			const displayHeight = vp.height / qualityBoost;
+
+			const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 3));
+			canvas.width = Math.ceil(vp.width * dpr);
+			canvas.height = Math.ceil(vp.height * dpr);
+			canvas.style.width = `${displayWidth}px`;
+			canvas.style.height = `${displayHeight}px`;
+
+			const ctx = canvas.getContext('2d', { alpha: false });
+			ctx.setTransform(1, 0, 0, 1, 0, 0);
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+			await page.render({ canvasContext: ctx, viewport: vp }).promise;
+
+			if (stage) {
+				stage.style.overflow = _zoomFactor > 1 ? 'auto' : 'hidden';
+				if (_zoomFactor <= 1) {
+					stage.scrollTop = 0;
+					stage.scrollLeft = 0;
+				}
+			}
+		}
+
+		function updateNav() {
+			const zoomText = `${Math.round(_zoomFactor * 100)}%`;
+			document.getElementById('pageInfo').textContent = `Page ${_currentPage} / ${_totalPages} (${zoomText})`;
+			document.getElementById('btnPrev').disabled = (_currentPage <= 1 || _isFlipping);
+			document.getElementById('btnNext').disabled = (_currentPage >= _totalPages || _isFlipping);
+			document.getElementById('btnZoomOut').disabled = _isFlipping || !_pdfDoc || _zoomFactor <= 0.5;
+			document.getElementById('btnZoomIn').disabled = _isFlipping || !_pdfDoc || _zoomFactor >= 3;
+			document.getElementById('btnZoomReset').disabled = _isFlipping || !_pdfDoc;
+		}
+
+		async function adjustZoom(delta) {
+			if (!_pdfDoc || _isFlipping) return;
+			_zoomFactor = Math.max(0.5, Math.min(3, Number((_zoomFactor + delta).toFixed(2))));
+			await renderPage(_currentPage, document.getElementById('canvasFront'));
+			updateNav();
+		}
+
+		async function resetZoom() {
+			if (!_pdfDoc || _isFlipping) return;
+			_zoomFactor = 1;
+			await renderPage(_currentPage, document.getElementById('canvasFront'));
+			updateNav();
+		}
+
+		async function doFlip(direction) {
+			if (_isFlipping) return;
+			const nextPage = _currentPage + direction;
+			if (nextPage < 1 || nextPage > _totalPages) return;
+			_isFlipping = true;
+			updateNav();
+
+			// Pre-render the incoming page on the back canvas
+			const back = document.getElementById('canvasBack');
+			await renderPage(nextPage, back);
+			// Match back canvas position/size to front
+			const front = document.getElementById('canvasFront');
+			back.style.width  = front.offsetWidth  + 'px';
+			back.style.height = front.offsetHeight + 'px';
+
+			// Kick off 3D flip
+			const card = document.getElementById('flipCard');
+			card.classList.add(direction > 0 ? 'flip-fwd' : 'flip-bwd');
+
+			card.addEventListener('transitionend', async () => {
+				_currentPage = nextPage;
+				// Render new current page on front, then reset card instantly
+				await renderPage(_currentPage, front);
+				card.classList.add('no-anim');
+				card.classList.remove('flip-fwd', 'flip-bwd');
+				void card.offsetWidth; // force reflow
+				card.classList.remove('no-anim');
+				_isFlipping = false;
+				updateNav();
+			}, { once: true });
+		}
+
+		function flipNext() { doFlip(1); }
+		function flipPrev() { doFlip(-1); }
+
+		// Keyboard arrow support
+		document.addEventListener('keydown', (e) => {
+			if (!document.getElementById('pdfOverlay').classList.contains('open')) return;
+			if (e.key === 'ArrowRight') flipNext();
+			if (e.key === 'ArrowLeft')  flipPrev();
+			if (e.key === 'Escape')     closePdfModal();
+		});
+
+		window.addEventListener('resize', async () => {
+			if (!_pdfDoc || !document.getElementById('pdfOverlay').classList.contains('open')) return;
+			try {
+				await renderPage(_currentPage, document.getElementById('canvasFront'));
+			} catch (_error) {
+				// Ignore transient resize render errors.
+			}
+		});
+
+		async function openPdfModal() {
+			if (!_currentPdfUrl || _currentPdfUrl === '#') {
+				alert('PDF not available for this book.');
+				return;
+			}
+			document.getElementById('pdfOverlay').classList.add('open');
+			document.getElementById('pdfLoading').classList.remove('hidden');
+			document.getElementById('pageInfo').textContent = 'Loading...';
+			document.getElementById('btnPrev').disabled = true;
+			document.getElementById('btnNext').disabled = true;
+			document.body.style.overflow = 'hidden';
+			try {
+				await loadPdfJs();
+				_pdfDoc = await pdfjsLib.getDocument({ url: _currentPdfUrl, withCredentials: false }).promise;
+				_totalPages  = _pdfDoc.numPages;
+				_currentPage = 1;
+				_zoomFactor = 1;
+				await renderPage(1, document.getElementById('canvasFront'));
+				document.getElementById('pdfLoading').classList.add('hidden');
+				updateNav();
+			} catch (err) {
+				console.error('PDF load error:', err);
+				document.getElementById('pdfLoading').textContent = '⚠ Could not load PDF.';
+			}
+		}
+
+		function closePdfModal() {
+			document.getElementById('pdfOverlay').classList.remove('open');
+			document.body.style.overflow = '';
+			_pdfDoc = null;
+			_currentPage = 1;
+			_zoomFactor = 1;
+			// Clear canvases
+			['canvasFront','canvasBack'].forEach(id => {
+				const c = document.getElementById(id);
+				const ctx = c.getContext('2d');
+				ctx.clearRect(0, 0, c.width, c.height);
+			});
+		}
+
+		function setupOpenPdf(book) {
+			_currentPdfUrl = resolvePdfUrl(book);
+			const titleEl = document.getElementById('pdfModalTitle');
+			titleEl.textContent = book.title || 'Book PDF';
+			document.getElementById('openPdfBtn').onclick = openPdfModal;
+		}
+
+		function getCurrentUserId() {
+			const raw = localStorage.getItem('currentUser');
+			if (!raw) return '';
+			try {
+				const parsed = JSON.parse(raw);
+				return parsed?.email || parsed?.id || parsed?.username || raw;
+			} catch (_error) {
+				return raw;
+			}
+		}
+
+		function getAnonymousUserId() {
+			let value = localStorage.getItem('anonymousUserId');
+			if (value) return value;
+			value = `anon-${Math.random().toString(36).slice(2)}-${Date.now()}`;
+			localStorage.setItem('anonymousUserId', value);
+			return value;
+		}
+
+		function getBookKey(book) {
+			const raw = String(book?._id || book?.id || book?.title || '').trim();
+			return raw.toLowerCase();
+		}
+
+		function isMongoObjectId(value) {
+			return /^[0-9a-fA-F]{24}$/.test(String(value || ''));
+		}
+
+		function readLocalRatings() {
+			try {
+				const raw = localStorage.getItem(LOCAL_RATINGS_KEY);
+				return raw ? JSON.parse(raw) : {};
+			} catch (_error) {
+				return {};
+			}
+		}
+
+		function writeLocalRatings(ratings) {
+			localStorage.setItem(LOCAL_RATINGS_KEY, JSON.stringify(ratings || {}));
+		}
+
+		function applyLocalRating(book, score, userId) {
+			const ratings = readLocalRatings();
+			const key = getBookKey(book);
+			if (!key) return { average: 0, count: 0 };
+
+			if (!ratings[key]) {
+				ratings[key] = {
+					total: 0,
+					count: 0,
+					average: 0,
+					users: {}
+				};
+			}
+
+			const entry = ratings[key];
+			const uid = String(userId || getAnonymousUserId());
+			const previous = Number(entry.users?.[uid] || 0);
+
+			if (previous > 0) {
+				entry.total = Math.max(0, Number(entry.total || 0) - previous + score);
+			} else {
+				entry.total = Number(entry.total || 0) + score;
+				entry.count = Number(entry.count || 0) + 1;
+			}
+
+			entry.users = entry.users || {};
+			entry.users[uid] = score;
+			entry.average = entry.count > 0 ? Number((entry.total / entry.count).toFixed(2)) : 0;
+
+			ratings[key] = entry;
+			writeLocalRatings(ratings);
+
+			return {
+				average: Number(entry.average || 0),
+				count: Number(entry.count || 0)
+			};
+		}
+
+		function getEffectiveRating(book) {
+			const backendAverage = Number(book?.rating?.average || 0);
+			const backendCount = Number(book?.rating?.count || 0);
+
+			if (backendCount > 0) {
+				return { average: backendAverage, count: backendCount, source: 'api' };
+			}
+
+			const ratings = readLocalRatings();
+			const key = getBookKey(book);
+			const local = key ? ratings[key] : null;
+			if (!local) {
+				return { average: 0, count: 0, source: 'none' };
+			}
+
+			return {
+				average: Number(local.average || 0),
+				count: Number(local.count || 0),
+				source: 'local'
+			};
+		}
+
+		function paintStars(value) {
+			document.querySelectorAll('.star-btn').forEach((btn) => {
+				const v = Number(btn.dataset.value || 0);
+				btn.classList.toggle('active', v <= value);
+			});
+		}
+
+		function renderRatingMeta(book) {
+			const effective = getEffectiveRating(book);
+			const avg = Number(effective.average || 0);
+			const count = Number(effective.count || 0);
+			document.getElementById('ratingMeta').textContent = count > 0
+				? `Average ${avg.toFixed(1)} / 5 from ${count} user${count > 1 ? 's' : ''}`
+				: 'No ratings yet';
+		}
+
+		function setupRating(book) {
+			renderRatingMeta(book);
+			_selectedRating = 0;
+			paintStars(0);
+
+			document.querySelectorAll('.star-btn').forEach((btn) => {
+				btn.onclick = () => {
+					_selectedRating = Number(btn.dataset.value || 0);
+					paintStars(_selectedRating);
+				};
+			});
+
+			document.getElementById('rateSubmitBtn').onclick = async () => {
+				if (!_currentBook || !(_currentBook._id || _currentBook.id)) {
+					alert('Book details not ready. Please try again.');
+					return;
+				}
+				if (_selectedRating < 1 || _selectedRating > 5) {
+					alert('Please select a rating from 1 to 5 stars.');
+					return;
+				}
+
+				const submitBtn = document.getElementById('rateSubmitBtn');
+				submitBtn.disabled = true;
+				submitBtn.textContent = 'Submitting...';
+
+				try {
+					const bookId = _currentBook._id || _currentBook.id;
+					const userId = getCurrentUserId() || getAnonymousUserId();
+					let submitted = false;
+
+					if (isMongoObjectId(bookId)) {
+						try {
+							const response = await fetch(`${API_BASE}/books/${encodeURIComponent(bookId)}/rate`, {
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({
+									rating: _selectedRating,
+									userId
+								})
+							});
+							const data = await response.json();
+							if (!response.ok || !data.ok) {
+								throw new Error(data.error || 'Failed to submit rating');
+							}
+
+							_currentBook.rating = {
+								average: Number(data?.rating?.average || 0),
+								count: Number(data?.rating?.count || 0)
+							};
+							submitted = true;
+						} catch (_apiError) {
+							// Fall through to local persistence.
+						}
+					}
+
+					if (!submitted) {
+						const local = applyLocalRating(_currentBook, _selectedRating, userId);
+						_currentBook.rating = {
+							average: local.average,
+							count: local.count
+						};
+					}
+
+					renderRatingMeta(_currentBook);
+					alert('Thank you for your feedback!');
+				} catch (error) {
+					alert(error.message || 'Could not submit rating.');
+				} finally {
+					submitBtn.disabled = false;
+					submitBtn.textContent = 'Submit Rating';
+				}
+			};
+		}
+
+		function setupSave(book) {
+			const btn = document.getElementById('saveBtn');
+			btn.onclick = () => {
+				const email = localStorage.getItem('currentUser');
+				if (!email) {
+					alert('Please login first');
+					window.location.href = 'login.html';
+					return;
+				}
+				const key = `saved_${email}`;
+				const list = JSON.parse(localStorage.getItem(key) || '[]');
+				const exists = list.find((item) => String(item.id || item._id) === String(book.id || book._id));
+				if (exists) {
+					alert('Already saved');
+					return;
+				}
+				list.push(book);
+				localStorage.setItem(key, JSON.stringify(list));
+				alert('Saved to My Books');
+			};
+		}
+
+		function renderBook(book) {
+			_currentBook = book;
+			const categoryValue = book.category || book.branch || 'General';
+			text('headTitle', `${categoryValue} Book Details`, 'Book Details');
+			text('bookTitle', book.title, 'Untitled Book');
+			text('bookAuthor', book.author, 'Unknown Author');
+			text('bookSubject', resolveSubject(book), 'General');
+			text('bookBranch', categoryValue, 'General');
+			text('bookDesc', book.description, 'No description available for this book.');
+
+			text('bookPublisher', book.publisher || book.uploadedBy, 'Not Available');
+			text('bookYear', book.year || book.publishedYear, 'Not Available');
+			text('bookEdition', book.edition, 'Not Available');
+			const pages = book.pages || book.pageCount;
+			text('bookPages', pages ? `${pages} Pages` : '', 'Not Available');
+			text('bookLanguage', book.language, 'English');
+			text('bookIsbn', book.isbn, 'Not Available');
+
+			const image = document.getElementById('bookImage');
+			image.src = book.book_cover || book.coverImage || book?.coverImage?.url || 'images/book_cover.jpeg';
+
+			renderFeatures(book.features || []);
+			renderChapters(book.toc || book.chapters || []);
+			setupRating(book);
+
+			setupOpenPdf(book);
+			setupSave(book);
+
+			document.getElementById('status').style.display = 'none';
+			document.getElementById('bookView').style.display = 'block';
+		}
+
+		async function load() {
+			const params = new URLSearchParams(window.location.search);
+			const id = params.get('id');
+			const fallbackBook = getLocalBook();
+
+			if (!id && !fallbackBook) {
+				document.getElementById('status').textContent = 'Book details not found.';
+				return;
+			}
+
+			if (!id && fallbackBook) {
+				renderBook(fallbackBook);
+				return;
+			}
+
+			try {
+				const response = await fetch(`${API_BASE}/books/${encodeURIComponent(id)}`);
+				const data = await response.json();
+				if (!response.ok || !data.ok || !data.book) {
+					if (fallbackBook) {
+						renderBook(fallbackBook);
+						return;
+					}
+					document.getElementById('status').textContent = data.error || 'Book not found.';
+					return;
+				}
+
+				const merged = {
+					...(fallbackBook || {}),
+					...data.book,
+					id: data.book._id || id,
+					_isDynamic: true
+				};
+				renderBook(merged);
+			} catch (error) {
+				if (fallbackBook) {
+					renderBook(fallbackBook);
+					return;
+				}
+				document.getElementById('status').textContent = 'Failed to load details. Ensure backend is running.';
+			}
+		}
+
+		window.addEventListener('DOMContentLoaded', load);
+	</script>
+</body>
+</html>

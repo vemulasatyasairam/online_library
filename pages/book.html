@@ -1,0 +1,923 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Book Details</title>
+  <script>
+    window.location.replace('book-view.html' + window.location.search);
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .header {
+      background-color: #0b72b9;
+      color: white;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      border-radius: 8px 8px 0 0;
+      margin-bottom: 0;
+    }
+
+    .header a {
+      color: white;
+      text-decoration: none;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .header h2 {
+      flex: 1;
+      font-size: 24px;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .book-detail-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+
+    .book-content {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 40px;
+      padding: 40px;
+    }
+
+    .book-cover {
+      position: relative;
+    }
+
+    .book-cover img {
+      width: 100%;
+      height: 380px;
+      object-fit: cover;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .book-info {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .book-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1a202c;
+      line-height: 1.2;
+    }
+
+    .book-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .meta-label {
+      font-size: 12px;
+      color: #718096;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .meta-value {
+      font-size: 16px;
+      color: #2d3748;
+      font-weight: 500;
+      margin-top: 4px;
+    }
+
+    .divider {
+      height: 1px;
+      background-color: #e2e8f0;
+      margin: 10px 0;
+    }
+
+    .description {
+      color: #4a5568;
+      font-size: 15px;
+      line-height: 1.6;
+      margin: 10px 0;
+    }
+
+    .details-section {
+      margin: 20px 0;
+    }
+
+    .details-section h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 10px;
+    }
+
+    .details-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .detail-item {
+      padding: 12px;
+      background-color: #f7fafc;
+      border-left: 3px solid #0b72b9;
+      border-radius: 4px;
+    }
+
+    .detail-item label {
+      font-size: 12px;
+      color: #718096;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .detail-item value {
+      display: block;
+      font-size: 14px;
+      color: #2d3748;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px 20px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn.open {
+      background: #0b72b9;
+      color: white;
+    }
+
+    .btn.open:hover {
+      background: #0a5fa0;
+    }
+
+    .btn.save {
+      background: #10b981;
+      color: white;
+    }
+
+    .btn.save:hover {
+      background: #059669;
+    }
+
+    .message {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .message.success {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    .message.error {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+
+    .not-found {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .not-found h1 {
+      font-size: 32px;
+      color: #1a202c;
+      margin-bottom: 10px;
+    }
+
+    .not-found p {
+      color: #718096;
+      margin-bottom: 20px;
+    }
+
+    .not-found a {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #0b72b9;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      margin-top: 10px;
+    }
+
+    /* Warning Banner Styles */
+    .warning-banner {
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 5px solid #7f1d1d;
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
+    .warning-banner-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .warning-banner-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .warning-banner-title {
+      flex: 1;
+    }
+
+    .warning-banner-divider {
+      height: 2px;
+      background: rgba(255, 255, 255, 0.3);
+      margin: 12px 0;
+    }
+
+    .warning-banner-content {
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .warning-banner-list {
+      list-style: none;
+      margin: 10px 0 0 0;
+      padding-left: 0;
+    }
+
+    .warning-banner-list li {
+      padding: 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .warning-banner-list li:before {
+      content: "\2713";
+      font-weight: bold;
+      color: #fecaca;
+    }
+
+    @media (max-width: 768px) {
+      .book-content {
+        grid-template-columns: 1fr;
+        padding: 20px;
+      }
+
+      .book-title {
+        font-size: 24px;
+      }
+
+      .details-list {
+        grid-template-columns: 1fr;
+      }
+
+      .book-meta {
+        flex-direction: column;
+        gap: 15px;
+      }
+    }
+
+    /* Reader Modal Styles */
+    .reader-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    .reader-modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .reader-container {
+      background: white;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    .reader-header {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      z-index: 10;
+      border-radius: 10px 10px 0 0;
+    }
+
+    .reader-close-btn {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 28px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .reader-close-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+
+    .reader-title {
+      flex: 1;
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .reader-content {
+      padding: 30px;
+    }
+
+    .reader-warning {
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      border-left: 5px solid #7f1d1d;
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
+    .reader-warning-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+
+    .reader-warning-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .reader-warning-content {
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0 0 12px 0;
+    }
+
+    .reader-warning-list {
+      list-style: none;
+      margin: 10px 0 0 0;
+      padding-left: 0;
+    }
+
+    .reader-warning-list li {
+      padding: 6px 0 6px 24px;
+      position: relative;
+      font-size: 13px;
+    }
+
+    .reader-warning-list li:before {
+      content: "\2713";
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+      color: #fecaca;
+    }
+
+    .reader-book-info {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .reader-book-info h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #0b72b9;
+      padding-bottom: 10px;
+    }
+
+    .reader-book-meta {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .reader-meta-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .reader-meta-label {
+      font-size: 12px;
+      color: #718096;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .reader-meta-value {
+      font-size: 14px;
+      color: #2d3748;
+      font-weight: 500;
+      margin-top: 4px;
+    }
+
+    .reader-pdf-action {
+      background: #0b72b9;
+      color: white;
+      padding: 15px 25px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      width: 100%;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .reader-pdf-action:hover {
+      background: #0a5fa0;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    @media (max-width: 768px) {
+      .reader-container {
+        width: 95%;
+        max-height: 85vh;
+      }
+
+      .reader-header {
+        padding: 15px;
+      }
+
+      .reader-title {
+        font-size: 16px;
+      }
+
+      .reader-content {
+        padding: 20px;
+      }
+
+      .reader-book-meta {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="theme.js"></script>
+</head>
+<body>
+  <div class="header">
+    <a href="explorer.html">&larr;</a>
+    <h2>Book Details</h2>
+  </div>
+
+  <div class="container">
+    <div class="book-detail-card">
+      <div id="notFound" class="not-found" style="display:none;">
+        <h1>Book Not Found</h1>
+        <p>We couldn't find the book you're looking for.</p>
+        <a href="explorer.html">Back to Explorer</a>
+      </div>
+
+      <div id="bookContainer" style="display:none;">
+        <div class="book-content">
+          <div class="book-cover">
+            <img id="bookImage" src="" alt="Book Cover">
+          </div>
+
+          <div class="book-info">
+            <h1 class="book-title" id="title">Book Title</h1>
+
+            <div class="book-meta">
+              <div class="meta-item">
+                <span class="meta-label">Author</span>
+                <span class="meta-value" id="author">Unknown</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Subject</span>
+                <span class="meta-value" id="subject">General</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Branch</span>
+                <span class="meta-value" id="branch">N/A</span>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="description" id="description">
+              This is a detailed description of the book. It provides information about the book's content, themes, and relevance to the course.
+            </div>
+
+            <div class="details-section">
+              <h3>Publication Details</h3>
+              <div class="details-list">
+                <div class="detail-item">
+                  <label>Publisher</label>
+                  <value id="publisher">Not Available</value>
+                </div>
+                <div class="detail-item">
+                  <label>Year of Publication</label>
+                  <value id="year">Not Available</value>
+                </div>
+                <div class="detail-item">
+                  <label>Edition</label>
+                  <value id="edition">Not Available</value>
+                </div>
+                <div class="detail-item">
+                  <label>Pages</label>
+                  <value id="pages">Not Available</value>
+                </div>
+              </div>
+            </div>
+
+            <!-- Non-Commercial Use Warning Banner -->
+            <div class="warning-banner" id="warningBanner" style="display:none;">
+              <div class="warning-banner-header">
+                <span class="warning-banner-icon">⚠️</span>
+                <span class="warning-banner-title">IMPORTANT: Educational Use Only</span>
+              </div>
+              <div class="warning-banner-divider"></div>
+              <p class="warning-banner-content">
+                <strong>This book is NOT FOR COMMERCIAL PURPOSE.</strong> This book is provided exclusively for educational and study purposes only. 
+              </p>
+              <ul class="warning-banner-list">
+                <li>Use is restricted to personal study and learning</li>
+                <li>DO NOT sell, distribute, or republish this content</li>
+                <li>DO NOT use for commercial purposes or profit</li>
+                <li>Respect intellectual property rights and copyright</li>
+                <li>This is for educational institutions and individual learners only</li>
+              </ul>
+            </div>
+
+            <div class="actions">
+              <button id="openPdf" class="btn open">📖 Open PDF</button>
+              <button id="saveBook" class="btn save save-btn" data-id="book1">⭐ Save to My Books</button>
+            </div>
+
+            <div id="msg"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reader Modal -->
+  <div class="reader-modal" id="readerModal">
+    <div class="reader-container">
+      <div class="reader-header">
+        <button class="reader-close-btn" id="readerCloseBtn">&times;</button>
+        <h2 class="reader-title" id="readerTitle">Book Reader</h2>
+      </div>
+      <div class="reader-content">
+        <!-- Warning Banner -->
+        <div class="reader-warning">
+          <div class="reader-warning-header">
+            <span class="reader-warning-icon">⚠️</span>
+            <span>IMPORTANT: Educational Use Only</span>
+          </div>
+          <p class="reader-warning-content">
+            <strong>This book is NOT FOR COMMERCIAL PURPOSE.</strong> This book is provided exclusively for educational and study purposes only.
+          </p>
+          <ul class="reader-warning-list">
+            <li>Use is restricted to personal study and learning</li>
+            <li>DO NOT sell, distribute, or republish this content</li>
+            <li>DO NOT use for commercial purposes or profit</li>
+            <li>Respect intellectual property rights and copyright</li>
+            <li>This is for educational institutions and individual learners only</li>
+          </ul>
+        </div>
+
+        <!-- Book Information -->
+        <div class="reader-book-info">
+          <h3>Book Information</h3>
+          <div class="reader-book-meta">
+            <div class="reader-meta-item">
+              <span class="reader-meta-label">Author</span>
+              <span class="reader-meta-value" id="readerAuthor">-</span>
+            </div>
+            <div class="reader-meta-item">
+              <span class="reader-meta-label">Subject</span>
+              <span class="reader-meta-value" id="readerSubject">-</span>
+            </div>
+            <div class="reader-meta-item">
+              <span class="reader-meta-label">Publisher</span>
+              <span class="reader-meta-value" id="readerPublisher">-</span>
+            </div>
+            <div class="reader-meta-item">
+              <span class="reader-meta-label">Year</span>
+              <span class="reader-meta-value" id="readerYear">-</span>
+            </div>
+          </div>
+          <button class="reader-pdf-action" id="openPdfExternal">📄 Open PDF in New Window</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Book database with detailed information
+    const booksDatabase = {
+      book1: {
+        id: 'book1',
+        title: 'IAS Examination Guide',
+        author: 'Dr. M. Laxmikanth',
+        subject: 'Government & Politics',
+        branch: 'General Knowledge',
+        publisher: 'McGraw Hill Education',
+        year: 2023,
+        edition: '8th Edition',
+        pages: 1200,
+        book_cover: 'https://sp-ao.shortpixel.ai/client/to_auto,q_glossy,ret_img,w_1024/https://shop.chanakyamandal.org/wp-content/uploads/2021/11/WhatsApp-Image-2021-11-19-at-3.06.30-PM-1-1024x1024.jpeg',
+        description: 'Comprehensive guide for IAS examination covering all important topics and current affairs relevant to civil services examination. This book is a must-have for aspirants.',
+        pdf: 'pdfs/ias-guide.pdf'
+      },
+      book2: {
+        id: 'book2',
+        title: 'Indian Polity',
+        author: 'M. Laxmikanth',
+        subject: 'Constitutional Law',
+        branch: 'CSE - All Years',
+        publisher: 'McGraw Hill',
+        year: 2022,
+        edition: '7th Edition',
+        pages: 850,
+        book_cover: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAAAAD/2wCE...',
+        description: 'A detailed textbook on Indian Constitution, political system, and governance. Essential for understanding the fundamental structure of Indian democracy.',
+        pdf: 'pdfs/indian-polity.pdf'
+      },
+      book3: {
+        id: 'book3',
+        title: 'Indian Economy',
+        author: 'Ramesh Singh',
+        subject: 'Economics',
+        branch: 'CSE/Commerce',
+        publisher: 'Pearson',
+        year: 2023,
+        edition: '14th Edition',
+        pages: 720,
+        book_cover: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEA...',
+        description: 'Comprehensive coverage of Indian economic policies, growth, inflation, poverty, and development. Perfect for competitive exams and academic study.',
+        pdf: 'pdfs/indian-economy.pdf'
+      },
+      book4: {
+        id: 'book4',
+        title: 'Mahabharata - English Translation',
+        author: 'Vyasa (Trans. by C.V. Narasimhan)',
+        subject: 'Indian Literature & Philosophy',
+        branch: 'All Branches',
+        publisher: 'Penguin Classics',
+        year: 2006,
+        edition: 'Standard Edition',
+        pages: 900,
+        book_cover: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEA...',
+        description: 'The epic narrative of the Mahabharata is one of the greatest literary works in human history. This translation brings the profound teachings and stories to modern readers.',
+        pdf: 'pdfs/mahabharata.pdf'
+      },
+      book5: {
+        id: 'book5',
+        title: 'Ramayana - English Translation',
+        author: 'Valmiki (Trans. by Robert P. Goldman)',
+        subject: 'Indian Literature & Mythology',
+        branch: 'All Branches',
+        publisher: 'Penguin Classics',
+        year: 2005,
+        edition: 'Abridged Edition',
+        pages: 780,
+        book_cover: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtokXL1tmbLZxcin_BxQRrNmnipAmevWvxvA&s',
+        description: 'The Ramayana is an ancient Sanskrit epic that tells the story of Prince Rama. A timeless narrative filled with moral lessons and spiritual wisdom.',
+        pdf: 'pdfs/ramayana.pdf'
+      },
+      book6: {
+        id: 'book6',
+        title: 'Bhagavad Gita',
+        author: 'Lord Krishna (Trans. by Swami Sivananda)',
+        subject: 'Philosophy & Spirituality',
+        branch: 'All Branches',
+        publisher: 'Divine Life Society',
+        year: 2012,
+        edition: 'Standard Translation',
+        pages: 450,
+        book_cover: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEA...',
+        description: 'A philosophical dialogue between Lord Krishna and Prince Arjuna. The Bhagavad Gita contains universal teachings on duty, righteousness, and the path to enlightenment.',
+        pdf: 'pdfs/bhagavad-gita.pdf'
+      }
+    };
+
+    function getQueryParam(name) {
+      const params = new URLSearchParams(location.search);
+      return params.get(name);
+    }
+
+    const bookId = getQueryParam('id');
+    const book = booksDatabase[bookId];
+    
+    const notFoundEl = document.getElementById('notFound');
+    const bookContainerEl = document.getElementById('bookContainer');
+    const warningBanner = document.getElementById('warningBanner');
+    const titleEl = document.getElementById('title');
+    const authorEl = document.getElementById('author');
+    const subjectEl = document.getElementById('subject');
+    const branchEl = document.getElementById('branch');
+    const descriptionEl = document.getElementById('description');
+    const publisherEl = document.getElementById('publisher');
+    const yearEl = document.getElementById('year');
+    const editionEl = document.getElementById('edition');
+    const pagesEl = document.getElementById('pages');
+    const bookImageEl = document.getElementById('bookImage');
+    const openBtn = document.getElementById('openPdf');
+    const saveBtn = document.getElementById('saveBook');
+    const msgEl = document.getElementById('msg');
+
+    // Reader Modal Elements
+    const readerModal = document.getElementById('readerModal');
+    const readerCloseBtn = document.getElementById('readerCloseBtn');
+    const readerTitle = document.getElementById('readerTitle');
+    const readerAuthor = document.getElementById('readerAuthor');
+    const readerSubject = document.getElementById('readerSubject');
+    const readerPublisher = document.getElementById('readerPublisher');
+    const readerYear = document.getElementById('readerYear');
+    const openPdfExternal = document.getElementById('openPdfExternal');
+
+    if (!book) {
+      notFoundEl.style.display = 'block';
+      bookContainerEl.style.display = 'none';
+      warningBanner.style.display = 'none';
+    } else {
+      notFoundEl.style.display = 'none';
+      bookContainerEl.style.display = 'block';
+      warningBanner.style.display = 'block';
+
+      // Populate book details
+      titleEl.textContent = book.title;
+      authorEl.textContent = book.author;
+      subjectEl.textContent = book.subject;
+      branchEl.textContent = book.branch;
+      descriptionEl.textContent = book.description;
+      publisherEl.textContent = book.publisher || 'Not Available';
+      yearEl.textContent = book.year || 'Not Available';
+      editionEl.textContent = book.edition || 'Not Available';
+      pagesEl.textContent = book.pages || 'Not Available';
+      bookImageEl.src = book.book_cover;
+      saveBtn.setAttribute('data-id', book.id);
+
+      // Open PDF button - Show Reader Modal
+      openBtn.addEventListener('click', function() {
+        if (book.pdf && book.pdf !== '#') {
+          // Populate reader modal with book information
+          readerTitle.textContent = book.title;
+          readerAuthor.textContent = book.author;
+          readerSubject.textContent = book.subject;
+          readerPublisher.textContent = book.publisher || 'Not Available';
+          readerYear.textContent = book.year || 'Not Available';
+          
+          // Store the PDF path for external opening
+          openPdfExternal.setAttribute('data-pdf', book.pdf);
+          
+          // Show the reader modal
+          readerModal.classList.add('active');
+        } else {
+          showMessage('PDF is not available for this book.', 'error');
+        }
+      });
+
+      // Close Reader Modal
+      readerCloseBtn.addEventListener('click', function() {
+        readerModal.classList.remove('active');
+      });
+
+      // Open PDF in New Window
+      openPdfExternal.addEventListener('click', function() {
+        const pdfPath = openPdfExternal.getAttribute('data-pdf');
+        if (pdfPath && pdfPath !== '#') {
+          window.open(pdfPath, '_blank');
+        }
+      });
+
+      // Close modal when clicking outside the container
+      readerModal.addEventListener('click', function(e) {
+        if (e.target === readerModal) {
+          readerModal.classList.remove('active');
+        }
+      });
+
+      // Save to My Books button
+      saveBtn.addEventListener('click', function() {
+        const isLogged = localStorage.getItem('loggedIn') === 'true';
+        if (!isLogged) {
+          location.href = 'login.html';
+          return;
+        }
+
+        const email = localStorage.getItem('currentUser');
+        if (!email) {
+          location.href = 'login.html';
+          return;
+        }
+
+        const storageKey = `saved_${email}`;
+        const savedBooks = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        
+        // Check if book is already saved
+        if (!savedBooks.find(b => b.id === book.id)) {
+          savedBooks.push(book);
+          localStorage.setItem(storageKey, JSON.stringify(savedBooks));
+          showMessage('✓ Book saved to My Books successfully!', 'success');
+        } else {
+          showMessage('This book is already in your collection.', 'error');
+        }
+      });
+
+      function showMessage(text, type) {
+        msgEl.textContent = text;
+        msgEl.className = `message ${type}`;
+        setTimeout(() => {
+          msgEl.textContent = '';
+          msgEl.className = 'message';
+        }, 3000);
+      }
+    }
+  </script>
+</body>
+</html>

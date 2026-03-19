@@ -42,7 +42,7 @@ Successfully installed in backend directory.
 ### 4. ✅ Frontend Files Created
 
 #### HTML Interface
-- **[legacy_html/pdf-manager.html](../legacy_html/pdf-manager.html)** - PDF Manager UI
+- **[pages/pdf-manager.html](../pages/pdf-manager.html)** - PDF Manager UI
   - Modern, responsive design
   - Upload interface
   - PDF viewer with iframe
@@ -50,7 +50,7 @@ Successfully installed in backend directory.
   - Mobile-friendly
 
 #### JavaScript Handler
-- **[legacy_html/pdf-manager.js](../legacy_html/pdf-manager.js)** - Frontend functionality
+- **[pages/pdf-manager.js](../pages/pdf-manager.js)** - Frontend functionality
   - PDF upload handling
   - File display in viewer
   - localStorage for history
@@ -71,7 +71,7 @@ backend/
       pdfService.js                 (NEW)
     routes/
       pdf.js                        (NEW)
-legacy_html/
+pages/
   pdf-manager.html                  (NEW)
   pdf-manager.js                    (NEW)
 ```
@@ -89,7 +89,7 @@ api_secret: 'YOUR_ACTUAL_API_SECRET' // Replace this
 ```
 
 ### Step 2: Update Frontend API URL
-In **legacy_html/pdf-manager.js**, if your backend runs on different port:
+In **pages/pdf-manager.js**, if your backend runs on different port:
 ```javascript
 const API_BASE = 'http://localhost:3000/api/pdf'; // Update port if needed
 ```
@@ -106,7 +106,7 @@ Open in browser:
 ```
 http://localhost:3000/pdf-manager.html
 # OR
-file:///c:/sai%20ram%20html/Online%20Library%20project/legacy_html/pdf-manager.html
+file:///c:/sai%20ram%20html/Online%20Library%20project/pages/pdf-manager.html
 ```
 
 ---

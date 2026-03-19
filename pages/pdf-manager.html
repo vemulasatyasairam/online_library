@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Manager - Upload & View</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 1em;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .file-input-label:hover {
+            transform: translateY(-2px);
+        }
+
+        .file-name {
+            margin-top: 8px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            margin-right: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ff5252;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .pdf-list {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .pdf-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .pdf-item:hover {
+            background: #e9ecef;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .pdf-info {
+            flex: 1;
+        }
+
+        .pdf-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .pdf-id {
+            font-size: 0.85em;
+            color: #999;
+            word-break: break-all;
+        }
+
+        .pdf-actions {
+            display: flex;
+            gap: 10px;
+            margin-left: 15px;
+        }
+
+        .pdf-viewer-section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+        }
+
+        .pdf-viewer-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .iframe-container {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .no-pdf {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .pdf-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .pdf-actions {
+                margin-left: 0;
+                margin-top: 10px;
+                width: 100%;
+            }
+
+            .pdf-actions button {
+                flex: 1;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="theme.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 PDF Manager</h1>
+            <p>Upload, store, and manage your PDFs with Cloudinary</p>
+        </div>
+
+        <div class="content">
+            <!-- Upload Section -->
+            <div class="card">
+                <h2>Upload PDF</h2>
+                <div id="uploadMessage" class="message"></div>
+                
+                <form id="uploadForm">
+                    <div class="form-group">
+                        <label for="pdfFile">Select PDF File</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="pdfFile" name="pdf" accept=".pdf" required>
+                            <label for="pdfFile" class="file-input-label">
+                                Choose PDF File
+                            </label>
+                            <div class="file-name" id="fileName"></div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="uploadBtn">
+                        Upload PDF
+                    </button>
+                </form>
+            </div>
+
+            <!-- View/Display Section -->
+            <div class="card">
+                <h2>View PDF</h2>
+                <div id="viewMessage" class="message"></div>
+                
+                <div class="form-group">
+                    <label for="publicIdInput">Enter Public ID</label>
+                    <input type="text" id="publicIdInput" placeholder="e.g., 1702123456789_document">
+                </div>
+
+                <button class="btn btn-primary" id="loadPdfBtn">Load PDF</button>
+            </div>
+        </div>
+
+        <!-- PDF List Section -->
+        <div class="card">
+            <h2>Uploaded PDFs</h2>
+            <div id="pdfList" class="pdf-list">
+                <p style="color: #999; text-align: center;">No PDFs uploaded yet</p>
+            </div>
+        </div>
+
+        <!-- PDF Viewer Section -->
+        <div class="pdf-viewer-section" id="viewerSection" style="display: none;">
+            <h2>PDF Viewer</h2>
+            <div class="iframe-container" id="iframeContainer">
+                <div class="no-pdf">Loading PDF...</div>
+            </div>
+            <div style="margin-top: 15px; display: flex; gap: 10px;">
+                <a id="downloadLink" href="#" class="btn btn-secondary" download>⬇️ Download</a>
+                <button class="btn btn-secondary" onclick="document.getElementById('viewerSection').style.display = 'none';">Close Viewer</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="pdf-manager.js"></script>
+</body>
+</html>

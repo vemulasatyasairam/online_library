@@ -233,7 +233,7 @@
 - ✅ Search functionality
 - ✅ My Books click handling
 
-### main.html
+### index.html
 - ✅ Logout handler with AuthService support
 - ✅ Storage event listener
 

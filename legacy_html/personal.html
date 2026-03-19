@@ -128,6 +128,8 @@
       align-items:stretch;
       position:relative;
       transition:all 0.3s ease;
+      width:140px;
+      min-height:150px;
     }
     .book-card:hover{
       box-shadow:0 12px 32px rgba(0,0,0,0.15);
@@ -196,6 +198,9 @@
       .book-card img{height:180px}
     }
   </style>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="theme.js"></script>
 </head>
 <body>
   <header class="topbar">
@@ -320,6 +325,13 @@
         profileBtn.addEventListener('click', (e) => {
           e.stopPropagation();
           window.location.href = 'profile.html';
+        });
+      }
+
+      if (profileClose) {
+        profileClose.addEventListener('click', () => {
+          profileModal.classList.remove('show');
+        });
       }
 
       if (profileModal) {
@@ -339,7 +351,7 @@
         }
         profileModal.classList.remove('show');
         updateProfileUI();
-        location.href = 'main.html';
+        location.href = 'index.html';
       });
 
       updateProfileUI();

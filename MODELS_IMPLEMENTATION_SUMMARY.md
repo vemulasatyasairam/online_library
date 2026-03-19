@@ -189,7 +189,7 @@ node test-models.js
 
 ### 3. Open Frontend
 ```
-file:///c:/sai%20ram%20html/Online%20Library%20project/legacy_html/login.html
+file:///c:/sai%20ram%20html/Online%20Library%20project/pages/login.html
 ```
 
 ### 4. Register

@@ -23,7 +23,7 @@ CORS enabled for localhost:3000 and file:// protocol
 
 Navigate to:
 ```
-file:///c:/sai%20ram%20html/Online%20Library%20project/legacy_html/login.html
+file:///c:/sai%20ram%20html/Online%20Library%20project/pages/login.html
 ```
 
 Or better, use VS Code Live Server extension.
@@ -66,7 +66,7 @@ backend/
 ├── data/saved.json              # Saved books
 └── src/                         # API code
 
-legacy_html/
+pages/
 ├── auth-service.js              # Authentication service
 ├── login.html                   # Login/Register page
 ├── explorer.html                # Books browser

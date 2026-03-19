@@ -15,8 +15,8 @@ npm i cloudinary
 4. **src/routes/pdf.js** - PDF API routes
 
 ### Frontend Files:
-1. **legacy_html/pdf-manager.html** - PDF Manager UI
-2. **legacy_html/pdf-manager.js** - PDF Manager Functionality
+1. **pages/pdf-manager.html** - PDF Manager UI
+2. **pages/pdf-manager.js** - PDF Manager Functionality
 
 ## Integration Steps
 
@@ -56,7 +56,7 @@ cloudinary.config({
 ```
 
 ### Step 4: Update API_BASE in frontend
-In **legacy_html/pdf-manager.js**, update:
+In **pages/pdf-manager.js**, update:
 ```javascript
 const API_BASE = 'http://localhost:5000/api/pdf'; // Change port if needed
 ```
@@ -111,7 +111,7 @@ Response:
 ### Access PDF Manager
 Open in browser:
 ```
-file:///c:/sai%20ram%20html/Online%20Library%20project/legacy_html/pdf-manager.html
+file:///c:/sai%20ram%20html/Online%20Library%20project/pages/pdf-manager.html
 ```
 
 Or serve through your backend:

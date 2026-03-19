@@ -13,6 +13,7 @@
     .field .toggle-password { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; padding: 0; }
     .btn{ width:100%; height:42px; background:#2563eb; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:700 }
     .msg{ font-size:0.95rem; color:#333; margin-top:12px; text-align:center; min-height:20px }
+    .hint{ font-size:0.82rem; color:#334155; text-align:center; margin-top:6px; }
     .link { display:block; text-align:center; margin-top:10px; color:#2563eb; text-decoration:underline; cursor:pointer }
     .tabs { display:flex; gap:10px; margin-bottom:15px; border-bottom:2px solid #ddd; }
     .tab { padding:8px 12px; cursor:pointer; border:none; background:transparent; font-weight:600; color:#666; border-bottom:3px solid transparent; }
@@ -23,6 +24,9 @@
     #forgot-link { transition: all 0.3s ease; }
     #forgot-link:hover { font-weight:700; }
   </style>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="theme.js"></script>
 </head>
 <body>
   <div class="login-card" role="main" aria-labelledby="login-title">
@@ -38,6 +42,7 @@
     <div id="login" class="tab-content active">
       <form id="login-form" autocomplete="on">
         <div class="field"><input id="email" name="email" type="email" placeholder="Email" required></div>
+        <div class="hint">Use your college mail only: @sasi.ac.in</div>
         <div class="field">
           <input id="password" name="password" type="password" placeholder="Password" required>
           <button type="button" class="toggle-password" onclick="togglePassword('password')">👁️</button>
@@ -53,6 +58,7 @@
       <form id="register-form" autocomplete="on">
         <div class="field"><input id="reg-name" name="name" type="text" placeholder="Name (optional)"></div>
         <div class="field"><input id="reg-email" name="email" type="email" placeholder="Email" required></div>
+        <div class="hint">Only @sasi.ac.in accounts are allowed</div>
         <div class="field">
           <input id="reg-password" name="password" type="password" placeholder="Password" required>
           <button type="button" class="toggle-password" onclick="togglePassword('reg-password')">👁️</button>
@@ -98,8 +104,8 @@
     (function () {
       // Redirect if already logged in
       if (localStorage.getItem('loggedIn') === 'true') {
-        console.log('[Login Page] User already logged in, redirecting to main.html');
-        location.href = 'main.html';
+        console.log('[Login Page] User already logged in, redirecting to index.html');
+        location.href = 'index.html';
         return;
       }
 
@@ -121,10 +127,16 @@
           const p = new URLSearchParams(location.search).get('next');
           if (p) return decodeURIComponent(p);
         } catch (e) {}
-        return 'main.html';
+        return 'index.html';
       }
 
       // ===== LOGIN FORM =====
+      const institutionEmailRegex = /^[^\s@]+@sasi\.ac\.in$/i;
+
+      function isInstitutionEmail(email) {
+        return institutionEmailRegex.test((email || '').trim());
+      }
+
       const loginForm = document.getElementById('login-form');
       const emailEl = document.getElementById('email');
       const passEl = document.getElementById('password');
@@ -138,6 +150,11 @@
         
         if (!email || !password) {
           loginMsg.textContent = 'Enter email and password.';
+          return;
+        }
+
+        if (!isInstitutionEmail(email)) {
+          loginMsg.textContent = 'Access is only for @sasi.ac.in email accounts.';
           return;
         }
 
@@ -175,6 +192,11 @@
 
         if (!email || !password) {
           registerMsg.textContent = 'Email and password required.';
+          return;
+        }
+
+        if (!isInstitutionEmail(email)) {
+          registerMsg.textContent = 'Only @sasi.ac.in email accounts are allowed.';
           return;
         }
 
@@ -219,6 +241,11 @@
           return;
         }
 
+        if (!isInstitutionEmail(email)) {
+          otpMsg.textContent = 'Only @sasi.ac.in email accounts are allowed.';
+          return;
+        }
+
         otpMsg.textContent = 'Sending OTP…';
         const result = await AuthService.sendOTP(email);
 
@@ -238,6 +265,10 @@
 
         if (!code) {
           otpMsg.textContent = 'Enter OTP';
+          return;
+        }
+        if (!isInstitutionEmail(email)) {
+          otpMsg.textContent = 'Only @sasi.ac.in email accounts are allowed.';
           return;
         }
         if (!newPassword || newPassword.length < 6) {

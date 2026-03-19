@@ -302,7 +302,7 @@ AuthService.logout();
    - OTP-based password reset
    - Tab switching between login/register
 
-2. **main.html, personal.html** - Updated to:
+2. **index.html, personal.html** - Updated to:
    - Include `auth-service.js` before `script.js`
    - Use `AuthService.logout()` in logout handler
 
@@ -400,7 +400,7 @@ backend/
 
 ### Frontend Structure
 ```
-legacy_html/
+pages/
 ├── auth-service.js          # Authentication service module
 ├── script.js                # General page logic
 ├── style.css                # Styles

@@ -8,7 +8,7 @@ The **Security & Password** section in the profile page is now fully integrated 
 
 ## 🎯 What Was Implemented
 
-### Frontend Changes ([profile.html](legacy_html/profile.html))
+### Frontend Changes ([profile.html](pages/profile.html))
 
 1. **Enhanced Security Section UI**
    - Added security tips panel
@@ -68,7 +68,7 @@ Response:
 ### For Users:
 
 1. **Navigate to Profile Page**
-   - Go to [profile.html](legacy_html/profile.html)
+   - Go to [profile.html](pages/profile.html)
    - Make sure you're logged in
 
 2. **Find Security & Password Section**
@@ -103,7 +103,7 @@ Response:
    ```
 
 2. **Open Profile Page:**
-   - Open [profile.html](legacy_html/profile.html) in browser
+   - Open [profile.html](pages/profile.html) in browser
    - Make sure you're logged in
 
 3. **Test Change Password:**
@@ -164,8 +164,8 @@ This will:
 ## 📁 Files Modified
 
 1. **Frontend**
-   - [profile.html](legacy_html/profile.html) - Added backend integration
-   - [profile-service.js](legacy_html/profile-service.js) - Already had changePassword method
+   - [profile.html](pages/profile.html) - Added backend integration
+   - [profile-service.js](pages/profile-service.js) - Already had changePassword method
 
 2. **Backend** (No changes needed - already working)
    - [authController.js](backend/src/controllers/authController.js)

@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Knowledge Books</title>
+  <style>
+    :root{
+      --accent:#0b72b9;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --bg:#f3f6f8;
+      --radius:10px;
+      --shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    html,body{height:100%;margin:0;font-family:system-ui,Arial;background:var(--bg);color:#0f1724}
+    body{position:relative;background:#0f1724;overflow-x:hidden}
+    .netflix-bg{
+      position:fixed;
+      inset:-65%;
+      display:grid;
+      grid-template-columns:repeat(10, minmax(0, 1fr));
+      grid-auto-rows:180px;
+      gap:12px;
+      padding:12px;
+      transform:rotate(-45deg) scale(1.35);
+      transform-origin:center;
+      z-index:0;
+      pointer-events:none;
+    }
+    .netflix-bg img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      border-radius:8px;
+      opacity:0.9;
+      filter:saturate(0.9) brightness(0.72);
+    }
+    .netflix-overlay{
+      position:fixed;
+      inset:0;
+      background:linear-gradient(180deg, rgba(2,6,23,0.46) 0%, rgba(2,6,23,0.68) 50%, rgba(2,6,23,0.84) 100%);
+      z-index:1;
+      pointer-events:none;
+    }
+    .topbar,.layout{position:relative;z-index:2}
+    .topbar{
+      display:flex;
+      align-items:center;
+      gap:18px;
+      padding:12px 20px;
+      background:linear-gradient(90deg,var(--accent),#0963a0);
+      color:#fff;
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+    .topbar img.logo{height:48px;width:48px;border-radius:8px;object-fit:cover}
+    .topbar h1{margin:0;font-size:18px}
+    .search-wrap{margin-left:auto}
+    .search-wrap input{
+      height:36px;border-radius:8px;border:0;padding:6px 10px;width:300px;
+      font-size:14px;
+    }
+    .topbar nav { display:flex; gap:16px; align-items:center; }
+    .topbar a, .topbar button{color:#fff;text-decoration:none;border:none;background:transparent;cursor:pointer;margin-left:0;white-space:nowrap;padding:8px 14px;border-radius:6px;transition:all 0.3s ease;position:relative;font-weight:500;letter-spacing:0.5px}
+    .topbar a:hover, .topbar button:hover { background:rgba(255,255,255,0.15); transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.2); }
+    .profile-btn-explorer { 
+      width:44px; 
+      height:44px; 
+      border-radius:50%; 
+      background:linear-gradient(135deg,#FFD700,#FFA500);
+      border:2px solid #FFE55C;
+      color:#0b72b9; 
+      font-size:20px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all 0.3s ease;
+      padding:0;
+      flex-shrink:0;
+      box-shadow:0 4px 15px rgba(255,165,0,0.4),inset 0 1px 2px rgba(255,255,255,0.5);
+      position:relative;
+      overflow:hidden;
+      font-weight:bold;
+    }
+    .profile-btn-explorer:hover { 
+      background:linear-gradient(135deg,#FFE55C,#FFB84D);
+      transform:scale(1.15);
+      border-color:#FFEB3B;
+      box-shadow:0 6px 20px rgba(255,165,0,0.5),inset 0 1px 2px rgba(255,255,255,0.6),0 0 15px rgba(255,215,0,0.5);
+    }
+    .profile-btn-explorer:active { transform:scale(0.95); }
+    .profile-btn-explorer.hidden { display:none; }
+    .profile-modal { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; }
+    .profile-modal.show { display:flex; }
+    .profile-content { background:white; border-radius:16px; padding:32px; max-width:400px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3); animation:slideDown 0.3s ease; position:relative; }
+    @keyframes slideDown { from { transform:translateY(-30px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+    .profile-header { display:flex; align-items:center; gap:16px; margin-bottom:24px; }
+    .profile-avatar { width:60px; height:60px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:28px; color:white; }
+    .profile-name { margin:0; font-size:18px; font-weight:700; color:#0f1724; }
+    .profile-email { margin:4px 0 0 0; font-size:13px; color:var(--muted); }
+    .profile-divider { height:1px; background:#e5e7eb; margin:16px 0; }
+    .profile-item { display:flex; justify-content:space-between; padding:10px 0; font-size:14px; color:#0f1724; }
+    .profile-label { color:var(--muted); }
+    .profile-value { font-weight:600; }
+    .profile-actions { display:flex; gap:10px; margin-top:20px; }
+    .profile-actions button { flex:1; padding:10px; border:1px solid #e5e7eb; border-radius:8px; background:transparent; color:#0f1724; cursor:pointer; transition:all 0.3s ease; }
+    .profile-actions button:hover { background:var(--accent); color:white; border-color:var(--accent); }
+    .profile-close { position:absolute; top:16px; right:16px; background:transparent; border:none; color:#0f1724; font-size:24px; cursor:pointer; }
+
+    .category-links {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:20px;
+      padding:0 8px;
+    }
+    .category-link {
+      padding:10px 18px;
+      background:linear-gradient(135deg,#0b72b9,#0963a0);
+      color:white;
+      text-decoration:none;
+      border-radius:8px;
+      font-weight:600;
+      font-size:14px;
+      transition:all 0.3s ease;
+      box-shadow:0 3px 10px rgba(11,114,185,0.25);
+      border:1px solid rgba(255,255,255,0.2);
+    }
+    .category-link:hover {
+      transform:translateY(-2px);
+      box-shadow:0 5px 15px rgba(11,114,185,0.4);
+      background:linear-gradient(135deg,#0963a0,#085089);
+    }
+    
+    .layout{display:flex;gap:20px;max-width:1200px;margin:20px auto;padding:0 16px;box-sizing:border-box}
+    .content{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+    .book-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+      gap:16px;
+    }
+    .book-card{
+      background:var(--card);
+      border-radius:12px;
+      padding:10px;
+      box-shadow:var(--shadow);
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      align-items:stretch;
+      width:140px;
+      min-height:150px;
+    }
+    .book-card figure{margin:0}
+    .book-card img{
+      width:100%;
+      height:220px;
+      object-fit:cover;
+      border-radius:8px;
+      display:block;
+      cursor:pointer;
+    }
+    .book-card .meta{padding:6px 2px}
+    .book-card h3{margin:6px 0;font-size:16px}
+    .book-card p{margin:0;color:var(--muted);font-size:13px}
+    .book-card .rating-line{margin-top:4px;font-size:12px;color:var(--muted)}
+    .book-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .book-actions button {
+      flex: 1;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .btn-open {
+      background: linear-gradient(135deg, #0b72b9, #0963a0);
+      color: white;
+    }
+    .btn-open:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(11, 114, 185, 0.3);
+    }
+    .btn-save {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+    }
+    .btn-save:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    .btn-saved {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    @media(max-width:900px){
+      .layout{padding:0 10px}
+      .topbar .search-wrap input{width:160px}
+      .book-card img{height:180px}
+    }
+  </style>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="theme.js"></script>
+</head>
+<body>
+  <div id="netflixBg" class="netflix-bg" aria-hidden="true"></div>
+  <div class="netflix-overlay" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <img class="logo" src="assets/logo.png" alt="logo">
+    <h1>Online Library</h1>
+
+    <div class="search-wrap">
+      <input id="globalSearch" type="text" placeholder="Search for books" aria-label="Search books">
+    </div>
+
+    <nav>
+      <a href="personal.html" id="nav-mybooks-link" style="display:none">My Books</a>
+      <a id="nav-login-link" href="login.html" style="display:none">Login</a>
+      <button id="profile-btn-explorer" class="profile-btn-explorer hidden" title="View Profile">👤</button>
+    </nav>
+  </header>
+
+  <!-- Profile Modal -->
+  <div id="profile-modal-explorer" class="profile-modal">
+    <div class="profile-content">
+      <button class="profile-close" id="profile-close-explorer">✕</button>
+      <div class="profile-header">
+        <div class="profile-avatar" id="profile-avatar-explorer">👤</div>
+        <div>
+          <h3 class="profile-name" id="profile-name-explorer">Loading...</h3>
+          <p class="profile-email" id="profile-email-explorer"></p>
+        </div>
+      </div>
+      <div class="profile-divider"></div>
+      <div class="profile-item">
+        <span class="profile-label">Status</span>
+        <span class="profile-value" id="profile-status-explorer">Active</span>
+      </div>
+      <div class="profile-item">
+        <span class="profile-label">Member Since</span>
+        <span class="profile-value" id="profile-joined-explorer"></span>
+      </div>
+      <div class="profile-item">
+        <span class="profile-label">Last Login</span>
+        <span class="profile-value" id="profile-lastlogin-explorer"></span>
+      </div>
+      <div class="profile-divider"></div>
+      <div class="profile-actions">
+        <button id="profile-edit-explorer">Edit Profile</button>
+        <button id="profile-settings-explorer">Settings</button>
+        <button id="profile-logout-explorer">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <section class="content" aria-label="Books content">
+      <h2 style="margin:0 0 6px 8px;color:#ffffff;text-shadow:0 6px 18px rgba(0,0,0,0.45)">📚 Knowledge Books</h2>
+
+      <div class="category-links">
+        <a class="category-link" href="explorer.html">🔍 Explorer</a>
+        <a class="category-link" href="devotional.html">🕉️ Devotional</a>
+        <a class="category-link" href="course_books.html">📖 Course Books</a>
+        <a class="category-link" href="english_stories.html">📝 English Stories</a>
+        <a class="category-link" href="telugu_novels.html">📕 Telugu Novels</a>
+      </div>
+
+      <div id="bookGrid" class="book-grid" aria-live="polite">
+        <!-- Books will be loaded here -->
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function(){
+      const searchInput = document.getElementById('globalSearch');
+      if (!searchInput) return;
+      searchInput.addEventListener('input', function(e){
+        const q = (e.target.value || '').trim().toLowerCase();
+        const cards = document.querySelectorAll('.book-card');
+        cards.forEach(card => {
+          const text = (card.innerText || '').toLowerCase();
+          card.style.display = q === '' || text.indexOf(q) !== -1 ? '' : 'none';
+        });
+      });
+    })();
+  </script>
+
+  <script>
+    (function(){
+      function isLogged() {
+        return localStorage.getItem('loggedIn') === 'true';
+      }
+
+      function formatDate(dateString) {
+        if (!dateString) return 'Never';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+      }
+
+      function loadProfileData() {
+        if (typeof AuthService !== 'undefined') {
+          const userData = AuthService.getCurrentUser();
+          if (userData) {
+            const user = typeof userData === 'string' ? { email: userData } : userData;
+            document.getElementById('profile-name-explorer').textContent = user.name || user.email.split('@')[0];
+            document.getElementById('profile-email-explorer').textContent = user.email;
+            document.getElementById('profile-joined-explorer').textContent = formatDate(user.createdAt);
+            document.getElementById('profile-lastlogin-explorer').textContent = formatDate(user.lastLogin);
+            const initial = (user.name || user.email).charAt(0).toUpperCase();
+            document.getElementById('profile-avatar-explorer').textContent = initial;
+          }
+        }
+      }
+
+      function updateProfileUI() {
+        const profileBtn = document.getElementById('profile-btn-explorer');
+        const navLoginLink = document.getElementById('nav-login-link');
+        const navMyBooksLink = document.getElementById('nav-mybooks-link');
+        
+        if (isLogged()) {
+          if (navLoginLink) navLoginLink.style.display = 'none';
+          if (profileBtn) profileBtn.classList.remove('hidden');
+          if (navMyBooksLink) navMyBooksLink.style.display = '';
+          loadProfileData();
+        } else {
+          if (navLoginLink) navLoginLink.style.display = '';
+          if (profileBtn) profileBtn.classList.add('hidden');
+          if (navMyBooksLink) navMyBooksLink.style.display = 'none';
+        }
+      }
+
+      const profileBtn = document.getElementById('profile-btn-explorer');
+      const profileModal = document.getElementById('profile-modal-explorer');
+      const profileClose = document.getElementById('profile-close-explorer');
+      
+      if (profileBtn) {
+        profileBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          loadProfileData();
+          profileModal.classList.add('show');
+        });
+      }
+
+      if (profileClose) {
+        profileClose.addEventListener('click', () => {
+          profileModal.classList.remove('show');
+        });
+      }
+
+      if (profileModal) {
+        profileModal.addEventListener('click', (e) => {
+          if (e.target === profileModal) {
+            profileModal.classList.remove('show');
+          }
+        });
+      }
+
+      document.getElementById('profile-edit-explorer').addEventListener('click', () => {
+        alert('Edit profile feature coming soon!');
+        profileModal.classList.remove('show');
+      });
+
+      document.getElementById('profile-settings-explorer').addEventListener('click', () => {
+        alert('Settings feature coming soon!');
+        profileModal.classList.remove('show');
+      });
+
+      document.getElementById('profile-logout-explorer').addEventListener('click', () => {
+        if (typeof AuthService !== 'undefined') {
+          AuthService.logout();
+        } else {
+          localStorage.removeItem('loggedIn');
+          localStorage.removeItem('currentUser');
+        }
+        profileModal.classList.remove('show');
+        updateProfileUI();
+        location.href = 'index.html';
+      });
+
+      updateProfileUI();
+      window.addEventListener('storage', function(e){
+        if (e.key === 'loggedIn' || e.key === 'currentUser') updateProfileUI();
+      }, false);
+    })();
+  </script>
+
+  <script>
+    const API_BASE_URL = 'http://localhost:3000/api';
+    const knowledgeBooks = [
+      { 
+        id: 'kb1', 
+        title: 'Polity & Governance', 
+        author: 'M. Laxmikanth',
+        subject: 'Political Science',
+        publisher: 'McGraw Hill Education',
+        year: 2023,
+        edition: '7th Edition',
+        pages: 850,
+        language: 'English',
+        isbn: '978-9389432398',
+        book_cover: 'https://images.unsplash.com/photo-1589998059171-988d887df646?w=400&h=400&fit=crop',
+        description: 'Comprehensive guide to Indian Polity and Governance covering constitutional framework, political institutions, governance mechanisms, and current affairs related to polity.',
+        features: ['Complete coverage of Indian Constitution', 'Political institutions and governance', 'Current affairs and developments', 'Practice questions', 'Simplified language', 'Latest constitutional changes'],
+        toc: ['Historical Background', 'Constitution Features', 'Preamble', 'Union Territory', 'Citizenship', 'Fundamental Rights', 'Directive Principles', 'Parliament', 'Executive', 'Judiciary', 'Local Government']
+      },
+      { 
+        id: 'kb2', 
+        title: 'Current Affairs 2024-2025', 
+        author: 'Editorial Team',
+        subject: 'Current Affairs',
+        publisher: 'Monthly Briefings Publishing',
+        year: 2024,
+        edition: 'Latest Edition',
+        pages: 450,
+        language: 'English',
+        isbn: '978-9389876543',
+        book_cover: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=400&fit=crop',
+        description: 'Monthly compilation covering national and international events, economic updates, science and technology developments.',
+        features: ['Monthly updates', 'Economic survey analysis', 'Science advances', 'Government schemes', 'Awards and honors', 'Sports affairs', 'Environment updates', 'Practice MCQs'],
+        toc: ['National Affairs', 'International Relations', 'Economic Developments', 'Science & Technology', 'Environment', 'Government Schemes', 'Sports', 'Awards', 'Books & Authors', 'Important Days']
+      },
+      { 
+        id: 'kb3', 
+        title: 'Environment & Ecology', 
+        author: 'Environmental Studies Team',
+        subject: 'Environmental Science',
+        publisher: 'Green Earth Publications',
+        year: 2023,
+        edition: '5th Edition',
+        pages: 520,
+        language: 'English',
+        isbn: '978-9389234567',
+        book_cover: 'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=400&h=400&fit=crop',
+        description: 'Detailed study of environment and ecology including ecosystems, biodiversity, climate change, pollution, and conservation efforts.',
+        features: ['Ecosystems and biodiversity', 'Climate change analysis', 'Pollution control', 'Environmental laws', 'Conservation strategies', 'Sustainable development', 'Wildlife protection', 'Illustrations and diagrams'],
+        toc: ['Environment Introduction', 'Ecosystems', 'Natural Resources', 'Climate Change', 'Pollution', 'Waste Management', 'Environmental Laws', 'Biodiversity Conservation', 'Sustainable Development', 'International Agreements']
+      },
+      { 
+        id: 'kb4', 
+        title: 'Geography - Physical & Political', 
+        author: 'Dr. Khullar',
+        subject: 'Geography',
+        publisher: 'Kalyani Publishers',
+        year: 2023,
+        edition: '8th Edition',
+        pages: 680,
+        language: 'English',
+        isbn: '978-9389345678',
+        book_cover: 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=400&h=400&fit=crop',
+        description: 'Comprehensive guide covering physical and political geography with topography, climate patterns, resources, and geopolitical aspects.',
+        features: ['Physical geography with maps', 'Political geography', 'Climate and weather', 'Natural resources', 'Population patterns', 'Economic geography', 'Regional geography', 'World geography', 'UPSC exam focused'],
+        toc: ['Geography Introduction', 'Earth Features', 'Climate and Weather', 'Vegetation and Wildlife', 'Natural Resources', 'Agriculture and Industries', 'Population', 'Human Settlements', 'Transport', 'India Physical', 'India Political', 'World Geography']
+      },
+      { 
+        id: 'kb5', 
+        title: 'Indian History - Ancient to Modern', 
+        author: 'Bipan Chandra',
+        subject: 'History',
+        publisher: 'Orient BlackSwan',
+        year: 2022,
+        edition: '6th Edition',
+        pages: 920,
+        language: 'English',
+        isbn: '978-9389456789',
+        book_cover: 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=400&fit=crop',
+        description: 'Complete overview from ancient civilizations through independence movement. Covers dynasties, cultural developments, freedom struggle, and nation-building.',
+        features: ['Ancient to modern India', 'Dynasties and empires', 'Cultural developments', 'Economic history', 'Freedom struggle', 'Post-independence', 'Timelines and charts', 'Maps and illustrations', 'Critical analysis'],
+        toc: ['Prehistoric Civilization', 'Vedic Period', 'Mauryan Empire', 'Post-Mauryan', 'Gupta Empire', 'Delhi Sultanate', 'Mughal Empire', 'Vijayanagara', 'Maratha Empire', 'British India', 'Freedom Struggle', 'Independence']
+      },
+      { 
+        id: 'kb6', 
+        title: 'General Knowledge Encyclopedia', 
+        author: 'Knowledge Research Team',
+        subject: 'General Knowledge',
+        publisher: 'Universal Knowledge Press',
+        year: 2024,
+        edition: 'Latest Edition 2024',
+        pages: 750,
+        language: 'English',
+        isbn: '978-9389567890',
+        book_cover: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=400&fit=crop',
+        description: 'Comprehensive GK guide covering science, technology, sports, awards, dates, and organizations. Perfect for competitive exams.',
+        features: ['GK for all exams', 'Science and technology', 'Sports records', 'Awards and honors', 'Important dates', 'World organizations', 'Indian states facts', 'Revision notes', 'Practice questions', '2024 updates'],
+        toc: ['Indian Polity', 'Indian Economy', 'Geography', 'Indian History', 'Science & Technology', 'Environment', 'Sports', 'Awards', 'Books & Authors', 'Important Dates', 'Organizations', 'Indian States']
+      }
+    ];
+
+    async function getLiveKnowledgeBooks() {
+      try {
+        const params = new URLSearchParams();
+        params.set('category', 'Knowledge Books');
+        params.set('limit', '200');
+
+        const response = await fetch(`${API_BASE_URL}/books?${params.toString()}`);
+        const data = await response.json();
+        if (!response.ok || !data.ok || !Array.isArray(data.books)) return [];
+
+        return data.books.map((book) => ({
+          id: String(book._id || book.id || `${book.title || 'book'}-${book.author || 'author'}`),
+          title: book.title || 'Untitled Book',
+          author: book.author || 'Unknown Author',
+          book_cover: book.book_cover || book.coverImage || book?.coverImage?.url || 'images/book_cover.jpeg',
+          rating: book.rating || { average: 0, count: 0, total: 0 },
+          pdf: book.viewUrl || book.pdfUrl || book?.pdf?.url || '#',
+          _isDynamic: true
+        }));
+      } catch (error) {
+        console.error('[knowledgebooks] Failed to load live books:', error);
+        return [];
+      }
+    }
+
+    async function loadBooks() {
+      const bookGrid = document.getElementById('bookGrid');
+      const liveBooks = await getLiveKnowledgeBooks();
+      const booksToRender = liveBooks.length ? liveBooks : knowledgeBooks;
+
+      renderNetflixBackground(booksToRender);
+
+      if (!booksToRender.length) {
+        bookGrid.innerHTML = '<p style="text-align:center;color:var(--muted);grid-column:1/-1;">No books available right now.</p>';
+        return;
+      }
+
+      bookGrid.innerHTML = booksToRender.map(book => {
+        const serializedBook = JSON.stringify(book).replace(/"/g, '&quot;');
+        const avgRating = Number(book?.rating?.average || 0).toFixed(1);
+        return `
+        <article class="book-card">
+          <figure>
+            <a href="book-view.html" onclick="openBookView(${serializedBook}); return false;">
+              <img src="${book.book_cover}" alt="${book.title}" style="cursor:pointer;">
+            </a>
+          </figure>
+          <div class="meta">
+            <h3>${book.title}</h3>
+            <p>${book.author}</p>
+            <p class="rating-line">Rating: ${avgRating}/5</p>
+          </div>
+          <div class="book-actions">
+            <button class="btn-open" onclick="event.stopPropagation(); openBookView(${serializedBook})">Open</button>
+            <button class="btn-save" onclick="event.stopPropagation(); saveBook(${serializedBook})" id="save-${book.id}">Save</button>
+          </div>
+        </article>
+      `;
+      }).join('');
+    }
+
+    function renderNetflixBackground(books) {
+      const host = document.getElementById('netflixBg');
+      if (!host) return;
+
+      const covers = [...new Set((books || [])
+        .map((book) => String(book?.book_cover || '').trim())
+        .filter(Boolean))];
+
+      if (!covers.length) {
+        host.innerHTML = '';
+        return;
+      }
+
+      const targetCount = 220;
+      const wall = Array.from({ length: targetCount }, (_, idx) => covers[idx % covers.length]);
+      for (let i = wall.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = wall[i];
+        wall[i] = wall[j];
+        wall[j] = tmp;
+      }
+
+      host.innerHTML = wall
+        .map((src, idx) => `<img src="${src}" alt="Cover ${idx + 1}" loading="lazy">`)
+        .join('');
+    }
+
+    function openBookView(book) {
+      const normalizedBook = { ...book, id: book.id || book._id || '' };
+      sessionStorage.setItem('selectedBook', JSON.stringify(normalizedBook));
+      const target = normalizedBook.id
+        ? `book-view.html?id=${encodeURIComponent(normalizedBook.id)}`
+        : 'book-view.html';
+      window.location.href = target;
+    }
+
+    function saveBook(book) {
+      const email = localStorage.getItem('currentUser');
+      if (!email) {
+        alert('Please login first');
+        window.location.href = 'login.html';
+        return;
+      }
+      const key = 'saved_' + email;
+      const raw = localStorage.getItem(key);
+      const arr = raw ? JSON.parse(raw) : [];
+      const existing = arr.find(b => b.id === book.id);
+      if (existing) {
+        alert('Already saved');
+        const btn = document.getElementById('save-' + book.id);
+        if (btn) {
+          btn.textContent = '✓ Saved';
+          btn.classList.add('btn-saved');
+          btn.disabled = true;
+        }
+        return;
+      }
+      arr.push(book);
+      localStorage.setItem(key, JSON.stringify(arr));
+      const btn = document.getElementById('save-' + book.id);
+      if (btn) {
+        btn.textContent = '✓ Saved';
+        btn.classList.add('btn-saved');
+        btn.disabled = true;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadBooks);
+  </script>
+  
+</body>
+</html>

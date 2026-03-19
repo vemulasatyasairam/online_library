@@ -1,0 +1,181 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>English Story Details</title>
+  <script>
+    window.location.replace('book-view.html' + window.location.search);
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #e5524f 0%, #ff6b6b 100%); min-height: 100vh; padding: 20px; }
+    .header { background-color: #1f2937; color: white; padding: 20px; display: flex; align-items: center; gap: 20px; border-radius: 8px 8px 0 0; }
+    .header a { color: white; text-decoration: none; font-size: 24px; cursor: pointer; }
+    .header h2 { flex: 1; font-size: 24px; margin: 0; }
+    .container { max-width: 900px; margin: 0 auto; }
+    .book-detail-card { background: white; border-radius: 0 0 8px 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); overflow: hidden; }
+    .book-content { display: grid; grid-template-columns: 280px 1fr; gap: 40px; padding: 40px; }
+    .book-cover { position: relative; }
+    .book-cover img { width: 100%; height: 380px; object-fit: cover; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+    .book-info { display: flex; flex-direction: column; gap: 20px; }
+    .book-title { font-size: 32px; font-weight: 700; color: #1a202c; line-height: 1.2; }
+    .book-meta { display: flex; flex-wrap: wrap; gap: 20px; }
+    .meta-item { display: flex; flex-direction: column; }
+    .meta-label { font-size: 12px; color: #718096; font-weight: 600; text-transform: uppercase; }
+    .meta-value { font-size: 16px; color: #2d3748; font-weight: 500; margin-top: 4px; }
+    .divider { height: 1px; background-color: #e2e8f0; margin: 10px 0; }
+    .description { color: #4a5568; font-size: 15px; line-height: 1.6; margin: 10px 0; }
+    .details-section { margin: 20px 0; }
+    .details-section h3 { font-size: 16px; font-weight: 600; color: #2d3748; margin-bottom: 12px; }
+    .details-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    .detail-item { padding: 12px; background-color: #f7fafc; border-left: 3px solid #e5524f; border-radius: 4px; }
+    .detail-item label { font-size: 12px; color: #718096; font-weight: 600; text-transform: uppercase; }
+    .detail-item value { display: block; font-size: 14px; color: #2d3748; margin-top: 4px; font-weight: 500; }
+    .features-list { background: #ffebee; padding: 20px; border-radius: 8px; }
+    .features-list ul { list-style: none; margin: 0; padding: 0; }
+    .features-list li { padding: 8px 0 8px 24px; position: relative; color: #4a5568; }
+    .features-list li:before { content: "\2713"; position: absolute; left: 0; color: #e5524f; font-weight: bold; }
+    .toc-list { background: #ffe0e0; padding: 20px; border-radius: 8px; }
+    .toc-list ol { margin: 0; padding-left: 20px; color: #4a5568; }
+    .toc-list li { padding: 6px 0; }
+    .actions { display: flex; gap: 12px; margin-top: 20px; }
+    .btn { flex: 1; padding: 14px 20px; border-radius: 6px; border: none; cursor: pointer; font-size: 16px; font-weight: 600; transition: all 0.3s ease; }
+    .btn.open { background: #e5524f; color: white; }
+    .btn.open:hover { background: #d13e35; transform: translateY(-2px); }
+    .btn.save { background: #10b981; color: white; }
+    .btn.save:hover { background: #059669; transform: translateY(-2px); }
+    .message { margin-top: 12px; padding: 12px; border-radius: 6px; text-align: center; font-weight: 500; }
+    .message.success { background-color: #d1fae5; color: #065f46; }
+    .message.error { background-color: #fee2e2; color: #991b1b; }
+    .warning-banner { background: linear-gradient(135deg, #e5524f 0%, #ff6b6b 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+    .warning-banner-header { display: flex; gap: 12px; font-weight: 700; align-items: center; }
+    .not-found { text-align: center; padding: 60px 20px; }
+    @media (max-width: 768px) { .book-content { grid-template-columns: 1fr; } .details-list { grid-template-columns: 1fr; } }
+  </style>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="theme.js"></script>
+</head>
+<body>
+  <div class="header">
+    <a href="english_stories.html">&larr;</a>
+    <h2>📖 English Story Details</h2>
+  </div>
+  <div class="container">
+    <div class="book-detail-card">
+      <div id="notFound" class="not-found" style="display:none;">
+        <h1>Book Not Found</h1>
+        <a href="english_stories.html">Back to Stories</a>
+      </div>
+      <div id="bookContainer" style="display:none;">
+        <div class="book-content">
+          <div class="book-cover"><img id="bookImage" src="" alt="Book Cover"></div>
+          <div class="book-info">
+            <h1 class="book-title" id="title">Title</h1>
+            <div class="book-meta">
+              <div class="meta-item"><span class="meta-label">Author</span><span class="meta-value" id="author">Unknown</span></div>
+              <div class="meta-item"><span class="meta-label">Subject</span><span class="meta-value" id="subject">General</span></div>
+            </div>
+            <div class="divider"></div>
+            <div class="description" id="description"></div>
+            <div class="details-section">
+              <h3>📖 Publication Details</h3>
+              <div class="details-list">
+                <div class="detail-item"><label>Publisher</label><value id="publisher">-</value></div>
+                <div class="detail-item"><label>Year</label><value id="year">-</value></div>
+                <div class="detail-item"><label>Edition</label><value id="edition">-</value></div>
+                <div class="detail-item"><label>Pages</label><value id="pages">-</value></div>
+                <div class="detail-item"><label>Language</label><value id="language">-</value></div>
+                <div class="detail-item"><label>ISBN</label><value id="isbn">-</value></div>
+              </div>
+            </div>
+            <div class="details-section features-list" id="featuresSection" style="display:none;">
+              <h3>✨ Features</h3>
+              <ul id="featuresList"></ul>
+            </div>
+            <div class="details-section toc-list" id="tocSection" style="display:none;">
+              <h3>📚 Stories</h3>
+              <ol id="tocList"></ol>
+            </div>
+            <div class="warning-banner" id="warningBanner" style="display:none;">
+              <div class="warning-banner-header" ><span>ℹ️ Educational Use Only</span></div>
+            </div>
+            <div class="actions">
+              <button id="openBtn" class="btn open">📖 Open PDF</button>
+              <button id="saveBtn" class="btn save">⭐ Save</button>
+            </div>
+            <div id="msg" class="message"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const books = {
+      es1: { id: 'eng1', title: 'The Little Fox', author: 'Anonymous', subject: 'Fables', publisher: 'ELT Publishing', year: 2012, edition: 'First', pages: 120, language: 'English', isbn: '978-1447517581', book_cover: 'https://images.unsplash.com/photo-1507342564885-b6baf2e33b4f?w=400&h=400&fit=crop', description: 'Delightful collection of short stories featuring a clever fox and its forest adventures. Perfect for beginner English learners with simple vocabulary and engaging narratives.', features: ['Simple vocabulary', 'Comprehension practice', 'Character analysis', 'Moral lessons', 'Pronunciation guide', 'Vocabulary exercises'], toc: ['Story 1 - The Clever Fox', 'Story 2 - Fox and Grapes', 'Story 3 - Fox Meets Friends', 'Story 4 - Forest Adventure', 'Story 5 - The Wise Fox'], pdf: 'pdfs/little-fox.pdf' },
+      es2: { id: 'es2', title: 'Comic Collection', author: 'Various', subject: 'Comics', publisher: 'Oxford Bookworms', year: 2014, edition: 'Second', pages: 200, language: 'English', isbn: '978-0194789387', book_cover: 'https://images.unsplash.com/photo-1516979187457-635ffe35ebbd?w=400&h=400&fit=crop', description: 'Entertaining comic stories with colorful illustrations. Each story teaches English through humor and visual learning for intermediate learners.', features: ['Visual storytelling', 'Humor and wit', 'Dialogue practice', 'Cultural references', 'Comedy techniques', 'Entertainment'], toc: ['Comic 1 - Office Cat', 'Comic 2 - Weekend Adventure', 'Comic 3 - Restaurant Mix-up', 'Comic 4 - Travel Tales', 'Comic 5 - Lucky Day'], pdf: 'pdfs/comic-collection.pdf' },
+      es3: { id: 'es3', title: 'Classic Fairy Tales', author: 'Hans Andersen', subject: 'Fairy Tales', publisher: 'Dover', year: 2011, edition: 'Unabridged', pages: 350, language: 'English', isbn: '978-0486818238', book_cover: 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=400&fit=crop', description: 'Timeless fairy tales adapted for English learners. Classic stories with magical narratives teaching life lessons through accessible language.', features: ['Classic literature', 'Fantasy themes', 'Life lessons', 'Character development', 'Imaginative storytelling', 'Literary analysis'], toc: ['Tale 1 - Ugly Duckling', 'Tale 2 - Little Mermaid', 'Tale 3 - Snow Queen', 'Tale 4 - Cinderella', 'Tale 5 - Sleeping Beauty'], pdf: 'pdfs/fairy-tales.pdf' },
+      es4: { id: 'es4', title: 'Adventure Series', author: 'R.L. Stevenson', subject: 'Adventure', publisher: 'Penguin Readers', year: 2015, edition: 'Level 3', pages: 280, language: 'English', isbn: '978-0241375549', book_cover: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=400&h=400&fit=crop', description: 'Thrilling adventure stories including adapted Treasure Island. High-action narratives engaging readers while building vocabulary and comprehension skills.', features: ['Action-packed plots', 'Suspense building', 'Vocabulary expansion', 'Reading fluency', 'Descriptive language', 'Adventure themes'], toc: ['Part 1 - Island', 'Part 2 - Treasure', 'Part 3 - Pirates', 'Part 4 - Discovery', 'Part 5 - Journey Home'], pdf: 'pdfs/adventure-series.pdf' },
+      es5: { id: 'es5', title: 'Short Stories Collection', author: 'Various', subject: 'Stories', publisher: 'Oxford', year: 2016, edition: 'Revised', pages: 240, language: 'English', isbn: '978-0194791151', book_cover: 'https://images.unsplash.com/photo-1507342564885-b6baf2e33b4f?w=400&h=400&fit=crop', description: 'Diverse collection by renowned authors with different themes and writing styles. Ideal for developing reading skills and cultural understanding.', features: ['Diverse themes', 'Different styles', 'Cultural learning', 'Vocabulary practice', 'Quick reads', 'Author study'], toc: ['Story 1 - The Gift', 'Story 2 - Lost and Found', 'Story 3 - New Beginnings', 'Story 4 - Meeting', 'Story 5 - Last Letter'], pdf: 'pdfs/short-stories.pdf' },
+      es6: { id: 'es6', title: 'Modern English Tales', author: 'Contemporary', subject: 'Fiction', publisher: 'Cambridge', year: 2017, edition: 'First', pages: 260, language: 'English', isbn: '978-1107677547', book_cover: 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=400&h=400&fit=crop', description: 'Modern stories in contemporary settings with relatable characters and current issues. Perfect for intermediate to advanced learners interested in modern English.', features: ['Modern themes', 'Relatable characters', 'Contemporary issues', 'Urban settings', 'Emotional depth', 'Current language'], toc: ['Tale 1 - Digital Life', 'Tale 2 - City Dreams', 'Tale 3 - Love Today', 'Tale 4 - Work and Life', 'Tale 5 - Finding Home'], pdf: 'pdfs/modern-tales.pdf' }
+    };
+
+    const bookId = new URLSearchParams(location.search).get('id');
+    const book = books[bookId];
+
+    if (!book) {
+      document.getElementById('notFound').style.display = 'block';
+    } else {
+      document.getElementById('bookContainer').style.display = 'block';
+      document.getElementById('title').textContent = book.title;
+      document.getElementById('author').textContent = book.author;
+      document.getElementById('subject').textContent = book.subject;
+      document.getElementById('description').textContent = book.description;
+      document.getElementById('publisher').textContent = book.publisher;
+      document.getElementById('year').textContent = book.year;
+      document.getElementById('edition').textContent = book.edition;
+      document.getElementById('pages').textContent = book.pages + ' Pages';
+      document.getElementById('language').textContent = book.language;
+      document.getElementById('isbn').textContent = book.isbn;
+      document.getElementById('bookImage').src = book.book_cover;
+      document.getElementById('warningBanner').style.display = 'block';
+
+      if (book.features) {
+        document.getElementById('featuresList').innerHTML = book.features.map(f => `<li>${f}</li>`).join('');
+        document.getElementById('featuresSection').style.display = 'block';
+      }
+      if (book.toc) {
+        document.getElementById('tocList').innerHTML = book.toc.map(c => `<li>${c}</li>`).join('');
+        document.getElementById('tocSection').style.display = 'block';
+      }
+
+      document.getElementById('openBtn').addEventListener('click', () => {
+        if (book.pdf) window.open(book.pdf, '_blank');
+        else showMsg('PDF not available', 'error');
+      });
+
+      document.getElementById('saveBtn').addEventListener('click', () => {
+        const email = localStorage.getItem('currentUser');
+        if (!email) { location.href = 'login.html'; return; }
+        const key = `saved_${email}`;
+        const saved = JSON.parse(localStorage.getItem(key) || '[]');
+        if (saved.find(b => b.id === book.id)) {
+          showMsg('Already saved', 'error');
+        } else {
+          saved.push(book);
+          localStorage.setItem(key, JSON.stringify(saved));
+          showMsg('\u2713 Saved!', 'success');
+        }
+      });
+
+      function showMsg(text, type) {
+        const msg = document.getElementById('msg');
+        msg.textContent = text;
+        msg.className = `message ${type}`;
+        setTimeout(() => msg.className = 'message', 3000);
+      }
+    }
+  </script>
+</body>
+</html>

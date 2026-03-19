@@ -1,0 +1,5 @@
+[
+  { "id": 1, "title": "CSE 1st Year", "file": "pdfs/cse-1.pdf" },
+  { "id": 2, "title": "CSE 2nd Year", "file": "pdfs/cse-2.pdf" },
+  { "id": 3, "title": "ECE 1st Year", "file": "pdfs/ece-1.pdf" }
+]

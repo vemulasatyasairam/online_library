@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Online Library - Books</title>
+  <style>
+    :root {
+      --primary: #0b72b9;
+      --primary-dark: #095d97;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #10243b;
+      --muted: #6b7e92;
+      --border: #dde7f1;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary), #0a5d96);
+      color: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    .header h1 { margin: 0 0 6px 0; font-size: 26px; }
+    .header p { margin: 0; opacity: 0.92; font-size: 14px; }
+
+    .filters {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .field { display: grid; gap: 6px; }
+    .field label { font-size: 13px; color: var(--muted); font-weight: 600; }
+
+    .select, .btn {
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 0 12px;
+      font-size: 14px;
+      outline: none;
+      background: #fff;
+      color: var(--text);
+    }
+
+    .btn {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .btn:hover { background: var(--primary-dark); }
+
+    .status {
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      display: none;
+      font-size: 14px;
+    }
+
+    .status.show { display: block; }
+    .status.loading { background: #e8f1ff; color: #08448c; }
+    .status.empty { background: #fff4df; color: #8a5a00; }
+    .status.error { background: #fdebec; color: #9f2133; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .title { margin: 0; font-size: 17px; line-height: 1.35; }
+    .meta { color: var(--muted); font-size: 14px; }
+
+    .actions {
+      margin-top: 4px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .action {
+      text-decoration: none;
+      background: #1d4f77;
+      color: #fff;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 7px 11px;
+      display: inline-block;
+    }
+
+    @media (max-width: 900px) {
+      .filters { grid-template-columns: 1fr; }
+    }
+  </style>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="theme.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Library Books</h1>
+      <p>Browse books by Category, Branch, and Year</p>
+    </div>
+
+    <div class="filters">
+      <div class="field">
+        <label for="category">Category</label>
+        <select id="category" class="select">
+          <option value="">All Categories</option>
+          <option value="Branch Books">Branch Books</option>
+          <option value="Course Books">Course Books</option>
+          <option value="Technology">Technology</option>
+          <option value="Knowledge Books">Knowledge Books</option>
+          <option value="English Stories">English Stories</option>
+          <option value="Telugu Novels">Telugu Novels</option>
+          <option value="Devotional">Devotional</option>
+        </select>
+      </div>
+
+      <div class="field" id="branchField" style="display:none;">
+        <label for="branch">Branch</label>
+        <select id="branch" class="select">
+          <option value="">All Branches</option>
+          <option value="CSE">CSE</option>
+          <option value="CSM">CSM</option>
+          <option value="EEE">EEE</option>
+          <option value="CIC">CIC</option>
+          <option value="CSD">CSD</option>
+          <option value="CST">CST</option>
+          <option value="IT">IT</option>
+          <option value="ECE">ECE</option>
+          <option value="Civil">Civil</option>
+        </select>
+      </div>
+
+      <div class="field" id="yearField" style="display:none;">
+        <label for="year">Year</label>
+        <select id="year" class="select">
+          <option value="">All Years</option>
+          <option value="1st Year">1st Year</option>
+          <option value="2nd Year">2nd Year</option>
+          <option value="3rd Year">3rd Year</option>
+          <option value="4th Year">4th Year</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>&nbsp;</label>
+        <button id="loadBtn" class="btn" type="button">Fetch Books</button>
+      </div>
+    </div>
+
+    <div id="status" class="status"></div>
+    <div id="bookGrid" class="grid"></div>
+  </div>
+
+  <script>
+    const API_BASE_URL = 'http://localhost:3000/api/books';
+    const categoryEl = document.getElementById('category');
+    const branchEl = document.getElementById('branch');
+    const yearEl = document.getElementById('year');
+    const branchField = document.getElementById('branchField');
+    const yearField = document.getElementById('yearField');
+    const loadBtn = document.getElementById('loadBtn');
+    const statusEl = document.getElementById('status');
+    const bookGrid = document.getElementById('bookGrid');
+
+    function setStatus(type, message) {
+      statusEl.className = `status show ${type}`;
+      statusEl.textContent = message;
+    }
+
+    function clearStatus() {
+      statusEl.className = 'status';
+      statusEl.textContent = '';
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text ?? '-';
+      return div.innerHTML;
+    }
+
+    function toggleBranchYearFields() {
+      const isBranchBooks = categoryEl.value === 'Branch Books';
+      branchField.style.display = isBranchBooks ? 'grid' : 'none';
+      yearField.style.display = isBranchBooks && branchEl.value ? 'grid' : 'none';
+      if (!isBranchBooks) {
+        branchEl.value = '';
+        yearEl.value = '';
+      }
+    }
+
+    function buildQuery() {
+      const params = new URLSearchParams();
+      if (categoryEl.value) params.set('category', categoryEl.value);
+      if (branchEl.value) params.set('branch', branchEl.value);
+      if (yearEl.value) params.set('year', yearEl.value);
+      return params.toString();
+    }
+
+    async function fetchBooks() {
+      setStatus('loading', 'Loading books...');
+      bookGrid.innerHTML = '';
+
+      try {
+        const query = buildQuery();
+        const fullUrl = `${API_BASE_URL}${query ? `?${query}` : ''}`;
+        console.log('[FETCH_BOOKS] URL:', fullUrl);
+        
+        const response = await fetch(fullUrl);
+        const data = await response.json();
+
+        console.log('[FETCH_BOOKS] Response OK:', response.ok);
+        console.log('[FETCH_BOOKS] Data structure:', {
+          ok: data.ok,
+          booksCount: data.books?.length,
+          firstBookKeys: data.books?.[0] ? Object.keys(data.books[0]) : []
+        });
+
+        if (!response.ok || !data.ok) {
+          setStatus('error', data.error || 'Failed to fetch books.');
+          console.error('[FETCH_BOOKS] Error:', data.error);
+          return;
+        }
+
+        const books = Array.isArray(data.books) ? data.books : [];
+        console.log('[FETCH_BOOKS] Books array length:', books.length);
+        
+        if (books.length > 0) {
+          console.log('[FETCH_BOOKS] First book PDF object:', {
+            pdfObject: books[0].pdf,
+            pdfUrl: books[0]?.pdf?.url
+          });
+        }
+
+        if (!books.length) {
+          setStatus('empty', 'No Books Available');
+          return;
+        }
+
+        clearStatus();
+        bookGrid.innerHTML = books.map(book => {
+          const pdfUrl = book?.pdfUrl || book?.pdf?.url || book?.viewUrl || '#';
+          const viewUrl = book?.viewUrl || pdfUrl;
+          const downloadUrl = book?.downloadUrl || pdfUrl;
+          console.log('[RENDER_BOOK]', book.title, '-> PDF URL:', pdfUrl);
+          return `
+            <article class="card">
+              <h3 class="title">${escapeHtml(book.title)}</h3>
+              <div class="meta">Author: ${escapeHtml(book.author)}</div>
+              <div class="meta">Category: ${escapeHtml(book.category || 'General')}</div>
+              <div class="meta">Branch: ${escapeHtml(book.branch || '-')} • Year: ${escapeHtml(book.year || '-')}</div>
+              <div class="actions">
+                <a class="action" href="${viewUrl}" target="_blank" rel="noopener">View PDF</a>
+                <a class="action" href="${downloadUrl}">Download PDF</a>
+              </div>
+            </article>
+          `;
+        }).join('');
+      } catch (error) {
+        console.error('[FETCH_BOOKS] Exception:', error);
+        setStatus('error', 'Unable to load books. Ensure backend server is running.');
+      }
+    }
+
+    categoryEl.addEventListener('change', toggleBranchYearFields);
+    branchEl.addEventListener('change', toggleBranchYearFields);
+    loadBtn.addEventListener('click', fetchBooks);
+
+    window.addEventListener('DOMContentLoaded', () => {
+      toggleBranchYearFields();
+      fetchBooks();
+    });
+  </script>
+</body>
+</html>

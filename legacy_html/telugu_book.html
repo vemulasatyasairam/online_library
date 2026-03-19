@@ -3,20 +3,24 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Book Details - Telugu</title>
+  <title>Telugu Book Details</title>
+  <script>
+    window.location.replace('book-view.html' + window.location.search);
+  </script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); min-height: 100vh; padding: 20px; }
-    .header { background-color: #f59e0b; color: white; padding: 20px; display: flex; align-items: center; gap: 20px; border-radius: 8px 8px 0 0; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); min-height: 100vh; padding: 20px; }
+    .header { background-color: #1f2937; color: white; padding: 20px; display: flex; align-items: center; gap: 20px; border-radius: 8px 8px 0 0; }
     .header a { color: white; text-decoration: none; font-size: 24px; cursor: pointer; }
     .header h2 { flex: 1; font-size: 24px; margin: 0; }
     .container { max-width: 900px; margin: 0 auto; }
-    .book-detail-card { background: white; border-radius: 8px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); overflow: hidden; }
+    .book-detail-card { background: white; border-radius: 0 0 8px 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); overflow: hidden; }
     .book-content { display: grid; grid-template-columns: 280px 1fr; gap: 40px; padding: 40px; }
     .book-cover { position: relative; }
-    .book-cover img { width: 100%; height: 380px; object-fit: cover; border-radius: 8px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); }
+    .book-cover img { width: 100%; height: 380px; object-fit: cover; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
     .book-info { display: flex; flex-direction: column; gap: 20px; }
     .book-title { font-size: 32px; font-weight: 700; color: #1a202c; line-height: 1.2; }
+    .book-subtitle { font-size: 14px; color: #718096; margin-top: -10px; }
     .book-meta { display: flex; flex-wrap: wrap; gap: 20px; }
     .meta-item { display: flex; flex-direction: column; }
     .meta-label { font-size: 12px; color: #718096; font-weight: 600; text-transform: uppercase; }
@@ -33,9 +37,10 @@
     .features-list ul { list-style: none; margin: 0; padding: 0; }
     .features-list li { padding: 8px 0 8px 24px; position: relative; color: #4a5568; }
     .features-list li:before { content: "\2713"; position: absolute; left: 0; color: #f59e0b; font-weight: bold; }
-    .toc-list { background: #dbeafe; padding: 20px; border-radius: 8px; }
+    .toc-list { background: #fef8e7; padding: 20px; border-radius: 8px; }
     .toc-list ol { margin: 0; padding-left: 20px; color: #4a5568; }
     .toc-list li { padding: 6px 0; }
+    .telugu-text { font-size: 16px; color: #1a202c; font-weight: 500; margin-bottom: 8px; }
     .actions { display: flex; gap: 12px; margin-top: 20px; }
     .btn { flex: 1; padding: 14px 20px; border-radius: 6px; border: none; cursor: pointer; font-size: 16px; font-weight: 600; transition: all 0.3s ease; }
     .btn.open { background: #f59e0b; color: white; }
@@ -45,71 +50,68 @@
     .message { margin-top: 12px; padding: 12px; border-radius: 6px; text-align: center; font-weight: 500; }
     .message.success { background-color: #d1fae5; color: #065f46; }
     .message.error { background-color: #fee2e2; color: #991b1b; }
-    .warning-banner { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+    .warning-banner { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
     .warning-banner-header { display: flex; gap: 12px; font-weight: 700; align-items: center; }
-    .warning-banner-icon { font-size: 24px; }
     .not-found { text-align: center; padding: 60px 20px; }
     @media (max-width: 768px) { .book-content { grid-template-columns: 1fr; } .details-list { grid-template-columns: 1fr; } }
   </style>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="theme.js"></script>
 </head>
 <body>
   <div class="header">
     <a href="telugu_novels.html">&larr;</a>
-    <h2>📚 Telugu Novel Details</h2>
+    <h2>📕 తెలుగు నవల వివరాలు</h2>
   </div>
   <div class="container">
     <div class="book-detail-card">
       <div id="notFound" class="not-found" style="display:none;">
         <h1>Book Not Found</h1>
-        <a href="telugu_novels.html">Back to Telugu Novels</a>
+        <a href="telugu_novels.html">Return to Novels</a>
       </div>
       <div id="bookContainer" style="display:none;">
         <div class="book-content">
-          <div class="book-cover">
-            <img id="bookImage" src="" alt="Book Cover">
-          </div>
+          <div class="book-cover"><img id="bookImage" src="" alt="Book Cover"></div>
           <div class="book-info">
-            <h1 class="book-title" id="title">Title</h1>
+            <div>
+              <h1 class="book-title" id="title">Title</h1>
+              <div class="book-subtitle" id="telugu_title"></div>
+            </div>
             <div class="book-meta">
-              <div class="meta-item">
-                <span class="meta-label">Author</span>
-                <span class="meta-value" id="author">Unknown</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-label">Subject</span>
-                <span class="meta-value" id="subject">General</span>
-              </div>
+              <div class="meta-item"><span class="meta-label">Author</span><span class="meta-value" id="author">Unknown</span></div>
+              <div class="meta-item"><span class="meta-label">Genre</span><span class="meta-value" id="subject">General</span></div>
             </div>
             <div class="divider"></div>
             <div class="description" id="description"></div>
+            <div style="background: #f0f9ff; padding: 12px; border-radius: 6px; border-left: 3px solid #f59e0b;">
+              <div class="telugu-text" id="telugu_desc"></div>
+            </div>
             <div class="details-section">
-              <h3>📖 Publication Details</h3>
+              <h3>📖 Publishing Details</h3>
               <div class="details-list">
                 <div class="detail-item"><label>Publisher</label><value id="publisher">-</value></div>
                 <div class="detail-item"><label>Year</label><value id="year">-</value></div>
                 <div class="detail-item"><label>Edition</label><value id="edition">-</value></div>
                 <div class="detail-item"><label>Pages</label><value id="pages">-</value></div>
-                <div class="detail-item"><label>Language</label><value id="language">-</value></div>
+                <div class="detail-item"><label>Language</label><value id="language">తెలుగు</value></div>
                 <div class="detail-item"><label>ISBN</label><value id="isbn">-</value></div>
               </div>
             </div>
             <div class="details-section features-list" id="featuresSection" style="display:none;">
-              <h3>✨ Key Features</h3>
+              <h3>✨ Features</h3>
               <ul id="featuresList"></ul>
             </div>
             <div class="details-section toc-list" id="tocSection" style="display:none;">
-              <h3>📝 Chapters</h3>
+              <h3>📚 Chapters</h3>
               <ol id="tocList"></ol>
             </div>
-            <div class="warning-banner">
-              <div class="warning-banner-header">
-                <span class="warning-banner-icon">⚠️</span>
-                <span>Educational Use Only - NOT FOR COMMERCIAL PURPOSE</span>
-              </div>
+            <div class="warning-banner" id="warningBanner" style="display:none;">
+              <div class="warning-banner-header"><span>ℹ️ Cultural Literary Work</span></div>
             </div>
             <div class="actions">
-              <button id="openBtn" class="btn open">📖 Open</button>
-              <button id="saveBtn" class="btn save">⭐ Save to My Books</button>
+              <button id="openBtn" class="btn open">📖 Open PDF</button>
+              <button id="saveBtn" class="btn save">⭐ Save</button>
             </div>
             <div id="msg" class="message"></div>
           </div>
@@ -117,13 +119,84 @@
       </div>
     </div>
   </div>
-
   <script>
     const books = {
-      tel1: { id: 'tel1', title: 'చందమామ కథలు', author: 'విష్ణువర్ధనుడు', subject: 'ఫ్యంటసీ కథలు', publisher: 'అంధ్రభూమి పబ్లికేషన్‌లు', year: 2015, edition: 'మూడవ ఎడిషన్', pages: 248, language: 'తెలుగు', isbn: '978-8181860117', book_cover: 'https://images.unsplash.com/photo-1507342564885-b6baf2e33b4f?w=400&h=400&fit=crop', pdf: 'pdfs/chandamama-kathalu.pdf', description: 'చందమామ కథలు అనేది బాలల కోసం రచించిన సంపూర్ణ కథల సమాహారం. ఇందులో చంద్రుడి గురించిన పురాణ కథలు, ఖ్యాతిమాయిన పాత్రల కథలు ఈ చందమామ కథలు ఎక్కువ ఆసక్తికరమైన విషయాలను కలిగి ఉంటాయి.', features: ['బాలల కోసం రచించిన కథలు', 'గల్ఫ్ చరిత్ర నుండి ఆధారపడిన', 'ఆధార్కరమైన విషయాలు', 'సందర్భోచితమైన చిన్న కథలు', 'అకాడెమిక్‌ ఉపయోగానికి', 'తెలుగు సాహిత్యం'], toc: ['అధ్యాయం 1 - బాలల కథలు', 'అధ్యాయం 2 - పరిస్థితుల్ కథలు', 'అధ్యాయం 3 - పశువుల కథలు', 'అధ్యాయం 4 - ఆలోచనా కథలు', 'అధ్యాయం 5 - చరిత్ర కథలు'] },
-      tel2: { id: 'tel2', title: 'గ్రామ్య వర్ణనలు', author: 'రంగనాథ', subject: 'గ్రామీణ సాహిత్యం', publisher: 'సాహిత్య కేంద్రం', year: 2018, edition: 'రెండవ ఎడిషన్', pages: 320, language: 'తెలుగు', isbn: '978-8181860124', book_cover: 'https://images.unsplash.com/photo-1516979187457-635ffe35ebbd?w=400&h=400&fit=crop', pdf: 'pdfs/gramya-varnanalu.pdf', description: 'గ్రామ్య వర్ణనలు గ్రామీణ జీవనం, సంస్కృతి, ఐతిహ్యాలను వర్ణించే అద్భుత సంపూర్ణ కల్లోల నవలలు. ఇందులో ఆధాన్ దిశార్థ జీవనం యొక్క విశ్లేషణ ఉన్నాయి.', features: ['గ్రామీణ జీవనం యొక్క చిత్రణ', 'సాంస్కృతిక విలువలు', 'సమాజ గఠన', 'ప్రకృతి శిల్పం', 'ఐతిహ్య ఆధారం', 'సాహిత్య కళ'], toc: ['భాగం 1 - గ్రామీణ చిత్రాలు', 'భాగం 2 - సంస్కృతి చరిత్ర', 'భాగం 3 - జనజీవన అధ్యయనం', 'భాగం 4 - సమాజ విశ్లేషణ', 'భాగం 5 - భవిష్యత్ దృష్టిం'] },
-      tel3: { id: 'tel3', title: 'చారిత్ర నవలలు', author: 'సిద్దేశ్వర', subject: 'చరిత్ర నవలలు', publisher: 'పద్మ పబ్లికేషన్‌లు', year: 2016, edition: 'మూడవ ఎడిషన్', pages: 456, language: 'తెలుగు', isbn: '978-8181860131', book_cover: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=400&h=400&fit=crop', pdf: 'pdfs/charitra-navalalu.pdf', description: 'చారిత్ర నవలలు తెలుగు చరిత్ర నుండి గ్రహించిన ఆసక్తికరమైన చరిత్రాండలు. ఇందులో ఎంచుకోబడిన చరిత్రకారుల జీవితాలు, వారి పరిశ్రమలు, సాఫల్యాలు చర్చించబడ్డాయి.', features: ['చరిత్ర ఆధారిత నవల', 'ఐతిహ్య పరిశోధన', 'చరిత్ర వ్యక్తిత్వాలు', 'సమ్రాట్‌ కథలు', 'పరిణతి కథలు', 'ఐతిహ్య గ్రంథం'], toc: ['ఆధ్యాయం 1 - ఈశ్వర విజయం', 'ఆధ్యాయం 2 - చక్రవర్తుల శాసనం', 'ఆధ్యాయం 3 - రాజ్య నిర్మాణం', 'ఆధ్యాయం 4 - సంఘర్ష కథలు', 'ఆధ్యాయం 5 - అంతిమ విజయం'] },
-      tel4: { id: 'tel4', title: 'ప్రేమ కథలు', author: 'నందిని శర్మ', subject: 'ప్రేమ నవలలు', publisher: 'ఆనందం పబ్లికేషన్‌లు', year: 2019, edition: 'మొదటి ఎడిషన్', pages: 384, language: 'తెలుగు', isbn: '978-8181860148', book_cover: 'https://images.unsplash.com/photo-1507842564885-b6baf2e33b4f?w=400&h=400&fit=crop', pdf: 'pdfs/prema-kathalu.pdf', description: 'ప్రేమ కథలు అనేది హృదయానికి నెలిచే, ప్రేమ సంబంధాల సూక్ష్మ వర్ణనను చేసే కల్లోల నవలలు. సమాజ, కుటుంబ, విధి విడిపోయిన ప్రేమ కథలు ఈ సంపూర్ణ సమాహారంలో కనిపిస్తాయి.', features: ['రోమాంటిక్ నవలలు', 'సంబంధ విశ్లేషణ', 'సమాజ కల్మషం', 'కుటుంబ నాటకం', 'పరిస్థితుల సజీవత', 'హృదయ స్పర్శక'], toc: ['కథ 1 - చకిత ప్రేమ', 'కథ 2 - వియోగ వేదన', 'కథ 3 - సమాజ విరోధం', 'కథ 4 - కుటుంబ సంఘర్ష', 'కథ 5 - అనంత ప్రేమ'] },
+      tl1: {
+        id: 'tel1',
+        title: 'Chandamama Stories',
+        telugu_title: 'చందమామ కథలు',
+        author: 'Vishnu Vardhana',
+        subject: 'Folk Tales',
+        publisher: 'Visalandhra Publications',
+        year: 2010,
+        edition: 'First',
+        pages: 280,
+        language: 'తెలుగు',
+        isbn: '978-81-7525-891-3',
+        book_cover: 'https://images.unsplash.com/photo-1507842217343-583f7270bfba?w=400&h=400&fit=crop',
+        description: 'A collection of timeless Telugu folk stories passed down through generations, featuring the adventures of various characters in mythical and magical settings. These stories are deeply rooted in Telugu culture and tradition.',
+        telugu_desc: 'తెలుగు సంస్కృతిలో లోతుగా నిండిన మార్పులేని కథలు, అద్భుత సంఘటనలు, పాత్రల ఆధ్యత్మికత మరియు నైతిక విలువలను వెల్లడిచేందుకు సమర్థమైన కథలు.',
+        features: ['Classic folklore', 'Cultural heritage', 'Traditional values', 'Mythological elements', 'Engaging narratives', 'Family stories'],
+        toc: ['కధ 1 - చంద మామ చరిత్ర', 'కధ 2 - చేంచుకుండు రాజు', 'కధ 3 - నలుమహిళలు', 'కధ 4 - ఎరుక తెలిసిన వారు', 'కధ 5 - సిద్ధ చేతిలో సిద్ధార్థ', 'కధ 6 - అందమైన రాజ్యం'],
+        pdf: 'pdfs/chandamama-stories.pdf'
+      },
+      tl2: {
+        id: 'tl2',
+        title: 'Gramya Varnanalua',
+        telugu_title: 'గ్రామ్య వర్ణనలు',
+        author: 'Ranganath',
+        subject: 'Rural Fiction',
+        publisher: 'Heritage Press',
+        year: 2012,
+        edition: 'Second',
+        pages: 320,
+        language: 'తెలుగు',
+        isbn: '978-81-7525-892-0',
+        book_cover: 'https://images.unsplash.com/photo-1516979187457-635ffe35ebbd?w=400&h=400&fit=crop',
+        description: 'Vivid depictions of rural Telugu life, countryside customs, and village traditions. The author captures the essence of Telugu villages with detailed narratives of daily life and community relationships.',
+        telugu_desc: 'తెలుగు గ్రామ జీవన విధానం, సరళ ప్రజల సంస్కృతి, మరియు ఆంధ్ర ప్రాంతం యొక్క అంతర్గత సౌందర్యాన్ని సూక్ష్మంగా చిత్రీకరించిన గ్రంథం.',
+        features: ['Village life', 'Social customs', 'Cultural details', 'Local traditions', 'Realistic portrayal', 'Community dynamics'],
+        toc: ['అధ్యాయం 1 - గ్రామం యొక్క జీవితం', 'అధ్యాయం 2 - పంచాయతీ', 'అధ్యాయం 3 - మానవ సంబంధాలు', 'అధ్యాయం 4 - పంపకాల ఆచారాలు', 'అధ్యాయం 5 - ఋతువుల సందర్భం', 'అధ్యాయం 6 - పరిణామం'],
+        pdf: 'pdfs/gramya-varnanalua.pdf'
+      },
+      tl3: {
+        id: 'tl3',
+        title: 'Charithra Navalalu',
+        telugu_title: 'చారిత్ర నవలలు',
+        author: 'Siddeshwara',
+        subject: 'Historical Fiction',
+        publisher: 'Andhra Patrika',
+        year: 2013,
+        edition: 'First',
+        pages: 380,
+        language: 'తెలుగు',
+        isbn: '978-81-7525-893-7',
+        book_cover: 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=400&fit=crop',
+        description: 'compelling historical novels set against the backdrop of Andhra Pradesh\'s rich past. These narratives weave together historical events with fictional characters, bringing ancient and medieval Telugu history to life.',
+        telugu_desc: 'ఆంధ్ర ప్రదేశ్ యొక్క గौరవhouston చరిత్ర కల్పితాలతో మిళితమైన రచన, చరిత్ర ప్రేములకు ఆకర్షణీయమైన పాఠ్యం.',
+        features: ['Historical accuracy', 'Character depth', 'Period details', 'Narrative tension', 'Cultural context', 'Emotional storytelling'],
+        toc: ['ભાग 1 - చరిత్ర యొక్క విధానం', 'భాग 2 - రాజ్యంలోని నాటకీయతలు', 'భాग 3 - ప్రేమ మరియు యుద్ధం', 'ભాग 4 - మీరు చరిత్ర తెలిస్తారు', 'ભాग 5 - వీరోచితమైన చేష్ట'],
+        pdf: 'pdfs/charithra-navalalu.pdf'
+      },
+      tl4: {
+        id: 'tl4',
+        title: 'Prema Kathalu',
+        telugu_title: 'ప్రేమ కథలు',
+        author: 'Nandini Sharma',
+        subject: 'Romance',
+        publisher: 'Sahiti Akademi',
+        year: 2014,
+        edition: 'Revised',
+        pages: 260,
+        language: 'తెలుగు',
+        isbn: '978-81-7525-894-4',
+        book_cover: 'https://images.unsplash.com/photo-1507342564885-b6baf2e33b4f?w=400&h=400&fit=crop',
+        description: 'Romantic tales set in Telugu-speaking regions, exploring the complexities of love, relationships, and human emotions. The author beautifully portrays the evolution of relationships across different social contexts.',
+        telugu_desc: 'ప్రేమ సంబంధాల సూక్ష్మాలను లోతుగా అన్వేషించిన కథలు, సమాజ రంగాలలో ప్రేమ ఎలా గతిశీలంగా వెలుగున్నవటం చూపిస్తుంది.',
+        features: ['Emotional depth', 'Relationship dynamics', 'Character emotions', 'Social realism', 'Tender storytelling', 'Human connections'],
+        toc: ['కథ 1 - ఫిరంజీ ప్రేమ', 'కథ 2 - సమయం యొక్క సీమలు', 'కథ 3 - సంబంధాల చెవిలు', 'కథ 4 - చిందిన ఆశలు', 'కథ 5 - సర్వకాల ప్రేమ'],
+        pdf: 'pdfs/prema-kathalu.pdf'
+      }
     };
 
     const bookId = new URLSearchParams(location.search).get('id');
@@ -134,16 +207,18 @@
     } else {
       document.getElementById('bookContainer').style.display = 'block';
       document.getElementById('title').textContent = book.title;
+      document.getElementById('telugu_title').textContent = book.telugu_title;
       document.getElementById('author').textContent = book.author;
       document.getElementById('subject').textContent = book.subject;
       document.getElementById('description').textContent = book.description;
+      document.getElementById('telugu_desc').textContent = book.telugu_desc;
       document.getElementById('publisher').textContent = book.publisher;
       document.getElementById('year').textContent = book.year;
       document.getElementById('edition').textContent = book.edition;
-      document.getElementById('pages').textContent = book.pages + ' Pages';
-      document.getElementById('language').textContent = book.language;
+      document.getElementById('pages').textContent = book.pages + ' పేజీలు';
       document.getElementById('isbn').textContent = book.isbn;
       document.getElementById('bookImage').src = book.book_cover;
+      document.getElementById('warningBanner').style.display = 'block';
 
       if (book.features) {
         document.getElementById('featuresList').innerHTML = book.features.map(f => `<li>${f}</li>`).join('');
@@ -155,11 +230,8 @@
       }
 
       document.getElementById('openBtn').addEventListener('click', () => {
-        if (book.pdf) {
-          window.open(book.pdf, '_blank');
-        } else {
-          showMsg('PDF not available', 'error');
-        }
+        if (book.pdf) window.open(book.pdf, '_blank');
+        else showMessage('PDF available కాలేదు', 'error');
       });
 
       document.getElementById('saveBtn').addEventListener('click', () => {
@@ -168,15 +240,15 @@
         const key = `saved_${email}`;
         const saved = JSON.parse(localStorage.getItem(key) || '[]');
         if (saved.find(b => b.id === book.id)) {
-          showMsg('Already saved', 'error');
+          showMessage('ఇప్పటికే సేవ్ చేయబడినది', 'error');
         } else {
           saved.push(book);
           localStorage.setItem(key, JSON.stringify(saved));
-          showMsg('✓ Saved successfully!', 'success');
+          showMessage('\u2713 సేవ్ చేయబడింది!', 'success');
         }
       });
 
-      function showMsg(text, type) {
+      function showMessage(text, type) {
         const msg = document.getElementById('msg');
         msg.textContent = text;
         msg.className = `message ${type}`;

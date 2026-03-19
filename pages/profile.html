@@ -1,0 +1,1383 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>My Profile - Online Library</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --accent: #0b72b9;
+      --accent-light: #67b6ff;
+      --card: #ffffff;
+      --muted: #6b7280;
+      --bg: #f3f6f8;
+      --text: #0f1724;
+      --panel-border: #e5e7eb;
+      --soft-bg: #f9fafb;
+      --soft-bg-hover: #f3f4f6;
+      --input-bg: #ffffff;
+      --radius: 12px;
+      --shadow: 0 8px 24px rgba(0,0,0,0.08);
+      --shadow-lg: 0 16px 40px rgba(0,0,0,0.12);
+    }
+
+    body.theme-dark {
+      --card: #121d2b;
+      --muted: #9aa8ba;
+      --bg: #0b1220;
+      --text: #e6edf7;
+      --panel-border: #253448;
+      --soft-bg: #162335;
+      --soft-bg-hover: #1b2c44;
+      --input-bg: #0f1a2b;
+      --shadow: 0 8px 24px rgba(0,0,0,0.35);
+      --shadow-lg: 0 16px 40px rgba(0,0,0,0.45);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: var(--bg); color: var(--text); }
+    body { transition: background-color 0.25s ease, color 0.25s ease; }
+
+    /* Top Navigation */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 12px 24px;
+      background: linear-gradient(90deg, var(--accent), #0963a0);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topbar img.logo { height: 48px; width: 48px; border-radius: 8px; object-fit: cover; }
+    .topbar h1 { margin: 0; font-size: 20px; font-weight: 700; }
+    .topbar nav { margin-left: auto; display: flex; gap: 16px; align-items: center; }
+    .topbar a, .topbar button { 
+      color: #fff; 
+      text-decoration: none; 
+      padding: 8px 16px; 
+      border-radius: 8px; 
+      border: 1px solid rgba(255,255,255,0.2); 
+      background: transparent; 
+      cursor: pointer; 
+      transition: all 0.3s ease; 
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .topbar a:hover, .topbar button:hover { 
+      background: rgba(255,255,255,0.15); 
+      transform: translateY(-2px); 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 24px;
+    }
+
+    /* Profile Sidebar */
+    .profile-sidebar {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: var(--shadow);
+      height: fit-content;
+      position: sticky;
+      top: 100px;
+    }
+
+    .profile-sidebar-top {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 14px;
+    }
+
+    .theme-icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      border: 1px solid var(--panel-border);
+      background: var(--soft-bg);
+      color: var(--text);
+      font-size: 18px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .theme-icon-btn:hover {
+      transform: translateY(-2px);
+      background: var(--soft-bg-hover);
+    }
+
+    .profile-avatar-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      color: white;
+      font-weight: 700;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .profile-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-upload {
+      position: relative;
+    }
+
+    .avatar-upload-btn {
+      padding: 8px 16px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .avatar-upload-btn:hover {
+      background: #0963a0;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(11,114,185,0.3);
+    }
+
+    .profile-name {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      color: var(--text);
+    }
+
+    .profile-email {
+      margin: 4px 0 0 0;
+      font-size: 14px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .profile-status {
+      display: inline-block;
+      padding: 4px 12px;
+      background: #10b981;
+      color: white;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    .profile-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--panel-border);
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      display: block;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Main Content Area */
+    .profile-content {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .content-section {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: var(--shadow);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--panel-border);
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(11,114,185,0.3);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .btn-primary:hover {
+      background: #0963a0;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+      border-color: #ef4444;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--panel-border);
+      background: var(--input-bg);
+      color: var(--text);
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(11,114,185,0.1);
+    }
+
+    .form-input:disabled {
+      background: var(--soft-bg);
+      cursor: not-allowed;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* Info Cards */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+
+    .info-card {
+      padding: 20px;
+      background: linear-gradient(135deg, var(--soft-bg), var(--card));
+      border-radius: 10px;
+      border: 1px solid var(--panel-border);
+    }
+
+    .info-card-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .info-card-value {
+      font-size: 16px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .security-tip-card {
+      margin-bottom: 24px;
+      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(11,114,185,0.14), var(--card));
+    }
+
+    .security-tip-title {
+      color: var(--accent);
+    }
+
+    .security-tip-list {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 12px 0 0 20px;
+      padding: 0;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--muted);
+    }
+
+    /* Edit Mode */
+    .edit-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 968px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+      .profile-sidebar {
+        position: relative;
+        top: 0;
+      }
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Success Message */
+    .success-message {
+      padding: 12px 16px;
+      background: #10b981;
+      color: white;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+
+    .success-message.show {
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Dashboard Styles */
+    .stats-bar {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .stat-box {
+      flex: 1;
+      min-width: 200px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(11,114,185,0.3);
+      text-align: center;
+    }
+
+    .stat-box h4 {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      opacity: 0.9;
+      font-weight: 600;
+    }
+
+    .stat-box .value {
+      font-size: 42px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .progress-section {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .progress-item {
+      margin-bottom: 24px;
+    }
+
+    .progress-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .progress-label {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 15px;
+    }
+
+    .progress-value {
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 18px;
+    }
+
+    .progress-bar {
+      height: 20px;
+      background: var(--panel-border);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-light));
+      border-radius: 10px;
+      transition: width 1s ease;
+      box-shadow: 0 2px 8px rgba(11,114,185,0.3);
+    }
+
+    .chart-container {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--panel-border);
+    }
+
+    .chart-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0;
+    }
+
+    .chart-wrapper {
+      position: relative;
+      height: 400px;
+    }
+
+    .chart-wrapper.large {
+      height: 450px;
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .chart-full {
+      grid-column: 1 / -1;
+    }
+
+    .activity-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+      background: var(--soft-bg);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .activity-item:hover {
+      background: var(--soft-bg-hover);
+      transform: translateX(4px);
+    }
+
+    .activity-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(11,114,185,0.2);
+    }
+
+    .activity-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .activity-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0 0 4px 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .activity-time {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    @media (max-width: 968px) {
+      .chart-grid {
+        grid-template-columns: 1fr;
+      }
+      .dashboard-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
+    }
+  </style>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="theme.js"></script>
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="topbar">
+    <img class="logo" src="ChatGPT Image Sep 18, 2025, 09_32_41 AM.png" alt="Online Library Logo">
+    <h1>My Profile</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="explorer.html">Explore</a>
+      <a href="personal.html">My Books</a>
+      <button id="logout-btn">Logout</button>
+    </nav>
+  </div>
+
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Profile Sidebar -->
+    <aside class="profile-sidebar">
+      <div class="profile-avatar-container">
+        <div class="profile-avatar" id="profile-avatar">
+          <span id="avatar-initial">U</span>
+        </div>
+        <div class="avatar-upload">
+          <input type="file" id="avatar-input" accept="image/*" style="display: none;">
+          <button class="avatar-upload-btn" onclick="document.getElementById('avatar-input').click()">
+            📷 Change Photo
+          </button>
+        </div>
+      </div>
+
+      <h2 class="profile-name" id="profile-name">Loading...</h2>
+      <p class="profile-email" id="profile-email">Loading...</p>
+      <span class="profile-status">Active</span>
+
+      <div class="profile-stats">
+        <div class="stat-item">
+          <span class="stat-value" id="viewed-count">0</span>
+          <span class="stat-label">Books Viewed</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="reading-days">0</span>
+          <span class="stat-label">Days Active</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="profile-content">
+      <!-- Success Message -->
+      <div id="success-message" class="success-message">
+        ✓ Profile updated successfully!
+      </div>
+
+      <!-- Dashboard Section -->
+      <section class="content-section">
+        <div class="section-header">
+          <h3 class="section-title">📊 Reading Analytics Dashboard</h3>
+        </div>
+
+        <!-- Quick Stats Bar -->
+        <div class="stats-bar">
+          <div class="stat-box">
+            <h4>📚 Books Viewed</h4>
+            <div class="value" id="dash-viewed">0</div>
+          </div>
+          <div class="stat-box" style="background: linear-gradient(135deg, #10b981, #34d399);">
+            <h4>💾 Books Saved</h4>
+            <div class="value" id="dash-saved">0</div>
+          </div>
+          <div class="stat-box" style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">
+            <h4>🏆 Reading Streak</h4>
+            <div class="value" id="dash-streak">0</div>
+          </div>
+        </div>
+
+        <!-- Reading Progress Bars -->
+        <div class="progress-section">
+          <div class="chart-header" style="margin-bottom: 24px;">
+            <h4 class="chart-title">📈 Reading Progress</h4>
+          </div>
+          <div id="category-progress"></div>
+        </div>
+
+        <!-- Main Activity Chart -->
+        <div class="chart-container chart-full">
+          <div class="chart-header">
+            <h4 class="chart-title">📊 Daily Reading Activity - Last 14 Days</h4>
+          </div>
+          <div class="chart-wrapper large">
+            <canvas id="activityChart"></canvas>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Personal Information Section -->
+      <section class="content-section">
+        <div class="section-header">
+          <h3 class="section-title">Personal Information</h3>
+          <button class="btn" id="edit-btn">✏️ Edit</button>
+        </div>
+
+        <!-- View Mode -->
+        <div id="view-mode">
+          <div class="info-grid">
+            <div class="info-card">
+              <div class="info-card-label">Full Name</div>
+              <div class="info-card-value" id="display-name">Not set</div>
+            </div>
+            <div class="info-card">
+              <div class="info-card-label">Email Address</div>
+              <div class="info-card-value" id="display-email">Not set</div>
+            </div>
+            <div class="info-card">
+              <div class="info-card-label">Member Since</div>
+              <div class="info-card-value" id="display-joined">Not set</div>
+            </div>
+            <div class="info-card">
+              <div class="info-card-label">Last Login</div>
+              <div class="info-card-value" id="display-lastlogin">Not set</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Edit Mode -->
+        <div id="edit-mode" class="hidden">
+          <form id="profile-form">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" class="form-input" id="input-name" placeholder="Enter your full name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" class="form-input" id="input-email" disabled>
+            </div>
+            <div class="edit-actions">
+              <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+              <button type="button" class="btn" id="cancel-btn">✕ Cancel</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Security Section -->
+      <section class="content-section">
+        <div class="section-header">
+          <h3 class="section-title">🔐 Security & Password</h3>
+        </div>
+
+        <div class="info-card security-tip-card">
+          <div class="info-card-label security-tip-title">💡 Password Security Tips</div>
+          <ul class="security-tip-list">
+            <li>Use at least 8 characters (minimum 6 required)</li>
+            <li>Include uppercase and lowercase letters</li>
+            <li>Add numbers and special characters</li>
+            <li>Don't reuse passwords from other accounts</li>
+            <li>Change your password regularly for better security</li>
+          </ul>
+        </div>
+
+        <form id="password-form">
+          <div class="form-group">
+            <label class="form-label">Current Password</label>
+            <div style="position: relative;">
+              <input type="password" class="form-input" id="current-password" placeholder="Enter current password" required style="padding-right: 45px;">
+              <button type="button" class="toggle-password" onclick="togglePasswordVisibility('current-password')">👁️</button>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">New Password</label>
+              <div style="position: relative;">
+                <input type="password" class="form-input" id="new-password" placeholder="Enter new password (min 6 chars)" required minlength="6" style="padding-right: 45px;">
+                <button type="button" class="toggle-password" onclick="togglePasswordVisibility('new-password')">👁️</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirm New Password</label>
+              <div style="position: relative;">
+                <input type="password" class="form-input" id="confirm-password" placeholder="Confirm new password" required style="padding-right: 45px;">
+                <button type="button" class="toggle-password" onclick="togglePasswordVisibility('confirm-password')">👁️</button>
+              </div>
+            </div>
+          </div>
+          <div id="password-message" style="display: none; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px;"></div>
+          <button type="submit" class="btn btn-primary">🔒 Change Password</button>
+        </form>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="profile-service.js"></script>
+  <script src="auth-service.js"></script>
+  <script>
+    function hydrateSessionFromUrl() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+        const user = params.get('user');
+        const name = params.get('name');
+
+        if (token) {
+          localStorage.setItem('auth_token', token);
+          localStorage.setItem('loggedIn', 'true');
+        }
+
+        if (user) {
+          const existingRaw = localStorage.getItem('currentUser');
+          let existingUser = null;
+          try {
+            existingUser = existingRaw ? JSON.parse(existingRaw) : null;
+          } catch (_error) {
+            existingUser = existingRaw ? { email: String(existingRaw).trim() } : null;
+          }
+
+          const nextUser = {
+            ...(existingUser && typeof existingUser === 'object' ? existingUser : {}),
+            email: user,
+            ...(name ? { name } : {})
+          };
+          localStorage.setItem('currentUser', JSON.stringify(nextUser));
+        }
+      } catch (_error) {
+        // Ignore malformed URL params.
+      }
+    }
+
+    function buildExplorerUrl() {
+      const params = new URLSearchParams();
+      const token = localStorage.getItem('auth_token') || '';
+      const rawUser = localStorage.getItem('currentUser') || '';
+
+      if (token) params.set('token', token);
+
+      if (rawUser) {
+        try {
+          const parsed = JSON.parse(rawUser);
+          if (parsed?.email) params.set('user', parsed.email);
+          if (parsed?.name) params.set('name', parsed.name);
+        } catch (_error) {
+          params.set('user', rawUser);
+        }
+      }
+
+      const query = params.toString();
+      return `explorer.html${query ? `?${query}` : ''}`;
+    }
+
+    hydrateSessionFromUrl();
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const exploreLink = document.querySelector('a[href="explorer.html"]');
+      if (exploreLink) {
+        exploreLink.href = buildExplorerUrl();
+      }
+    });
+
+    function initThemeSettings(userEmail) {
+      const button = document.getElementById('theme-toggle-button');
+      if (!button || button.dataset.bound === '1') return;
+
+      const syncThemeUi = () => {
+        const activeTheme = window.AppTheme ? window.AppTheme.getTheme(userEmail) : 'light';
+        button.textContent = activeTheme === 'dark' ? '🌙' : '☀️';
+        button.title = activeTheme === 'dark' ? 'Dark mode enabled' : 'Light mode enabled';
+        button.setAttribute('aria-label', button.title);
+      };
+
+      syncThemeUi();
+
+      button.dataset.bound = '1';
+      button.addEventListener('click', () => {
+        const activeTheme = window.AppTheme ? window.AppTheme.getTheme(userEmail) : 'light';
+        const nextTheme = activeTheme === 'dark' ? 'light' : 'dark';
+        if (window.AppTheme) {
+          window.AppTheme.setTheme(nextTheme, userEmail);
+        }
+        syncThemeUi();
+        loadDashboardData();
+      });
+
+      window.addEventListener('themechange', syncThemeUi);
+    }
+
+    function parseStoredUser(rawValue) {
+      if (!rawValue) return null;
+      try {
+        const parsed = JSON.parse(rawValue);
+        if (parsed && typeof parsed === 'object') return parsed;
+      } catch (_error) {
+        // Fallback for legacy plain-string storage.
+      }
+      return { email: String(rawValue).trim() };
+    }
+
+    async function resolveActiveUser() {
+      const authUser = (typeof AuthService !== 'undefined' && AuthService.getCurrentUser)
+        ? AuthService.getCurrentUser()
+        : null;
+
+      if (authUser) {
+        const normalizedAuthUser = typeof authUser === 'string' ? { email: authUser } : authUser;
+        if (normalizedAuthUser && normalizedAuthUser.email) {
+          return normalizedAuthUser;
+        }
+      }
+
+      const localUser = parseStoredUser(localStorage.getItem('currentUser'));
+      if (localUser && localUser.email) {
+        return localUser;
+      }
+
+      const hasToken = !!localStorage.getItem('auth_token');
+      if (!hasToken) return null;
+
+      try {
+        const profileResponse = await ProfileService.getProfile();
+        const apiUser = profileResponse?.data?.user;
+        if (apiUser && apiUser.email) {
+          localStorage.setItem('currentUser', JSON.stringify(apiUser));
+          return apiUser;
+        }
+      } catch (_error) {
+        // Ignore and let caller handle missing user.
+      }
+
+      return null;
+    }
+
+    // Initialize profile data
+    async function loadProfileData() {
+      const user = await resolveActiveUser();
+
+      if (!user || !user.email) {
+        // Redirect to login if not authenticated
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      // Get viewed books count
+      const viewedBooks = JSON.parse(localStorage.getItem('viewedBooks') || '[]');
+      const userViewedBooks = viewedBooks.filter(book => book.userId === user.email);
+      
+      // Calculate days active
+      const joinDate = user.createdAt ? new Date(user.createdAt) : new Date();
+      const today = new Date();
+      const daysActive = Math.floor((today - joinDate) / (1000 * 60 * 60 * 24));
+
+      // Update sidebar
+      document.getElementById('profile-name').textContent = user.name || user.email.split('@')[0];
+      document.getElementById('profile-email').textContent = user.email;
+      document.getElementById('viewed-count').textContent = userViewedBooks.length;
+      document.getElementById('reading-days').textContent = daysActive;
+      
+      // Set avatar initial
+      const initial = (user.name || user.email).charAt(0).toUpperCase();
+      document.getElementById('avatar-initial').textContent = initial;
+
+      // Update view mode
+      document.getElementById('display-name').textContent = user.name || 'Not set';
+      document.getElementById('display-email').textContent = user.email;
+      document.getElementById('display-joined').textContent = formatDate(user.createdAt);
+      document.getElementById('display-lastlogin').textContent = formatDate(user.lastLogin);
+
+      // Update edit mode inputs
+      document.getElementById('input-name').value = user.name || '';
+      document.getElementById('input-email').value = user.email;
+
+      initThemeSettings(user.email);
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return 'Never';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    }
+
+    // Toggle edit mode
+    document.getElementById('edit-btn').addEventListener('click', () => {
+      document.getElementById('view-mode').classList.add('hidden');
+      document.getElementById('edit-mode').classList.remove('hidden');
+    });
+
+    document.getElementById('cancel-btn').addEventListener('click', () => {
+      document.getElementById('edit-mode').classList.add('hidden');
+      document.getElementById('view-mode').classList.remove('hidden');
+      loadProfileData(); // Reset form
+    });
+
+    // Handle profile form submission
+    document.getElementById('profile-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const userData = AuthService.getCurrentUser();
+      const user = typeof userData === 'string' ? { email: userData } : userData;
+
+      if (!user || !user.email) {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      // Update user data
+      user.name = document.getElementById('input-name').value;
+      user.updatedAt = new Date().toISOString();
+      
+      // Save to localStorage
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      
+      // Update users array
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const userIndex = users.findIndex(u => u.email === user.email);
+      if (userIndex !== -1) {
+        users[userIndex] = user;
+        localStorage.setItem('users', JSON.stringify(users));
+      }
+      
+      // Show success message
+      const successMsg = document.getElementById('success-message');
+      successMsg.classList.add('show');
+      setTimeout(() => successMsg.classList.remove('show'), 3000);
+      
+      // Reload profile and switch back to view mode
+      loadProfileData();
+      document.getElementById('edit-mode').classList.add('hidden');
+      document.getElementById('view-mode').classList.remove('hidden');
+    });
+
+    // Handle password change
+    document.getElementById('password-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const currentPassword = document.getElementById('current-password').value;
+      const newPassword = document.getElementById('new-password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+      const messageDiv = document.getElementById('password-message');
+      
+      // Show inline message helper
+      function showMessage(text, isError = false) {
+        messageDiv.textContent = text;
+        messageDiv.style.display = 'block';
+        messageDiv.style.background = isError ? '#fee2e2' : '#d1fae5';
+        messageDiv.style.color = isError ? '#991b1b' : '#065f46';
+        messageDiv.style.border = isError ? '1px solid #fecaca' : '1px solid #a7f3d0';
+      }
+      
+      // Validation
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        showMessage('❌ Please fill in all password fields', true);
+        return;
+      }
+      
+      if (newPassword !== confirmPassword) {
+        showMessage('❌ New passwords do not match!', true);
+        return;
+      }
+      
+      if (newPassword.length < 6) {
+        showMessage('❌ Password must be at least 6 characters long', true);
+        return;
+      }
+      
+      if (currentPassword === newPassword) {
+        showMessage('❌ New password must be different from current password', true);
+        return;
+      }
+      
+      // Disable submit button to prevent double submission
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = '🔄 Changing Password...';
+      
+      try {
+        // Call backend API to change password
+        const result = await ProfileService.changePassword(currentPassword, newPassword);
+        
+        if (result.ok) {
+          // Show success message
+          showMessage('✅ Password changed successfully! You can now use your new password to login.', false);
+          
+          const successMsg = document.getElementById('success-message');
+          successMsg.textContent = '✓ Password changed successfully!';
+          successMsg.classList.add('show');
+          setTimeout(() => successMsg.classList.remove('show'), 3000);
+          
+          // Clear form
+          document.getElementById('password-form').reset();
+          
+          // Hide message after 5 seconds
+          setTimeout(() => {
+            messageDiv.style.display = 'none';
+          }, 5000);
+        } else {
+          showMessage('❌ Failed to change password: ' + (result.error || 'Unknown error'), true);
+        }
+      } catch (error) {
+        console.error('Password change error:', error);
+        showMessage('❌ Error changing password: ' + error.message, true);
+      } finally {
+        // Re-enable submit button
+        submitBtn.disabled = false;
+        submitBtn.textContent = '🔒 Change Password';
+      }
+    });
+
+    // Toggle password visibility
+    function togglePasswordVisibility(inputId) {
+      const input = document.getElementById(inputId);
+      const button = input.nextElementSibling;
+      
+      if (input.type === 'password') {
+        input.type = 'text';
+        button.textContent = '🙈';
+      } else {
+        input.type = 'password';
+        button.textContent = '👁️';
+      }
+    }
+
+    // Handle avatar upload
+    document.getElementById('avatar-input').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const avatarElement = document.getElementById('profile-avatar');
+          avatarElement.innerHTML = `<img src="${event.target.result}" alt="Profile Avatar">`;
+          
+          // Save to localStorage (in real app, upload to server)
+          const userData = AuthService.getCurrentUser();
+          const user = typeof userData === 'string' ? { email: userData } : userData;
+          if (!user || !user.email) return;
+          user.avatarUrl = event.target.result;
+          localStorage.setItem('currentUser', JSON.stringify(user));
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Handle logout
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      if (confirm('Are you sure you want to logout?')) {
+        AuthService.logout();
+        window.location.href = 'index.html';
+      }
+    });
+
+    // Dashboard functionality
+    async function loadDashboardData() {
+      const user = await resolveActiveUser();
+      if (!user || !user.email) return;
+      
+      // Get viewed books
+      const viewedBooks = JSON.parse(localStorage.getItem('viewedBooks') || '[]');
+      const userViewedBooks = viewedBooks.filter(book => book.userId === user.email);
+      
+      // Get saved books (check both formats)
+      let userSavedBooks = [];
+      const savedBooksNew = JSON.parse(localStorage.getItem('savedBooks') || '[]');
+      userSavedBooks = savedBooksNew.filter(book => book.userId === user.email);
+      
+      // Also check old format
+      const savedBooksOld = JSON.parse(localStorage.getItem('saved_' + user.email) || '[]');
+      userSavedBooks = [...userSavedBooks, ...savedBooksOld];
+      
+      // Calculate reading streak
+      let streak = 0;
+      if (userViewedBooks.length > 0) {
+        const sortedViews = [...userViewedBooks].sort((a, b) => new Date(b.viewedAt) - new Date(a.viewedAt));
+        let currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0);
+        
+        for (let view of sortedViews) {
+          const viewDate = new Date(view.viewedAt);
+          viewDate.setHours(0, 0, 0, 0);
+          const diffDays = Math.floor((currentDate - viewDate) / (1000 * 60 * 60 * 24));
+          
+          if (diffDays === streak) {
+            streak++;
+          } else if (diffDays > streak) {
+            break;
+          }
+        }
+      }
+      
+      // Calculate favorite category
+      const categories = {};
+      userViewedBooks.forEach(book => {
+        const category = book.category || 'Uncategorized';
+        categories[category] = (categories[category] || 0) + 1;
+      });
+      
+      let favoriteCategory = 'None';
+      let maxCount = 0;
+      for (let [category, count] of Object.entries(categories)) {
+        if (count > maxCount) {
+          maxCount = count;
+          favoriteCategory = category;
+        }
+      }
+      
+      // Update stat boxes
+      document.getElementById('dash-viewed').textContent = userViewedBooks.length;
+      document.getElementById('dash-saved').textContent = userSavedBooks.length;
+      document.getElementById('dash-streak').textContent = streak;
+      
+      // Load all charts and visualizations
+      loadActivityChart(userViewedBooks);
+      loadCategoryProgress(categories);
+    }
+    
+    function loadActivityChart(viewedBooks) {
+      const ctx = document.getElementById('activityChart');
+      if (!ctx) return;
+      const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
+      const tickColor = isDarkTheme ? '#cbd5e1' : '#475569';
+      const gridColor = isDarkTheme ? 'rgba(148, 163, 184, 0.14)' : 'rgba(0, 0, 0, 0.05)';
+      const tooltipBg = isDarkTheme ? 'rgba(15, 23, 42, 0.94)' : 'rgba(0, 0, 0, 0.8)';
+      
+      // Get last 14 days data
+      const last14Days = [];
+      const activityData = [];
+      
+      for (let i = 13; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        date.setHours(0, 0, 0, 0);
+        
+        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        last14Days.push(dateStr);
+        
+        const count = viewedBooks.filter(book => {
+          const viewDate = new Date(book.viewedAt);
+          viewDate.setHours(0, 0, 0, 0);
+          return viewDate.getTime() === date.getTime();
+        }).length;
+        
+        activityData.push(count);
+      }
+      
+      if (window.activityChart) {
+        window.activityChart.destroy();
+      }
+      
+      window.activityChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: last14Days,
+          datasets: [{
+            label: 'Books Viewed',
+            data: activityData,
+            backgroundColor: activityData.map((val, idx) => {
+              const colors = ['#0b72b9', '#1e88e5', '#42a5f5', '#64b5f6'];
+              return colors[idx % colors.length];
+            }),
+            borderRadius: 8,
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: tooltipBg,
+              padding: 12,
+              titleFont: { size: 14, weight: 'bold' },
+              bodyFont: { size: 13 },
+              cornerRadius: 8
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1,
+                font: { size: 12 },
+                color: tickColor
+              },
+              grid: {
+                color: gridColor
+              }
+            },
+            x: {
+              ticks: {
+                font: { size: 12 },
+                color: tickColor
+              },
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    function loadCategoryProgress(categories) {
+      const container = document.getElementById('category-progress');
+      if (!container) return;
+      
+      const sortedCategories = Object.entries(categories)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+      
+      if (sortedCategories.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--muted);">No reading data available yet</p>';
+        return;
+      }
+      
+      const maxCount = Math.max(...sortedCategories.map(c => c[1]));
+      
+      container.innerHTML = sortedCategories.map(([category, count]) => {
+        const percentage = (count / maxCount) * 100;
+        return `
+          <div class="progress-item">
+            <div class="progress-header">
+              <span class="progress-label">${category}</span>
+              <span class="progress-value">${count} books</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${percentage}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Load profile data on page load
+    loadProfileData();
+    loadDashboardData();
+
+    window.addEventListener('themechange', () => {
+      loadDashboardData();
+    });
+  </script>
+</body>
+</html>

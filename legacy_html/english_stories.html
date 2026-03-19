@@ -14,6 +14,36 @@
       --shadow: 0 8px 24px rgba(0,0,0,0.08);
     }
     html,body{height:100%;margin:0;font-family:system-ui,Arial;background:var(--bg);color:#0f1724}
+    body{position:relative;background:#0f1724;overflow-x:hidden}
+    .netflix-bg{
+      position:fixed;
+      inset:-65%;
+      display:grid;
+      grid-template-columns:repeat(10, minmax(0, 1fr));
+      grid-auto-rows:180px;
+      gap:12px;
+      padding:12px;
+      transform:rotate(-45deg) scale(1.35);
+      transform-origin:center;
+      z-index:0;
+      pointer-events:none;
+    }
+    .netflix-bg img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      border-radius:8px;
+      opacity:0.9;
+      filter:saturate(0.9) brightness(0.72);
+    }
+    .netflix-overlay{
+      position:fixed;
+      inset:0;
+      background:linear-gradient(180deg, rgba(2,6,23,0.46) 0%, rgba(2,6,23,0.68) 50%, rgba(2,6,23,0.84) 100%);
+      z-index:1;
+      pointer-events:none;
+    }
+    .topbar,.layout{position:relative;z-index:2}
     .topbar{
       display:flex;
       align-items:center;
@@ -126,6 +156,8 @@
       flex-direction:column;
       gap:8px;
       align-items:stretch;
+      width:140px;
+      min-height:150px;
     }
     .book-card figure{margin:0}
     .book-card img{
@@ -139,6 +171,7 @@
     .book-card .meta{padding:6px 2px}
     .book-card h3{margin:6px 0;font-size:16px}
     .book-card p{margin:0;color:var(--muted);font-size:13px}
+    .book-card .rating-line{margin-top:4px;font-size:12px;color:var(--muted)}
     .book-actions {
       display: flex;
       gap: 6px;
@@ -181,8 +214,14 @@
       .book-card img{height:180px}
     }
   </style>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="theme.js"></script>
 </head>
 <body>
+  <div id="netflixBg" class="netflix-bg" aria-hidden="true"></div>
+  <div class="netflix-overlay" aria-hidden="true"></div>
+
   <header class="topbar">
     <img class="logo" src="assets/logo.png" alt="logo">
     <h1>Online Library</h1>
@@ -233,7 +272,7 @@
 
   <div class="layout">
     <section class="content" aria-label="Books content">
-      <h2 style="margin:0 0 6px 8px">📝 English Stories</h2>
+      <h2 style="margin:0 0 6px 8px;color:#ffffff;text-shadow:0 6px 18px rgba(0,0,0,0.45)">📝 English Stories</h2>
 
       <div class="category-links">
         <a class="category-link" href="explorer.html">🔍 Explorer</a>
@@ -353,7 +392,7 @@
         }
         profileModal.classList.remove('show');
         updateProfileUI();
-        location.href = 'main.html';
+        location.href = 'index.html';
       });
 
       updateProfileUI();
@@ -364,6 +403,7 @@
   </script>
 
   <script>
+    const API_BASE_URL = 'http://localhost:3000/api';
     const storyBooks = [
       { 
         id: 'es1', 
@@ -463,25 +503,101 @@
       }
     ];
 
-    function loadBooks() {
+    async function getLiveEnglishBooks() {
+      try {
+        const params = new URLSearchParams();
+        params.set('category', 'English Stories');
+        params.set('limit', '200');
+
+        const response = await fetch(`${API_BASE_URL}/books?${params.toString()}`);
+        const data = await response.json();
+        if (!response.ok || !data.ok || !Array.isArray(data.books)) return [];
+
+        return data.books.map((book) => ({
+          id: String(book._id || book.id || `${book.title || 'book'}-${book.author || 'author'}`),
+          title: book.title || 'Untitled Book',
+          author: book.author || 'Unknown Author',
+          book_cover: book.book_cover || book.coverImage || book?.coverImage?.url || 'images/book_cover.jpeg',
+          rating: book.rating || { average: 0, count: 0, total: 0 },
+          pdf: book.viewUrl || book.pdfUrl || book?.pdf?.url || '#',
+          _isDynamic: true
+        }));
+      } catch (error) {
+        console.error('[english_stories] Failed to load live books:', error);
+        return [];
+      }
+    }
+
+    async function loadBooks() {
       const bookGrid = document.getElementById('bookGrid');
-      bookGrid.innerHTML = storyBooks.map(book => `
+      const liveBooks = await getLiveEnglishBooks();
+      const booksToRender = liveBooks.length ? liveBooks : storyBooks;
+
+      renderNetflixBackground(booksToRender);
+
+      if (!booksToRender.length) {
+        bookGrid.innerHTML = '<p style="text-align:center;color:var(--muted);grid-column:1/-1;">No books available right now.</p>';
+        return;
+      }
+
+      bookGrid.innerHTML = booksToRender.map(book => {
+        const serializedBook = JSON.stringify(book).replace(/"/g, '&quot;');
+        const avgRating = Number(book?.rating?.average || 0).toFixed(1);
+        return `
         <article class="book-card">
           <figure>
-            <a href="english_book.html?id=${book.id}">
+            <a href="book-view.html" onclick="openBookView(${serializedBook}); return false;">
               <img src="${book.book_cover}" alt="${book.title}" style="cursor:pointer;">
             </a>
           </figure>
           <div class="meta">
             <h3>${book.title}</h3>
             <p>${book.author}</p>
+            <p class="rating-line">Rating: ${avgRating}/5</p>
           </div>
           <div class="book-actions">
-            <button class="btn-open" onclick="window.location.href='english_book.html?id=${book.id}'">Open</button>
-            <button class="btn-save" onclick="event.stopPropagation(); saveBook(${JSON.stringify(book).replace(/"/g, '&quot;')})" id="save-${book.id}">Save</button>
+            <button class="btn-open" onclick="event.stopPropagation(); openBookView(${serializedBook})">Open</button>
+            <button class="btn-save" onclick="event.stopPropagation(); saveBook(${serializedBook})" id="save-${book.id}">Save</button>
           </div>
         </article>
-      `).join('');
+      `;
+      }).join('');
+    }
+
+    function renderNetflixBackground(books) {
+      const host = document.getElementById('netflixBg');
+      if (!host) return;
+
+      const covers = [...new Set((books || [])
+        .map((book) => String(book?.book_cover || '').trim())
+        .filter(Boolean))];
+
+      if (!covers.length) {
+        host.innerHTML = '';
+        return;
+      }
+
+      const targetCount = 220;
+      const wall = Array.from({ length: targetCount }, (_, idx) => covers[idx % covers.length]);
+      for (let i = wall.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = wall[i];
+        wall[i] = wall[j];
+        wall[j] = tmp;
+      }
+
+      host.innerHTML = wall
+        .map((src, idx) => `<img src="${src}" alt="Cover ${idx + 1}" loading="lazy">`)
+        .join('');
+    }
+
+    function openBookView(book) {
+      const normalizedBook = { ...book, id: book.id || book._id || '' };
+      sessionStorage.setItem('selectedBook', JSON.stringify(normalizedBook));
+      const target = normalizedBook.id
+        ? `book-view.html?id=${encodeURIComponent(normalizedBook.id)}`
+        : 'book-view.html';
+      window.location.href = target;
     }
 
     function saveBook(book) {

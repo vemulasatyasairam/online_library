@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Online Library</title>
+    <style>
+        :root {
+            --primary: #0b72b9;
+            --primary-dark: #094d7f;
+            --accent: #69b8ff;
+            --bg: #071427;
+            --bg-soft: #0d1c31;
+            --card: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #eaf6ff;
+            --muted: #9db5c5;
+            --success: #1fa34a;
+            --danger: #d9384e;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Inter, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            background: linear-gradient(180deg, #071427, #0b1220);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .app { display: flex; min-height: 100vh; }
+
+        .sidebar {
+            width: 270px;
+            background: var(--bg-soft);
+            border-right: 1px solid var(--border);
+            padding: 22px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .brand h1 { font-size: 22px; margin-bottom: 4px; }
+        .brand p { color: var(--muted); font-size: 13px; }
+
+        .menu { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+
+        .menu-item {
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--muted);
+            border-radius: 10px;
+            text-align: left;
+            padding: 12px 14px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .menu-item:hover { background: var(--card); color: var(--text); }
+        .menu-item.active { background: var(--card); border-color: var(--border); color: var(--accent); }
+        .menu-item.logout { margin-top: auto; color: #ff9aa7; }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            border-bottom: 1px solid var(--border);
+            background: #0a182d;
+            padding: 20px 28px;
+        }
+
+        .header h2 { font-size: 27px; margin-bottom: 4px; }
+        .header p { color: var(--muted); font-size: 14px; }
+
+        .body {
+            padding: 24px 28px;
+            overflow-y: auto;
+            display: grid;
+            gap: 18px;
+        }
+
+        .tab { display: none; }
+        .tab.active { display: block; }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .card small { color: var(--muted); }
+        .card h3 { margin-top: 8px; font-size: 30px; color: var(--accent); }
+
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+        }
+
+        .panel h3 { margin-bottom: 14px; font-size: 20px; }
+
+        form { display: grid; gap: 14px; }
+
+        .row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .field { display: grid; gap: 8px; }
+        .field label { font-weight: 600; font-size: 14px; }
+
+        .input, .select, .file {
+            background: #071426;
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 10px;
+            padding: 11px 12px;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .select option { color: white; }
+
+        .hidden { display: none; }
+
+        .actions { display: flex; gap: 10px; }
+
+        .btn {
+            border: none;
+            border-radius: 10px;
+            padding: 11px 16px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: #22324e; color: #fff; }
+
+        .message {
+            display: none;
+            border-radius: 10px;
+            padding: 11px 12px;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .message.success { display: block; background: var(--success); color: #fff; }
+        .message.error { display: block; background: var(--danger); color: #fff; }
+
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th, td {
+            border-bottom: 1px solid var(--border);
+            padding: 11px 10px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th { color: var(--muted); font-size: 13px; }
+
+        .table-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .link-btn {
+            display: inline-block;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            background: #214061;
+            color: #fff;
+            border-radius: 999px;
+            padding: 7px 11px;
+        }
+
+        .link-btn.delete {
+            background: #b4233a;
+            border: none;
+            cursor: pointer;
+        }
+
+        .link-btn.delete:hover {
+            background: #8f1a2d;
+        }
+
+        .search {
+            margin-bottom: 12px;
+            max-width: 340px;
+        }
+
+        .badge {
+            display: inline-block;
+            border-radius: 999px;
+            padding: 4px 9px;
+            border: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        /* Upload tab only: keep original look, but use white text for readability */
+        #uploadTab .panel,
+        #uploadTab .panel h3,
+        #uploadTab .field label,
+        #uploadTab .field span,
+        #uploadTab small {
+            color: #ffffff;
+        }
+
+        .rating-report {
+            margin-top: 16px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .mini-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .mini-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            font-size: 13px;
+        }
+
+        .mini-item .left {
+            display: grid;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .mini-item .left strong {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mini-item .right {
+            text-align: right;
+            color: var(--accent);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .chart-grid {
+            margin-top: 16px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .chart-host {
+            min-height: 180px;
+            display: grid;
+            gap: 8px;
+        }
+
+        .chart-empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 140px;
+            border: 1px dashed var(--border);
+            border-radius: 10px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .trend-wrap {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(24px, 1fr));
+            gap: 8px;
+            align-items: end;
+            min-height: 145px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .trend-day {
+            display: grid;
+            grid-template-rows: 1fr auto;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .trend-bars {
+            height: 110px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 2px;
+        }
+
+        .trend-bar {
+            width: 5px;
+            border-radius: 3px 3px 0 0;
+            min-height: 2px;
+        }
+
+        .trend-label {
+            font-size: 10px;
+            color: var(--muted);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .legend {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+        }
+
+        .hbars {
+            display: grid;
+            gap: 9px;
+        }
+
+        .hbar-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 54px;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .hbar-track {
+            position: relative;
+            height: 22px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            overflow: hidden;
+        }
+
+        .hbar-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            border-radius: 999px;
+            min-width: 2px;
+        }
+
+        .hbar-label {
+            position: relative;
+            z-index: 1;
+            font-size: 12px;
+            line-height: 20px;
+            padding: 0 8px;
+            color: #f4fbff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .hbar-value {
+            text-align: right;
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar { width: 82px; }
+            .brand p, .menu-item span { display: none; }
+            .menu-item { text-align: center; padding: 12px 8px; }
+            .header { padding: 18px; }
+            .body { padding: 18px; }
+            .row { grid-template-columns: 1fr; }
+            .rating-report { grid-template-columns: 1fr; }
+            .chart-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="theme.js"></script>
+</head>
+<body>
+<div class="app">
+    <aside class="sidebar">
+        <div class="brand">
+            <h1>Admin Panel</h1>
+            <p>Online Library</p>
+        </div>
+
+        <nav class="menu">
+            <button class="menu-item active" data-tab="dashboard">📊 <span>Dashboard</span></button>
+            <button class="menu-item" data-tab="activity">📈 <span>User Activity</span></button>
+            <button class="menu-item" data-tab="upload">📤 <span>Upload Books</span></button>
+            <button class="menu-item" data-tab="manage">📚 <span>Manage Books</span></button>
+            <button class="menu-item" data-tab="categories">🏷️ <span>Categories</span></button>
+            <button class="menu-item logout" id="logoutBtn">🚪 <span>Logout</span></button>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <header class="header">
+            <h2 id="pageTitle">Dashboard</h2>
+            <p id="pageSubtitle">Overview of uploaded books and activity</p>
+        </header>
+
+        <section class="body">
+            <div class="tab active" id="dashboardTab">
+                <div class="cards">
+                    <div class="card"><small>Total Books</small><h3 id="totalBooks">0</h3></div>
+                    <div class="card"><small>Branch Books</small><h3 id="branchBooksCount">0</h3></div>
+                    <div class="card"><small>Categories</small><h3 id="categoryCount">0</h3></div>
+                    <div class="card"><small>Total Views</small><h3 id="totalViews">0</h3></div>
+                </div>
+
+                <div class="rating-report">
+                    <div class="panel">
+                        <h3>Top Rated Books</h3>
+                        <div id="topRatedList" class="mini-list">
+                            <div class="mini-item"><span class="left">No ratings yet</span></div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <h3>Most Active Raters</h3>
+                        <div id="activeRatersList" class="mini-list">
+                            <div class="mini-item"><span class="left">No raters yet</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab" id="activityTab">
+                <div class="cards">
+                    <div class="card"><small>Total Users</small><h3 id="activityTotalUsers">0</h3></div>
+                    <div class="card"><small>Active (7 days)</small><h3 id="activityActiveUsers7d">0</h3></div>
+                    <div class="card"><small>New Users (30 days)</small><h3 id="activityNewUsers30d">0</h3></div>
+                    <div class="card"><small>Total Ratings</small><h3 id="activityTotalRatings">0</h3></div>
+                </div>
+
+                <div class="chart-grid">
+                    <div class="panel">
+                        <h3>Daily User Activity (14 Days)</h3>
+                        <div id="activityTrendChart" class="chart-host"></div>
+                    </div>
+                    <div class="panel">
+                        <h3>New User Registrations (14 Days)</h3>
+                        <div id="userGrowthChart" class="chart-host"></div>
+                    </div>
+                    <div class="panel">
+                        <h3>Category Engagement</h3>
+                        <div id="categoryEngagementChart" class="chart-host"></div>
+                    </div>
+                    <div class="panel">
+                        <h3>Most Active Users (Ratings)</h3>
+                        <div id="topUsersChart" class="chart-host"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab" id="uploadTab">
+                <div class="panel">
+                    <h3>Upload Book</h3>
+                    <div id="uploadMessage" class="message"></div>
+
+                    <form id="uploadForm" action="javascript:void(0)">
+                        <div class="row">
+                            <div class="field">
+                                <label for="bookName">Book Name *</label>
+                                <input id="bookName" class="input" type="text" required minlength="2" placeholder="Enter book name">
+                            </div>
+                            <div class="field">
+                                <label for="authorName">Author Name *</label>
+                                <input id="authorName" class="input" type="text" required placeholder="Enter author name">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="field">
+                                <label for="category">Category *</label>
+                                <select id="category" class="select">
+                                    <option value="">Select category</option>
+                                    <option value="Branch Books">Branch Books</option>
+                                    <option value="Course Books">Course Books</option>
+                                    <option value="Technology">Technology</option>
+                                    <option value="Knowledge Books">Knowledge Books</option>
+                                    <option value="English Stories">English Stories</option>
+                                    <option value="Telugu Novels">Telugu Novels</option>
+                                    <option value="Devotional">Devotional</option>
+                                </select>
+                            </div>
+
+                            <div class="field hidden" id="branchField">
+                                <label for="branch">Branch Selection *</label>
+                                <select id="branch" class="select">
+                                    <option value="">Select branch</option>
+                                    <option value="CSE">CSE</option>
+                                    <option value="CSM">CSM</option>
+                                    <option value="EEE">EEE</option>
+                                    <option value="CIC">CIC</option>
+                                    <option value="CSD">CSD</option>
+                                    <option value="CST">CST</option>
+                                    <option value="IT">IT</option>
+                                    <option value="ECE">ECE</option>
+                                    <option value="Civil">Civil</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row hidden" id="yearRow">
+                            <div class="field" id="yearField">
+                                <label for="year">Year Selection *</label>
+                                <select id="year" class="select">
+                                    <option value="">Select year</option>
+                                    <option value="1st Year">1st Year</option>
+                                    <option value="2nd Year">2nd Year</option>
+                                    <option value="3rd Year">3rd Year</option>
+                                    <option value="4th Year">4th Year</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="uploadSection" class="field">
+                            <label for="pdfFile">PDF Upload *</label>
+                            <input id="pdfFile" class="file" type="file" accept=".pdf,application/pdf">
+
+                            <label for="coverFile" style="margin-top: 8px;">Cover Image (optional)</label>
+                            <input id="coverFile" class="file" type="file" accept="image/*">
+
+                            <label for="uploadTargetPath" style="margin-top: 8px;">HTML Folder Path *</label>
+                            <input id="uploadTargetPath" class="input" type="text" placeholder="Example: books/Branch Books/CSM/2nd Year">
+                            <small style="color: var(--muted); margin-top: 4px;">Required. Use HTML path format starting with books/ . Category, Branch and Year are auto detected.</small>
+                        </div>
+
+                        <div class="actions">
+                            <button type="button" class="btn btn-secondary" id="resetBtn">Reset</button>
+                            <button type="button" class="btn btn-primary" id="submitBtn">Add Book</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="tab" id="manageTab">
+                <div class="panel">
+                    <h3>Manage Books</h3>
+                    <input id="searchInput" class="input search" type="text" placeholder="Search by book, author, category, branch, year">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Book Name</th>
+                                <th>Author</th>
+                                <th>Category</th>
+                                <th>Branch</th>
+                                <th>Year</th>
+                                <th>View / Download</th>
+                            </tr>
+                            </thead>
+                            <tbody id="booksTableBody">
+                            <tr><td colspan="6">Loading books...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab" id="categoriesTab">
+                <div class="panel">
+                    <h3>Categories</h3>
+                    <div id="categoriesList" style="display:flex;flex-wrap:wrap;gap:10px;"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    const API_BASE_URL = 'http://localhost:3000/api';
+    let allBooks = [];
+    let uniqueViewUsersCount = null;
+    const CATEGORY_CANONICAL_MAP = {
+        'branch books': 'Branch Books',
+        'branchbooks': 'Branch Books',
+        'course books': 'Course Books',
+        'coursebooks': 'Course Books',
+        'knowledge books': 'Knowledge Books',
+        'knowledgebooks': 'Knowledge Books',
+        devotional: 'Devotional',
+        'english stories': 'English Stories',
+        'englishstories': 'English Stories',
+        'telugu novels': 'Telugu Novels',
+        'telugunovels': 'Telugu Novels'
+    };
+    const HTML_CATEGORY_PATH_MAP = {
+        'course_books.html': 'Course Books',
+        'knowledgebooks.html': 'Knowledge Books',
+        'english_stories.html': 'English Stories',
+        'telugu_novels.html': 'Telugu Novels',
+        'devotional.html': 'Devotional',
+        'branch_books.html': 'Branch Books'
+    };
+
+    function normalizeCategoryLabel(value) {
+        const raw = String(value || '').trim();
+        if (!raw) return '';
+
+        const key = raw
+            .toLowerCase()
+            .replace(/[_-]+/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+        const compactKey = key.replace(/\s+/g, '');
+        return CATEGORY_CANONICAL_MAP[key] || CATEGORY_CANONICAL_MAP[compactKey] || raw;
+    }
+
+    const tabs = {
+        dashboard: {
+            tabId: 'dashboardTab',
+            title: 'Dashboard',
+            subtitle: 'Overview of uploaded books and activity'
+        },
+        activity: {
+            tabId: 'activityTab',
+            title: 'User Activity',
+            subtitle: 'Graphical representation of all users activity'
+        },
+        upload: {
+            tabId: 'uploadTab',
+            title: 'Upload Books',
+            subtitle: 'Add books and store them by Category to Branch to Year'
+        },
+        manage: {
+            tabId: 'manageTab',
+            title: 'Manage Books',
+            subtitle: 'View and access uploaded books'
+        },
+        categories: {
+            tabId: 'categoriesTab',
+            title: 'Categories',
+            subtitle: 'Category distribution of uploaded books'
+        }
+    };
+
+    function switchTab(key) {
+        Object.values(tabs).forEach(cfg => {
+            document.getElementById(cfg.tabId).classList.remove('active');
+        });
+
+        document.querySelectorAll('.menu-item').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tabs[key].tabId).classList.add('active');
+        document.querySelector(`[data-tab="${key}"]`).classList.add('active');
+
+        document.getElementById('pageTitle').textContent = tabs[key].title;
+        document.getElementById('pageSubtitle').textContent = tabs[key].subtitle;
+    }
+
+    document.querySelectorAll('.menu-item[data-tab]').forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        window.location.href = 'login.html';
+    });
+
+    const categoryEl = document.getElementById('category');
+    const branchField = document.getElementById('branchField');
+    const yearRow = document.getElementById('yearRow');
+    const branchEl = document.getElementById('branch');
+    const yearEl = document.getElementById('year');
+
+    function updateBranchYearVisibility() {
+        const isBranchBooks = categoryEl.value === 'Branch Books';
+        branchField.classList.toggle('hidden', !isBranchBooks);
+        yearRow.classList.toggle('hidden', !isBranchBooks || !branchEl.value);
+
+        if (!isBranchBooks) {
+            branchEl.value = '';
+            yearEl.value = '';
+            branchEl.required = false;
+            yearEl.required = false;
+        } else {
+            branchEl.required = true;
+            yearEl.required = true;
+        }
+    }
+
+    categoryEl.addEventListener('change', updateBranchYearVisibility);
+    branchEl.addEventListener('change', () => {
+        if (categoryEl.value === 'Branch Books') {
+            yearRow.classList.toggle('hidden', branchEl.value === '');
+        }
+    });
+
+    function showMessage(text, type) {
+        const box = document.getElementById('uploadMessage');
+        box.className = `message ${type}`;
+        box.textContent = text;
+    }
+
+    function clearMessage() {
+        const box = document.getElementById('uploadMessage');
+        box.className = 'message';
+        box.textContent = '';
+    }
+
+    function parseTargetPath(inputPath) {
+        const cleaned = (inputPath || '').trim().replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
+        if (!cleaned) return null;
+
+        const htmlKey = cleaned.toLowerCase();
+        if (HTML_CATEGORY_PATH_MAP[htmlKey]) {
+            return { category: HTML_CATEGORY_PATH_MAP[htmlKey], branch: '', year: '' };
+        }
+
+        let parts = cleaned.split('/').map((part) => part.trim()).filter(Boolean);
+        if (!parts.length) {
+            return { error: 'Target path is empty.' };
+        }
+
+        if (parts[0].toLowerCase() === 'books') {
+            parts = parts.slice(1);
+        }
+
+        if (!parts.length) {
+            return { error: 'Target path must include at least a category folder.' };
+        }
+
+        if (/\.pdf$/i.test(parts[parts.length - 1])) {
+            parts = parts.slice(0, -1);
+        }
+
+        if (!parts.length) {
+            return { error: 'Target path must include at least a category folder.' };
+        }
+
+        if (parts.includes('..') || parts.includes('.')) {
+            return { error: 'Target path cannot contain . or .. segments.' };
+        }
+
+        const category = normalizeCategoryLabel(parts[0]);
+        const branch = category === 'Branch Books' ? (parts[1] || '') : '';
+        const year = category === 'Branch Books' ? (parts[2] || '') : '';
+
+        if (category === 'Branch Books' && (!branch || !year)) {
+            return { error: 'Branch Books path must include branch and year (for example: books/Branch Books/CSM/2nd Year).' };
+        }
+
+        return { category, branch, year };
+    }
+
+    function parseLocalFilePathForMeta(filePath) {
+        const normalized = (filePath || '').trim().replace(/\\/g, '/');
+        if (!normalized || !/\.pdf$/i.test(normalized)) return null;
+
+        const parts = normalized.split('/').map((part) => part.trim()).filter(Boolean);
+        if (!parts.length) return null;
+
+        const folderOnly = parts.slice(0, -1).join('/');
+        if (!folderOnly) return null;
+
+        return parseTargetPath(folderOnly);
+    }
+
+    function syncMetaFromUploadDirectory() {
+        const directoryValue = document.getElementById('uploadTargetPath').value.trim();
+        const parsed = directoryValue ? parseTargetPath(directoryValue) : null;
+        if (!parsed || parsed.error) return;
+
+        categoryEl.value = normalizeCategoryLabel(parsed.category || '');
+        branchEl.value = parsed.branch || '';
+        yearEl.value = parsed.year || '';
+        updateBranchYearVisibility();
+    }
+
+    function validateForm() {
+        const bookName = document.getElementById('bookName').value.trim();
+        const authorName = document.getElementById('authorName').value.trim();
+        const category = categoryEl.value;
+        const branch = branchEl.value;
+        const year = yearEl.value;
+        const file = document.getElementById('pdfFile').files[0];
+        const targetPath = document.getElementById('uploadTargetPath').value.trim();
+        const parsedTargetPath = targetPath ? parseTargetPath(targetPath) : null;
+
+        if (parsedTargetPath?.error) {
+            return parsedTargetPath.error;
+        }
+
+        if (!targetPath) {
+            return 'Please enter HTML path (example: course_books.html or books/Course Books).';
+        }
+
+        const normalizedTargetPath = targetPath.replace(/\\/g, '/').trim();
+        const htmlPathLower = normalizedTargetPath.toLowerCase();
+        const isHtmlAlias = Boolean(HTML_CATEGORY_PATH_MAP[htmlPathLower]);
+        if (!isHtmlAlias && !htmlPathLower.startsWith('books/')) {
+            return 'Use HTML path like course_books.html or folder path starting with books/';
+        }
+
+        const effectiveCategory = normalizeCategoryLabel(parsedTargetPath?.category || category);
+        const effectiveBranch = parsedTargetPath?.branch || branch;
+        const effectiveYear = parsedTargetPath?.year || year;
+
+        if (!bookName || !authorName) {
+            return 'Please fill all required fields (Book Name, Author).';
+        }
+
+        if (!effectiveCategory) {
+            return 'Please select a category or provide a target folder path.';
+        }
+
+        if (!file) {
+            return 'Please select a PDF file to upload.';
+        }
+        if (!file.name.toLowerCase().endsWith('.pdf')) {
+            return 'Only .pdf files are allowed.';
+        }
+
+        if (effectiveCategory === 'Branch Books') {
+            if (!effectiveBranch) return 'Please select a branch or include it in the target path.';
+            if (!effectiveYear) return 'Please select a year or include it in the target path.';
+        }
+
+        return null;
+    }
+
+    document.getElementById('uploadTargetPath').addEventListener('blur', syncMetaFromUploadDirectory);
+
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+        clearMessage();
+
+        const validationError = validateForm();
+        if (validationError) {
+            showMessage(validationError, 'error');
+            return;
+        }
+
+        const submitBtn = document.getElementById('submitBtn');
+        await handleFileUploadSubmit(submitBtn);
+    });
+
+    async function handleFileUploadSubmit(submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Uploading...';
+
+        try {
+            const file = document.getElementById('pdfFile').files[0];
+            const coverFile = document.getElementById('coverFile').files[0];
+            const targetPath = document.getElementById('uploadTargetPath').value.trim();
+            const parsedTargetPath = targetPath ? parseTargetPath(targetPath) : null;
+            const effectiveCategory = normalizeCategoryLabel(parsedTargetPath?.category || categoryEl.value);
+            const effectiveBranch = parsedTargetPath?.branch || branchEl.value;
+            const effectiveYear = parsedTargetPath?.year || yearEl.value;
+
+            const formData = new FormData();
+            formData.append('title', document.getElementById('bookName').value.trim());
+            formData.append('author', document.getElementById('authorName').value.trim());
+            formData.append('category', effectiveCategory);
+            if (effectiveCategory === 'Branch Books') {
+                formData.append('branch', effectiveBranch);
+                formData.append('year', effectiveYear);
+            }
+            if (targetPath) {
+                formData.append('targetPath', targetPath);
+            }
+            formData.append('pdf', file);
+            if (coverFile) {
+                formData.append('cover', coverFile);
+            }
+
+            console.log('[UPLOAD] Sending to:', `${API_BASE_URL}/books/upload`);
+            const response = await fetch(`${API_BASE_URL}/books/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            const rawBody = await response.text();
+            let data = {};
+            try {
+                data = rawBody ? JSON.parse(rawBody) : {};
+            } catch (_parseError) {
+                data = { error: rawBody || 'Unexpected server response' };
+            }
+            console.log('[UPLOAD] Response OK:', response.ok);
+            console.log('[UPLOAD] Response JSON:', data);
+
+            if (!response.ok || !data.ok) {
+                const errorText = data.error || `Upload failed with status ${response.status}`;
+                showMessage(errorText, 'error');
+                return;
+            }
+
+            const savedPath = data.book?.pdf?.url || '';
+            console.log('[UPLOAD] Book PDF URL:', savedPath);
+            showMessage(`PDF uploaded successfully. URL: ${savedPath}`, 'success');
+
+            document.getElementById('uploadForm').reset();
+            updateBranchYearVisibility();
+            document.getElementById('uploadSection').classList.remove('hidden');
+            await loadBooks();
+        } catch (error) {
+            showMessage(`Upload failed: ${error.message || 'Unknown error'}`, 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Upload Book';
+        }
+    }
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        document.getElementById('uploadForm').reset();
+        updateBranchYearVisibility();
+        clearMessage();
+    });
+
+    function safeText(value) {
+        const div = document.createElement('div');
+        div.textContent = value ?? '-';
+        return div.innerHTML;
+    }
+
+    function renderBooksTable(books) {
+        const tbody = document.getElementById('booksTableBody');
+        if (!books.length) {
+            tbody.innerHTML = '<tr><td colspan="6">No books uploaded yet.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = books.map((book) => {
+            const rawUrl = book?.pdf?.url || '';
+            const fileUrl = rawUrl.startsWith('http') ? rawUrl : (rawUrl ? `http://localhost:3000${rawUrl}` : '#');
+            const bookId = book?._id || book?.id || '';
+            const hasFile = fileUrl !== '#';
+            const coverInputId = `coverInput-${bookId}`;
+            return `
+                <tr>
+                    <td>${safeText(book.title)}</td>
+                    <td>${safeText(book.author)}</td>
+                    <td>${safeText(book.category || book.branch)}</td>
+                    <td>${safeText(book.branch || '-')}</td>
+                    <td>${safeText(book.year || '-')}</td>
+                    <td>
+                        <div class="table-actions">
+                            <a class="link-btn" href="${fileUrl}" target="_blank" rel="noopener" ${hasFile ? '' : 'style="pointer-events:none;opacity:0.5;"'}>View</a>
+                            <a class="link-btn" href="${fileUrl}" download ${hasFile ? '' : 'style="pointer-events:none;opacity:0.5;"'}>Download</a>
+                            <button type="button" class="link-btn" onclick="triggerCoverPicker('${bookId}')">Update Cover</button>
+                            <input type="file" id="${coverInputId}" accept="image/*" style="display:none" onchange="uploadBookCover('${bookId}', '${safeText(book.title).replace(/'/g, "&#39;")}', this)">
+                            <button type="button" class="link-btn delete" onclick="deleteBook('${bookId}', '${safeText(book.title).replace(/'/g, "&#39;")}')">Delete</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function triggerCoverPicker(bookId) {
+        if (!bookId) {
+            showMessage('Book id missing. Cannot update cover.', 'error');
+            return;
+        }
+        const input = document.getElementById(`coverInput-${bookId}`);
+        if (!input) {
+            showMessage('Cover picker not available for this row.', 'error');
+            return;
+        }
+        input.click();
+    }
+
+    async function uploadBookCover(bookId, title, inputEl) {
+        const file = inputEl?.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            showMessage('Please choose a valid image file for cover.', 'error');
+            inputEl.value = '';
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('cover', file);
+
+            const response = await fetch(`${API_BASE_URL}/books/${encodeURIComponent(bookId)}/cover`, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+
+            if (!response.ok || !data.ok) {
+                throw new Error(data.error || 'Failed to update cover image');
+            }
+
+            showMessage(`Cover updated for ${title || 'book'}.`, 'success');
+            await loadBooks();
+        } catch (error) {
+            showMessage(error.message || 'Failed to update cover image.', 'error');
+        } finally {
+            inputEl.value = '';
+        }
+    }
+
+    async function deleteBook(bookId, title) {
+        if (!bookId) {
+            showMessage('Book id missing. Cannot delete.', 'error');
+            return;
+        }
+
+        const ok = confirm(`Delete "${title || 'this book'}" permanently?`);
+        if (!ok) return;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/books/${encodeURIComponent(bookId)}`, {
+                method: 'DELETE'
+            });
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok || data.ok === false) {
+                throw new Error(data.error || 'Failed to delete book');
+            }
+
+            showMessage('Book and PDF deleted successfully.', 'success');
+            await loadBooks();
+        } catch (error) {
+            showMessage(error.message || 'Failed to delete book.', 'error');
+        }
+    }
+
+    function renderCategories(books) {
+        const map = new Map();
+        books.forEach(book => {
+            const key = book.category || book.branch || 'General';
+            map.set(key, (map.get(key) || 0) + 1);
+        });
+
+        const host = document.getElementById('categoriesList');
+        if (map.size === 0) {
+            host.innerHTML = '<span class="badge">No categories yet</span>';
+            return;
+        }
+
+        host.innerHTML = Array.from(map.entries())
+            .map(([name, count]) => `<span class="badge">${safeText(name)} (${count})</span>`)
+            .join('');
+    }
+
+    function updateDashboard(books) {
+        const totalBooks = books.length;
+        const branchBooksCount = books.filter(b => (b.category || '') === 'Branch Books').length;
+        const categoryCount = new Set(books.map(b => b.category || b.branch || 'General')).size;
+        const totalViews = Number.isFinite(uniqueViewUsersCount)
+            ? uniqueViewUsersCount
+            : books.reduce((sum, b) => sum + (b.views || 0), 0);
+
+        document.getElementById('totalBooks').textContent = String(totalBooks);
+        document.getElementById('branchBooksCount').textContent = String(branchBooksCount);
+        document.getElementById('categoryCount').textContent = String(categoryCount);
+        document.getElementById('totalViews').textContent = String(totalViews);
+    }
+
+    function renderEmptyChart(hostId, message) {
+        const host = document.getElementById(hostId);
+        host.innerHTML = `<div class="chart-empty">${safeText(message || 'No activity data available')}</div>`;
+    }
+
+    function toShortDayLabel(dateText) {
+        const parts = String(dateText || '').split('-');
+        if (parts.length !== 3) return '-';
+        return `${parts[1]}/${parts[2]}`;
+    }
+
+    function renderActivityTrend(trend) {
+        const hostId = 'activityTrendChart';
+        if (!Array.isArray(trend) || !trend.length) {
+            renderEmptyChart(hostId, 'No trend data yet');
+            return;
+        }
+
+        const maxValue = Math.max(1, ...trend.map((item) => Math.max(
+            Number(item.ratings || 0),
+            Number(item.uploads || 0),
+            Number(item.newUsers || 0)
+        )));
+
+        const host = document.getElementById(hostId);
+        const bars = trend.map((item, idx) => {
+            const ratings = Number(item.ratings || 0);
+            const uploads = Number(item.uploads || 0);
+            const newUsers = Number(item.newUsers || 0);
+
+            const ratingsHeight = Math.max(2, Math.round((ratings / maxValue) * 100));
+            const uploadsHeight = Math.max(2, Math.round((uploads / maxValue) * 100));
+            const usersHeight = Math.max(2, Math.round((newUsers / maxValue) * 100));
+            const showLabel = idx % 2 === 0 || idx === trend.length - 1;
+
+            return `
+                <div class="trend-day" title="${safeText(item.date)} | Ratings: ${ratings}, Uploads: ${uploads}, New Users: ${newUsers}">
+                    <div class="trend-bars">
+                        <span class="trend-bar" style="height:${ratingsHeight}%;background:#35c3ff;"></span>
+                        <span class="trend-bar" style="height:${uploadsHeight}%;background:#ffd166;"></span>
+                        <span class="trend-bar" style="height:${usersHeight}%;background:#80ed99;"></span>
+                    </div>
+                    <span class="trend-label">${showLabel ? toShortDayLabel(item.date) : ''}</span>
+                </div>
+            `;
+        }).join('');
+
+        host.innerHTML = `
+            <div class="legend">
+                <span class="legend-item"><span class="legend-dot" style="background:#35c3ff;"></span>Ratings</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#ffd166;"></span>Uploads</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#80ed99;"></span>New Users</span>
+            </div>
+            <div class="trend-wrap">${bars}</div>
+        `;
+    }
+
+    function renderSingleMetricTrend(hostId, trend, key, colorHex, legendLabel) {
+        if (!Array.isArray(trend) || !trend.length) {
+            renderEmptyChart(hostId, 'No growth data yet');
+            return;
+        }
+
+        const maxValue = Math.max(1, ...trend.map((item) => Number(item[key] || 0)));
+        const host = document.getElementById(hostId);
+        const bars = trend.map((item, idx) => {
+            const value = Number(item[key] || 0);
+            const height = Math.max(2, Math.round((value / maxValue) * 100));
+            const showLabel = idx % 2 === 0 || idx === trend.length - 1;
+            return `
+                <div class="trend-day" title="${safeText(item.date)} | ${safeText(legendLabel)}: ${value}">
+                    <div class="trend-bars">
+                        <span class="trend-bar" style="height:${height}%;width:12px;background:${colorHex};"></span>
+                    </div>
+                    <span class="trend-label">${showLabel ? toShortDayLabel(item.date) : ''}</span>
+                </div>
+            `;
+        }).join('');
+
+        host.innerHTML = `
+            <div class="legend">
+                <span class="legend-item"><span class="legend-dot" style="background:${colorHex};"></span>${safeText(legendLabel)}</span>
+            </div>
+            <div class="trend-wrap">${bars}</div>
+        `;
+    }
+
+    function renderHorizontalBars(hostId, items, labelGetter, valueGetter, colorHex, emptyMessage) {
+        if (!Array.isArray(items) || !items.length) {
+            renderEmptyChart(hostId, emptyMessage || 'No data yet');
+            return;
+        }
+
+        const values = items.map((item) => Number(valueGetter(item) || 0));
+        const maxValue = Math.max(1, ...values);
+        const host = document.getElementById(hostId);
+
+        host.innerHTML = `<div class="hbars">${items.map((item) => {
+            const label = labelGetter(item);
+            const value = Number(valueGetter(item) || 0);
+            const widthPct = Math.max(2, Math.round((value / maxValue) * 100));
+
+            return `
+                <div class="hbar-row" title="${safeText(label)}: ${value}">
+                    <div class="hbar-track">
+                        <div class="hbar-fill" style="width:${widthPct}%;background:${colorHex};"></div>
+                        <div class="hbar-label">${safeText(label)}</div>
+                    </div>
+                    <div class="hbar-value">${value}</div>
+                </div>
+            `;
+        }).join('')}</div>`;
+    }
+
+    async function loadUserActivityReport() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/books/reports/user-activity?days=14&limit=8`);
+            const data = await response.json();
+
+            if (!response.ok || !data.ok) {
+                throw new Error(data.error || 'Failed to load user activity report');
+            }
+
+            const summary = data.summary || {};
+            uniqueViewUsersCount = Number(summary.totalUsers || 0);
+            document.getElementById('activityTotalUsers').textContent = String(summary.totalUsers || 0);
+            document.getElementById('activityActiveUsers7d').textContent = String(summary.activeUsers7d || 0);
+            document.getElementById('activityNewUsers30d').textContent = String(summary.newUsers30d || 0);
+            document.getElementById('activityTotalRatings').textContent = String(summary.totalRatings || 0);
+            document.getElementById('totalViews').textContent = String(uniqueViewUsersCount);
+
+            const trend = Array.isArray(data.trend) ? data.trend : [];
+            renderActivityTrend(trend);
+            renderSingleMetricTrend('userGrowthChart', trend, 'newUsers', '#80ed99', 'New Users');
+
+            const categoryItems = Array.isArray(data.categoryEngagement) ? data.categoryEngagement : [];
+            renderHorizontalBars(
+                'categoryEngagementChart',
+                categoryItems,
+                (item) => item.category || 'General',
+                (item) => Number(item.views || 0) + Number(item.downloads || 0) + Number(item.ratings || 0),
+                '#35c3ff',
+                'No category engagement yet'
+            );
+
+            const topUsers = Array.isArray(data.topActiveUsers) ? data.topActiveUsers : [];
+            renderHorizontalBars(
+                'topUsersChart',
+                topUsers,
+                (item) => item.userId || 'Unknown',
+                (item) => Number(item.ratingsCount || 0),
+                '#ffd166',
+                'No active users yet'
+            );
+        } catch (_error) {
+            uniqueViewUsersCount = null;
+            document.getElementById('activityTotalUsers').textContent = '0';
+            document.getElementById('activityActiveUsers7d').textContent = '0';
+            document.getElementById('activityNewUsers30d').textContent = '0';
+            document.getElementById('activityTotalRatings').textContent = '0';
+
+            renderEmptyChart('activityTrendChart', 'Unable to load trend data');
+            renderEmptyChart('userGrowthChart', 'Unable to load growth data');
+            renderEmptyChart('categoryEngagementChart', 'Unable to load category data');
+            renderEmptyChart('topUsersChart', 'Unable to load user activity');
+        }
+    }
+
+    function renderTopRatedList(list) {
+        const host = document.getElementById('topRatedList');
+        if (!Array.isArray(list) || !list.length) {
+            host.innerHTML = '<div class="mini-item"><span class="left">No ratings yet</span></div>';
+            return;
+        }
+
+        host.innerHTML = list.map((book) => {
+            const avg = Number(book?.rating?.average || 0).toFixed(1);
+            const count = Number(book?.rating?.count || 0);
+            const subtitle = [book.author || 'Unknown', book.category || book.branch || 'General'].join(' · ');
+            return `
+                <div class="mini-item">
+                    <div class="left">
+                        <strong>${safeText(book.title || 'Untitled')}</strong>
+                        <span style="color:var(--muted);font-size:12px;">${safeText(subtitle)}</span>
+                    </div>
+                    <div class="right">⭐ ${avg}/5 (${count})</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function renderActiveRatersList(list) {
+        const host = document.getElementById('activeRatersList');
+        if (!Array.isArray(list) || !list.length) {
+            host.innerHTML = '<div class="mini-item"><span class="left">No raters yet</span></div>';
+            return;
+        }
+
+        host.innerHTML = list.map((rater) => {
+            const avgGiven = Number(rater?.averageGiven || 0).toFixed(1);
+            const count = Number(rater?.ratingsCount || 0);
+            return `
+                <div class="mini-item">
+                    <div class="left">
+                        <strong>${safeText(rater.userId || 'Unknown')}</strong>
+                        <span style="color:var(--muted);font-size:12px;">${count} rating${count > 1 ? 's' : ''}</span>
+                    </div>
+                    <div class="right">Avg ⭐ ${avgGiven}</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    async function loadRatingsReport() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/books/reports/ratings?limit=8`);
+            const data = await response.json();
+            if (!response.ok || !data.ok) {
+                throw new Error(data.error || 'Failed to load ratings report');
+            }
+
+            renderTopRatedList(data.topRatedBooks || []);
+            renderActiveRatersList(data.activeRaters || []);
+        } catch (_error) {
+            renderTopRatedList([]);
+            renderActiveRatersList([]);
+        }
+    }
+
+    async function loadBooks() {
+        try {
+            const booksUrl = `${API_BASE_URL}/books?page=1&limit=500`;
+            console.log('[LOAD_BOOKS] Fetching from:', booksUrl);
+            const response = await fetch(booksUrl);
+            const data = await response.json();
+            
+            console.log('[LOAD_BOOKS] Response OK:', response.ok);
+            console.log('[LOAD_BOOKS] Data structure:', {
+              ok: data.ok,
+              booksCount: data.books?.length,
+              firstBookKeys: data.books?.[0] ? Object.keys(data.books[0]) : []
+            });
+            
+            if (data.books?.length > 0) {
+              console.log('[LOAD_BOOKS] First book PDF object:', {
+                pdf: data.books[0].pdf,
+                url: data.books[0]?.pdf?.url
+              });
+            }
+            
+            allBooks = (response.ok && data.ok && Array.isArray(data.books)) ? data.books : [];
+        } catch (error) {
+            console.error('[LOAD_BOOKS] Error:', error);
+            allBooks = [];
+        }
+
+        renderBooksTable(allBooks);
+        renderCategories(allBooks);
+        updateDashboard(allBooks);
+        await loadRatingsReport();
+        await loadUserActivityReport();
+    }
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        const term = e.target.value.trim().toLowerCase();
+        if (!term) {
+            renderBooksTable(allBooks);
+            return;
+        }
+
+        const filtered = allBooks.filter(book => {
+            const text = [
+                book.title,
+                book.author,
+                book.category,
+                book.branch,
+                book.year
+            ].join(' ').toLowerCase();
+            return text.includes(term);
+        });
+
+        renderBooksTable(filtered);
+    });
+
+    window.addEventListener('DOMContentLoaded', async () => {
+        updateBranchYearVisibility();
+        await loadBooks();
+    });
+</script>
+</body>
+</html>

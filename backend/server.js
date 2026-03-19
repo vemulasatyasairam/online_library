@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const path = require('path');
 require('dotenv').config();
 
 // MongoDB Connection
@@ -12,46 +13,42 @@ const PORT = process.env.PORT || 3000;
 // Connect to MongoDB
 connectDB();
 
-// Middleware
+// Middleware - CORS configuration
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:5000',
-    'http://localhost:5051',
-    'http://localhost:5500',
-    'http://127.0.0.1:5051',
-    'http://127.0.0.1:5500',
-    'http://localhost:8000',
-    'http://localhost:8080',
-    'file://'
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like file:// or null)
+    if (!origin || origin === 'null') return callback(null, true);
+    
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:5000',
+      'http://localhost:5051',
+      'http://localhost:5500',
+      'http://127.0.0.1:5051',
+      'http://127.0.0.1:5500',
+      'http://localhost:8000',
+      'http://localhost:8080'
+    ];
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow all origins for development
+    }
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Handle preflight requests
-app.options('*', cors({
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:5000',
-    'http://localhost:5051',
-    'http://localhost:5500',
-    'http://127.0.0.1:5051',
-    'http://127.0.0.1:5500',
-    'http://localhost:8000',
-    'http://localhost:8080',
-    'file://'
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.options('*', cors());
 
 // Serve uploaded files
 app.use('/uploads', express.static('uploads'));
+app.use('/books', express.static(path.join(__dirname, 'books')));
 
 // Routes
 const authRoutes = require('./src/routes/auth');

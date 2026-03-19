@@ -8,14 +8,14 @@ Online Library Project/
 ├── COMPLETE_ARCHITECTURE.md               # Full system architecture
 ├── MODELS_IMPLEMENTATION_SUMMARY.md       # Summary of models implementation
 │
-├── legacy_html/                           # Frontend
+├── pages/                           # Frontend
 │   ├── auth-service.js                   # ⭐ Authentication service module
 │   ├── FRONTEND_BACKEND_INTEGRATION.js   # ⭐ Integration examples & patterns
 │   │
 │   ├── login.html                        # ✓ Login/Register page
 │   ├── explorer.html                     # ✓ Book browser (protected)
 │   ├── personal.html                     # ✓ Saved books (protected)
-│   ├── main.html                         # ✓ Homepage
+│   ├── index.html                         # ✓ Homepage
 │   ├── about_us.html                     # About page
 │   ├── book.html                         # Book details
 │   ├── course_books.html                 # Course books
@@ -114,7 +114,7 @@ Online Library Project/
    - `backend/MODELS_GUIDE.md` - Models documentation
    - `COMPLETE_ARCHITECTURE.md` - Architecture guide
    - `MODELS_IMPLEMENTATION_SUMMARY.md` - This summary
-   - `legacy_html/FRONTEND_BACKEND_INTEGRATION.js` - Integration guide
+   - `pages/FRONTEND_BACKEND_INTEGRATION.js` - Integration guide
 
 5. **Testing:**
    - `backend/test-models.js` - Model unit tests

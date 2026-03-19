@@ -168,7 +168,7 @@ Server runs on: http://localhost:3000
 
 ### Frontend
 Simply open any HTML file in a browser:
-- Main page: `main.html`
+- Main page: `index.html`
 - Login: `login.html`
 - Explorer: `explorer.html`
 - Categories: `devotional.html`, `telugu_novels.html`, `course_books.html`, `english_stories.html`

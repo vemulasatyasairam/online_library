@@ -5,13 +5,13 @@
 ```
 Online Library Project/
 │
-├── legacy_html/                           # Frontend - Pure HTML/CSS/JS
+├── pages/                           # Frontend - Pure HTML/CSS/JS
 │   ├── auth-service.js                   # ✓ Authentication service
 │   ├── FRONTEND_BACKEND_INTEGRATION.js   # ✓ Integration examples
 │   ├── login.html                        # ✓ Login/Register page
 │   ├── explorer.html                     # ✓ Book browser (protected)
 │   ├── personal.html                     # ✓ Saved books (protected)
-│   ├── main.html                         # ✓ Homepage
+│   ├── index.html                         # ✓ Homepage
 │   ├── script.js                         # ✓ General page logic
 │   └── style.css                         # ✓ Styling
 │
@@ -398,7 +398,7 @@ node test-models.js
 
 ### 4. Open Frontend
 ```
-file:///c:/sai%20ram%20html/Online%20Library%20project/legacy_html/login.html
+file:///c:/sai%20ram%20html/Online%20Library%20project/pages/login.html
 ```
 
 ### 5. Test Registration

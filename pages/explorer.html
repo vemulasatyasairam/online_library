@@ -1,0 +1,1156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Explore Our Books</title>
+  <style>
+    :root{
+      --accent:#0b72b9;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --bg:#f3f6f8;
+      --radius:10px;
+      --shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    html,body{height:100%;margin:0;font-family:system-ui,Arial;background:var(--bg);color:#0f1724}
+    .recommendation-bg{
+      position:fixed;
+      inset:-60%;
+      z-index:0;
+      display:grid;
+      grid-template-columns:repeat(10,minmax(140px,1fr));
+      grid-auto-rows:190px;
+      gap:12px;
+      transform:rotate(-20deg) scale(1.3);
+      pointer-events:none;
+      opacity:0.95;
+      overflow:hidden;
+    }
+    .recommendation-bg::after{
+      content:'';
+      position:absolute;
+      inset:0;
+      background:linear-gradient(180deg,rgba(1,4,9,0.68),rgba(1,4,9,0.9));
+      z-index:1;
+    }
+    .recommendation-bg img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      border-radius:10px;
+      filter:blur(4px) saturate(0.9) brightness(0.45);
+      transform:scale(1.08);
+      box-shadow:0 12px 26px rgba(0,0,0,0.45);
+    }
+    .recommendation-bg-overlay{
+      position:fixed;
+      inset:0;
+      z-index:1;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 22% 15%,rgba(42,93,132,0.26),transparent 44%),
+        radial-gradient(circle at 78% 25%,rgba(7,58,95,0.24),transparent 48%),
+        radial-gradient(circle at 50% 80%,rgba(3,24,38,0.46),transparent 52%);
+    }
+    .topbar{
+      display:flex;
+      align-items:center;
+      gap:18px;
+      padding:12px 20px;
+      background:linear-gradient(90deg,var(--accent),#0963a0);
+      color:#fff;
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+    .topbar img.logo{height:48px;width:48px;border-radius:8px;object-fit:cover}
+    .topbar h1{margin:0;font-size:18px}
+    .search-wrap{margin-left:auto}
+    .search-wrap input{
+      height:36px;border-radius:8px;border:0;padding:6px 10px;width:300px;
+      font-size:14px;
+    }
+    .topbar nav { display:flex; gap:16px; align-items:center; }
+    .topbar a, .topbar button{color:#fff;text-decoration:none;border:none;background:transparent;cursor:pointer;margin-left:0;white-space:nowrap;padding:8px 14px;border-radius:6px;transition:all 0.3s ease;position:relative;font-weight:500;letter-spacing:0.5px}
+    .topbar a:hover, .topbar button:hover { background:rgba(255,255,255,0.15); transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.2); }
+    .profile-btn-explorer { 
+      width:44px; 
+      height:44px; 
+      border-radius:50%; 
+      background:linear-gradient(135deg,#FFD700,#FFA500);
+      border:2px solid #FFE55C;
+      color:#0b72b9; 
+      font-size:20px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all 0.3s ease;
+      padding:0;
+      flex-shrink:0;
+      box-shadow:0 4px 15px rgba(255,165,0,0.4),inset 0 1px 2px rgba(255,255,255,0.5);
+      position:relative;
+      overflow:hidden;
+      font-weight:bold;
+    }
+    .profile-btn-explorer:hover { 
+      background:linear-gradient(135deg,#FFE55C,#FFB84D);
+      transform:scale(1.15);
+      border-color:#FFEB3B;
+      box-shadow:0 6px 20px rgba(255,165,0,0.5),inset 0 1px 2px rgba(255,255,255,0.6),0 0 15px rgba(255,215,0,0.5);
+    }
+    .profile-btn-explorer:active { transform:scale(0.95); }
+    .profile-btn-explorer.hidden { display:none; }
+    .profile-modal { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; }
+    .profile-modal.show { display:flex; }
+    .profile-content { background:white; border-radius:16px; padding:32px; max-width:400px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3); animation:slideDown 0.3s ease; position:relative; }
+    @keyframes slideDown { from { transform:translateY(-30px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+    .profile-header { display:flex; align-items:center; gap:16px; margin-bottom:24px; }
+    .profile-avatar { width:60px; height:60px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:28px; color:white; }
+    .profile-name { margin:0; font-size:18px; font-weight:700; color:#0f1724; }
+    .profile-email { margin:4px 0 0 0; font-size:13px; color:var(--muted); }
+    .profile-divider { height:1px; background:#e5e7eb; margin:16px 0; }
+    .profile-item { display:flex; justify-content:space-between; padding:10px 0; font-size:14px; color:#0f1724; }
+    .profile-label { color:var(--muted); }
+    .profile-value { font-weight:600; }
+    .profile-actions { display:flex; gap:10px; margin-top:20px; }
+    .profile-actions button { flex:1; padding:10px; border:1px solid #e5e7eb; border-radius:8px; background:transparent; color:#0f1724; cursor:pointer; transition:all 0.3s ease; }
+    .profile-actions button:hover { background:var(--accent); color:white; border-color:var(--accent); }
+    .profile-close { position:absolute; top:16px; right:16px; background:transparent; border:none; color:#0f1724; font-size:24px; cursor:pointer; }
+
+    .category-links {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:20px;
+      padding:0 8px;
+    }
+    .category-link {
+      padding:10px 18px;
+      background:linear-gradient(135deg,#0b72b9,#0963a0);
+      color:white;
+      text-decoration:none;
+      border-radius:8px;
+      font-weight:600;
+      font-size:14px;
+      transition:all 0.3s ease;
+      box-shadow:0 3px 10px rgba(11,114,185,0.25);
+      border:1px solid rgba(255,255,255,0.2);
+    }
+    .category-link:hover {
+      transform:translateY(-2px);
+      box-shadow:0 5px 15px rgba(11,114,185,0.4);
+      background:linear-gradient(135deg,#0963a0,#085089);
+    }
+    
+    .layout{display:flex;gap:20px;max-width:1200px;margin:20px auto;padding:0 16px;box-sizing:border-box;position:relative;z-index:2}
+    aside.sidebar{
+      width:250px;
+      background:rgba(6,16,28,0.62);
+      border:1px solid rgba(255,255,255,0.16);
+      backdrop-filter:blur(8px);
+      padding:12px 12px 12px 4px;border-radius:var(--radius);
+      box-shadow:0 14px 30px rgba(0,0,0,0.35);height:fit-content;
+      order:-1;
+    }
+    aside h4{margin:0 0 10px 0;text-align:left;padding-left:20px;margin-left:-4px;color:#ffffff;letter-spacing:0.4px}
+    details{margin-bottom:8px;margin-left:-4px;padding-left:20px;}
+    details summary{
+      cursor:pointer;
+      padding:8px 8px 8px 0;
+      border-radius:8px;
+      font-weight:700;
+      color:#ffffff;
+      text-align:left;
+      margin-left:0;
+      transition:all 0.3s ease;
+      position:relative;
+      display:inline-block;
+    }
+    details summary:hover {
+      background:linear-gradient(90deg,rgba(255,255,255,0.2),rgba(140,205,255,0.12));
+      color:#ffffff;
+      transform:translateX(4px) scale(1.02);
+      text-shadow:0 0 14px rgba(255,255,255,0.45);
+      box-shadow:0 4px 10px rgba(0,0,0,0.3);
+      border-left:3px solid rgba(255,255,255,0.8);
+      padding-left:5px;
+    }
+    details summary::before {
+      content:'';
+      position:absolute;
+      left:0;
+      bottom:-2px;
+      width:0;
+      height:2px;
+      background:linear-gradient(90deg,#0b72b9,#0963a0);
+      transition:width 0.3s ease;
+    }
+    details summary:hover::before {
+      width:calc(100% - 12px);
+    }
+    details[open] summary {
+      background:rgba(255,255,255,0.12);
+      color:#ffffff;
+    }
+    details[open] summary::before {
+      width:calc(100% - 12px);
+    }
+    .year-list{margin-top:8px;display:flex;flex-direction:column;gap:6px;padding-left:4px}
+    .year-list a{display:inline-block;padding:8px;border-radius:6px;text-decoration:none;color:var(--accent);background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid rgba(0,0,0,0.04)}
+    .content{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+    .content > h2 { display: none; }
+    .category-links { order: 1; }
+    #mostViewedSection { order: 2; }
+    #bookGrid { display: none !important; }
+    .book-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+      gap:16px;
+    }
+    .book-card{
+      background:var(--card);
+      border-radius:12px;
+      padding:10px;
+      box-shadow:var(--shadow);
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      align-items:stretch;
+      width:140px;
+      min-height:150px;
+    }
+    .book-card figure{margin:0}
+    .book-card img{
+      width:100%;
+      height:220px;
+      object-fit:cover;
+      border-radius:8px;
+      display:block;
+      cursor:pointer;
+    }
+    .book-card .meta{padding:6px 2px}
+    .book-card h3{margin:6px 0;font-size:16px}
+    .book-card p{margin:0;color:var(--muted);font-size:13px}
+
+    #mostViewedGrid .book-card{
+      width:220px;
+      min-height:340px;
+      padding:12px;
+    }
+
+    #mostViewedGrid{
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    #mostViewedGrid .book-card img{
+      height:260px;
+    }
+
+    .rating-summary{
+      margin-top:4px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.45;
+    }
+
+    /* Profile UI (right-corner) */
+    .profile {
+      position: relative;
+      display: inline-block;
+      margin-left: 12px;
+    }
+    .profile-btn {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:8px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.06);
+      cursor:pointer;
+      color: #fff;
+      font-weight:700;
+    }
+    .profile-avatar {
+      width:34px;
+      height:34px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.12);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:14px;
+      color:#fff;
+    }
+    .profile-dropdown {
+      display:none;
+      position:absolute;
+      right:0;
+      top:calc(100% + 8px);
+      background:#fff;
+      color:#0f1724;
+      min-width:160px;
+      border-radius:8px;
+      box-shadow:0 8px 30px rgba(2,8,23,0.3);
+      overflow:hidden;
+      z-index:50;
+    }
+    .profile-dropdown a, .profile-dropdown button {
+      display:block;
+      padding:10px 12px;
+      text-align:left;
+      width:100%;
+      border:0;
+      background:transparent;
+      cursor:pointer;
+      color:inherit;
+      text-decoration:none;
+      font-weight:600;
+    }
+    .profile-dropdown a:hover, .profile-dropdown button:hover { background:#f3f6f8; }
+
+    @media(max-width:900px){
+      .layout{padding:0 10px}
+      aside.sidebar{width:100%}
+      .topbar .search-wrap input{width:160px}
+      .book-card img{height:180px}
+      .recommendation-bg{
+        inset:-85%;
+        grid-template-columns:repeat(6,minmax(120px,1fr));
+        grid-auto-rows:150px;
+        gap:8px;
+        transform:rotate(-16deg) scale(1.2);
+      }
+    }
+  </style>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="theme.js"></script>
+</head>
+<body>
+  <div id="recommendationBg" class="recommendation-bg" aria-hidden="true"></div>
+  <div class="recommendation-bg-overlay" aria-hidden="true"></div>
+
+  <!-- Client-side protection: redirect to login if not logged in -->
+  <script>
+    (function () {
+      // Guard: require loggedIn flag AND a currentUser value
+      try {
+        const logged = localStorage.getItem('loggedIn') === 'true';
+        const user = localStorage.getItem('currentUser');
+        if (!logged || !user) {
+          localStorage.removeItem('loggedIn');
+          localStorage.removeItem('currentUser');
+          const next = encodeURIComponent(location.pathname + location.search + location.hash);
+          location.href = 'login.html?next=' + next;
+        }
+      } catch (e) {
+        // if localStorage is unavailable, redirect to login
+        location.href = 'login.html';
+      }
+    })();
+  </script>
+
+  <header class="topbar">
+    <img class="logo" src="ChatGPT Image Sep 18, 2025, 09_32_41 AM.png" alt="logo">
+    <h1>Online Library</h1>
+
+    <div class="search-wrap">
+      <!-- use type="text" to match scripts expecting input[type='text'] -->
+      <input id="globalSearch" type="text" placeholder="Search for books" aria-label="Search books">
+    </div>
+
+    <nav>
+      <!-- My Books visible when logged in -->
+      <a href="personal.html" id="nav-mybooks-link" style="display:none">My Books</a>
+      <a id="nav-login-link" href="login.html" style="display:none">Login</a>
+      
+      <!-- Profile button visible when logged in -->
+      <button id="profile-btn-explorer" class="profile-btn-explorer hidden" title="View Profile">👤</button>
+    </nav>
+  </header>
+
+  <!-- Profile Modal -->
+  <div id="profile-modal-explorer" class="profile-modal">
+    <div class="profile-content">
+      <button class="profile-close" id="profile-close-explorer">✕</button>
+      <div class="profile-header">
+        <div class="profile-avatar" id="profile-avatar-explorer">👤</div>
+        <div>
+          <h3 class="profile-name" id="profile-name-explorer">Loading...</h3>
+          <p class="profile-email" id="profile-email-explorer"></p>
+        </div>
+      </div>
+      <div class="profile-divider"></div>
+      <div class="profile-item">
+        <span class="profile-label">Status</span>
+        <span class="profile-value" id="profile-status-explorer">Active</span>
+      </div>
+      <div class="profile-item">
+        <span class="profile-label">Member Since</span>
+        <span class="profile-value" id="profile-joined-explorer"></span>
+      </div>
+      <div class="profile-item">
+        <span class="profile-label">Last Login</span>
+        <span class="profile-value" id="profile-lastlogin-explorer"></span>
+      </div>
+      <div class="profile-divider"></div>
+      <div class="profile-actions">
+        <button id="profile-view-explorer" onclick="window.location.href='profile.html'">View Full Profile</button>
+        <button id="profile-logout-explorer">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar" aria-label="Branches">
+      <h4>Branches</h4>
+
+      <details>
+        <summary>CSE — Computer Science Engineering</summary>
+      </details>
+
+      <details>
+        <summary>ECE — Electrical & Electronics Communication</summary>
+      </details>
+
+      <details>
+        <summary>EEE — Electrical & Electronical Engineering</summary>
+      </details>
+
+      <details>
+        <summary>Mechanical</summary>
+      </details>
+
+      <details>
+        <summary>CSM — Computer Science And Artificial Intelligence With Machine Learning</summary>
+      </details>
+
+      <details>
+        <summary>AIML — Artificial Intelligence With Machine Learning</summary>
+      </details>
+
+      <details>
+        <summary>CST — Computer Science Engineering</summary>
+      </details>
+
+      <details>
+        <summary>CSD — Computer Science Engineering</summary>
+      </details>
+
+      <details>
+        <summary>CIVIL — Computer Science Engineering</summary>
+      </details>
+
+      <details>
+        <summary>IT — Computer Science Engineering</summary>
+      </details>
+
+    </aside>
+
+    <section class="content" aria-label="Books content">
+      <h2 style="margin:0 0 6px 8px">Books</h2>
+
+      <!-- Recommended Books Section -->
+      <div id="mostViewedSection" style="margin-bottom:24px;display:none;">
+        <h3 id="recommendedHeading" style="margin:0 0 12px 8px;color:var(--accent);font-size:18px">⭐ Recommended Books (Top Rated)</h3>
+        <div id="mostViewedGrid" class="book-grid"></div>
+      </div>
+
+      <div class="category-links">
+        <a class="category-link" href="knowledgebooks.html">📚 Knowledge Books</a>
+        <a class="category-link" href="devotional.html">🕉️ Devotional</a>
+        <a class="category-link" href="course_books.html">📖 Course Books</a>
+        <a class="category-link" href="english_stories.html">📝 English Stories</a>
+        <a class="category-link" href="telugu_novels.html">📕 Telugu Novels</a>
+      </div>
+
+      <div id="bookGrid" class="book-grid" aria-live="polite">
+        <article class="book-card" data-book-id="book1">
+          <figure>
+            <a href="book-view.html?id=book1">
+              <img src="https://sp-ao.shortpixel.ai/client/to_auto,q_glossy,ret_img,w_1024/https://shop.chanakyamandal.org/wp-content/uploads/2021/11/WhatsApp-Image-2021-11-19-at-3.06.30-PM-1-1024x1024.jpeg"
+                   alt="IAS Examination Guide">
+            </a>
+          </figure>
+          <div class="meta">
+            <h3>IAS Examination Guide</h3>
+            <p>Dr. M. Laxmikanth — General Knowledge</p>
+          </div>
+        </article>
+
+        <article class="book-card" data-book-id="book2">
+          <figure>
+            <a href="book-view.html?id=book2">
+              <img src="data:image/jpeg;base64,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"
+                   alt="Indian Polity">
+            </a>
+          </figure>
+          <div class="meta">
+            <h3>Indian Polity</h3>
+            <p>M. Laxmikanth — Constitutional Law</p>
+          </div>
+        </article>
+
+        <article class="book-card" data-book-id="book3">
+          <figure>
+            <a href="book-view.html?id=book3">
+              <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMTEhUTExIWFhUXGRUVGRcXGBgaGxgXGBcXGBgXGRgaHSggGR0lGxcXITEhJSorLi4uFyAzODMsNygtLisBCgoKDg0OGxAQGi0lHyYtKysrLS0tLy0tMCstKy0rNS4tLS0tLS0tLS0tLS0tLS0tLS8tLS0tLS0rLS0tLf/AABEIAQEAxAMBIgACEQEDEQA/AKd6duViauoRLqp6QJ0wBppCUpCmCQlr+cCDb9YQWq6h/wBoqJb0zPhlSGH5eb/MYXCc4bIQatG8jem3gqA3SVdSeOGcfrjZbOndNKxSqmpJFjinrxA82LR84EgnK5EM9g7SXJUCj+IcRAcHRm0aKv8ATE5VM/8A3ln64XTaiuYNVVH+6r3xrKSqlzhcXzijbMpMiUVsPlMc2yJA1zhNrsyaZkZlfXD/ABdR/uqgVe2K2/wyo/3FRptk7Zp5xIUgggEu40ck+qDNo7tpUgKlkKSrUffvjKdug0YJW3a79NqP9wxFW368f42o/wBwwftTZxQS+kKlymF4oY6d46/9OqPnmOo3j2gf8bUfPMAzY5KUUnP7tEpt3orCKrYereLaH6bUfPMVp3m2j+nT/nmKJ5dI4gwGAeIgW0FRT3Q0G8+0f02d88xP8Jtoa1s4fxmFKQX490eVk/3zjcmMsa9DVW8+0f02d84++IHeraP6bO+effCnFHFPq8HkxXBehr+Fe0f02b89Xvj34V7S/S5vz1e+FqURxQ1jczfGvQzTvbtHWsmj+NXvjUbl7Qq58yUqbXTgBOQCkqOFQxJ6pD/G7PjGAWDGg3..."
+                   alt="Indian Economy">
+            </a>
+          </figure>
+          <div class="meta">
+            <h3>Indian Economy</h3>
+            <p>Ramesh Singh — Economics</p>
+          </div>
+        </article>
+
+        <!-- book4, book5, book6 blocks as above -->
+      </div><!-- end book-grid -->
+    </section>
+  </div>
+
+  <script>
+    (function(){
+      const searchInput = document.querySelector('.topbar .search-wrap input, #globalSearch, .logo input[type="text"], .logo input[type="search"]');
+      if (!searchInput) return;
+      searchInput.addEventListener('input', function(e){
+        const q = (e.target.value || '').trim().toLowerCase();
+        const cards = document.querySelectorAll('.book-card');
+        cards.forEach(card => {
+          const text = (card.innerText || '').toLowerCase();
+          card.style.display = q === '' || text.indexOf(q) !== -1 ? '' : 'none';
+        });
+      });
+    })();
+  </script>
+
+  <!-- Profile toggle and auth UI wiring (keeps rest of your code unchanged) -->
+  <script>
+    (function(){
+      function hydrateSessionFromUrl() {
+        try {
+          const params = new URLSearchParams(window.location.search);
+          const token = params.get('token');
+          const user = params.get('user');
+          const name = params.get('name');
+
+          if (token) {
+            localStorage.setItem('auth_token', token);
+            localStorage.setItem('loggedIn', 'true');
+          }
+
+          if (user) {
+            const existingRaw = localStorage.getItem('currentUser');
+            let existingUser = null;
+            try {
+              existingUser = existingRaw ? JSON.parse(existingRaw) : null;
+            } catch (_e) {
+              existingUser = existingRaw ? { email: String(existingRaw).trim() } : null;
+            }
+
+            const nextUser = {
+              ...(existingUser && typeof existingUser === 'object' ? existingUser : {}),
+              email: user,
+              ...(name ? { name } : {})
+            };
+            localStorage.setItem('currentUser', JSON.stringify(nextUser));
+          }
+        } catch (_error) {
+          // Ignore malformed URL params.
+        }
+      }
+
+      function buildProfileUrl() {
+        const params = new URLSearchParams();
+        const token = localStorage.getItem('auth_token') || '';
+        const rawUser = localStorage.getItem('currentUser') || '';
+
+        if (token) params.set('token', token);
+
+        if (rawUser) {
+          try {
+            const parsed = JSON.parse(rawUser);
+            if (parsed?.email) params.set('user', parsed.email);
+            if (parsed?.name) params.set('name', parsed.name);
+          } catch (_error) {
+            params.set('user', rawUser);
+          }
+        }
+
+        const qs = params.toString();
+        return `profile.html${qs ? `?${qs}` : ''}`;
+      }
+
+      hydrateSessionFromUrl();
+
+      // Show profile when logged in, otherwise show Login link.
+      const userProfile = document.getElementById('user-profile');
+      const navLoginLink = document.getElementById('nav-login-link');
+      const myBooksBtn = document.getElementById('my-books-btn');
+
+      function getStoredUser() {
+        const raw = localStorage.getItem('currentUser');
+        if (!raw) return null;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') return parsed;
+        } catch (_error) {
+          // currentUser may be plain email string in legacy flow
+        }
+        return { email: String(raw).trim() };
+      }
+
+      function isLogged() {
+        if (localStorage.getItem('loggedIn') === 'true') return true;
+        if (localStorage.getItem('auth_token')) return true;
+
+        const user = getStoredUser();
+        return !!(user && user.email);
+      }
+
+      function getUserEmail() {
+        const user = getStoredUser();
+        return user?.email || '';
+      }
+
+      function shortName(email) {
+        if (!email) return 'U';
+        const namePart = email.split('@')[0];
+        return namePart.charAt(0).toUpperCase();
+      }
+
+      function updateProfileUI() {
+        const profileBtn = document.getElementById('profile-btn-explorer');
+        const logoutBtn = document.getElementById('nav-logout-btn');
+        const navLoginLink = document.getElementById('nav-login-link');
+        const navMyBooksLink = document.getElementById('nav-mybooks-link');
+        
+        if (isLogged()) {
+          if (navLoginLink) navLoginLink.style.display = 'none';
+          if (profileBtn) profileBtn.classList.remove('hidden');
+          if (logoutBtn) logoutBtn.style.display = '';
+          if (navMyBooksLink) navMyBooksLink.style.display = '';
+          loadProfileData();
+        } else {
+          if (navLoginLink) navLoginLink.style.display = '';
+          if (profileBtn) profileBtn.classList.add('hidden');
+          if (logoutBtn) logoutBtn.style.display = 'none';
+          if (navMyBooksLink) navMyBooksLink.style.display = 'none';
+        }
+      }
+
+      function formatDate(dateString) {
+        if (!dateString) return 'Never';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+      }
+
+      function loadProfileData() {
+        let user = null;
+
+        if (typeof AuthService !== 'undefined') {
+          const userData = AuthService.getCurrentUser();
+          if (userData) {
+            user = typeof userData === 'string' ? { email: userData } : userData;
+          }
+        }
+
+        if (!user) {
+          user = getStoredUser();
+        }
+
+        if (!user || !user.email) return;
+
+        document.getElementById('profile-name-explorer').textContent = user.name || user.email.split('@')[0];
+        document.getElementById('profile-email-explorer').textContent = user.email;
+        document.getElementById('profile-joined-explorer').textContent = formatDate(user.createdAt);
+        document.getElementById('profile-lastlogin-explorer').textContent = formatDate(user.lastLogin);
+        const initial = (user.name || user.email).charAt(0).toUpperCase();
+        document.getElementById('profile-avatar-explorer').textContent = initial;
+      }
+
+      // Profile button - direct navigation to profile page
+      const profileBtn = document.getElementById('profile-btn-explorer');
+      const profileModal = document.getElementById('profile-modal-explorer');
+      const profileClose = document.getElementById('profile-close-explorer');
+      const logoutBtn = document.getElementById('nav-logout-btn');
+      
+      if (profileBtn) {
+        profileBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          window.location.href = buildProfileUrl();
+        });
+      }
+
+      const profileViewBtn = document.getElementById('profile-view-explorer');
+      if (profileViewBtn) {
+        profileViewBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.location.href = buildProfileUrl();
+        });
+      }
+
+      if (profileClose) {
+        profileClose.addEventListener('click', () => {
+          profileModal.classList.remove('show');
+        });
+      }
+
+      if (profileModal) {
+        profileModal.addEventListener('click', (e) => {
+          if (e.target === profileModal) {
+            profileModal.classList.remove('show');
+          }
+        });
+      }
+
+      document.getElementById('profile-logout-explorer').addEventListener('click', () => {
+        if (typeof AuthService !== 'undefined') {
+          AuthService.logout();
+        } else {
+          localStorage.removeItem('loggedIn');
+          localStorage.removeItem('currentUser');
+        }
+        profileModal.classList.remove('show');
+        updateProfileUI();
+        location.href = 'index.html';
+      });
+
+      // Initialize UI
+      updateProfileUI();
+
+      // Keep in sync across tabs if login state changed
+      window.addEventListener('storage', function(e){
+        if (e.key === 'loggedIn' || e.key === 'currentUser') updateProfileUI();
+      }, false);
+    })();
+  </script>
+
+  <!-- Branch Navigation Script -->
+  <script>
+    (function() {
+      // Add click listeners to branch summaries - open branch page
+      document.querySelectorAll('aside.sidebar details summary').forEach(summary => {
+        summary.addEventListener('click', function(e) {
+          e.preventDefault();
+          const branchText = this.textContent.trim();
+          const branchId = branchText.split('—')[0].trim();
+          
+          // Open in new page
+          window.location.href = `branch_books.html?branch=${branchId}`;
+        });
+      });
+
+      // Add click listeners to year links - open branch page with year filter
+      document.querySelectorAll('.year-list a').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const branch = this.closest('details');
+          if (branch) {
+            const branchText = branch.querySelector('summary').textContent.trim();
+            const branchId = branchText.split('—')[0].trim();
+            const year = this.textContent.trim();
+            
+            // Open in new page with year filter
+            window.location.href = `branch_books.html?branch=${branchId}&year=${encodeURIComponent(year)}`;
+          }
+        });
+      });
+    })();
+  </script>
+
+  <!-- Recommendations and Book View Tracking Script -->
+  <script>
+    (function() {
+      const API_URL = 'http://localhost:3000/api';
+      const LOCAL_RATINGS_KEY = 'bookRatings';
+
+      function getCurrentUserId() {
+        const raw = localStorage.getItem('currentUser');
+        if (!raw) return '';
+        try {
+          const parsed = JSON.parse(raw);
+          return parsed?.email || parsed?.id || parsed?.username || raw;
+        } catch (_error) {
+          return raw;
+        }
+      }
+
+      function getColdStartPreferences() {
+        const userId = getCurrentUserId();
+        const prefs = {
+          preferredBranch: '',
+          preferredYear: '',
+          preferredCategory: ''
+        };
+
+        // Try user profile first.
+        try {
+          const raw = localStorage.getItem('currentUser');
+          if (raw) {
+            const parsed = raw.startsWith('{') ? JSON.parse(raw) : { email: raw };
+            prefs.preferredBranch = String(parsed?.branch || parsed?.department || '').trim();
+            prefs.preferredYear = String(parsed?.year || parsed?.studyYear || '').trim();
+            prefs.preferredCategory = String(parsed?.favoriteCategory || parsed?.category || '').trim();
+          }
+        } catch (_error) {
+          // ignore profile parse errors
+        }
+
+        // If missing, infer from local view history for this user.
+        try {
+          const viewed = JSON.parse(localStorage.getItem('viewedBooks') || '[]');
+          const mine = viewed.filter((item) => String(item?.userId || '').trim() === String(userId || '').trim());
+          if (mine.length) {
+            const bucket = (selector) => {
+              const counts = {};
+              mine.forEach((item) => {
+                const key = String(selector(item) || '').trim();
+                if (!key) return;
+                counts[key] = (counts[key] || 0) + 1;
+              });
+              const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+              return sorted.length ? sorted[0][0] : '';
+            };
+
+            if (!prefs.preferredCategory) {
+              prefs.preferredCategory = bucket((item) => item.category);
+            }
+            if (!prefs.preferredBranch) {
+              prefs.preferredBranch = bucket((item) => item.branch);
+            }
+            if (!prefs.preferredYear) {
+              prefs.preferredYear = bucket((item) => item.year);
+            }
+          }
+        } catch (_error) {
+          // ignore local history errors
+        }
+
+        return prefs;
+      }
+
+      function readLocalRatings() {
+        try {
+          const raw = localStorage.getItem(LOCAL_RATINGS_KEY);
+          return raw ? JSON.parse(raw) : {};
+        } catch (_error) {
+          return {};
+        }
+      }
+
+      function getBookKey(book) {
+        const raw = String(book?._id || book?.id || book?.title || '').trim();
+        return raw.toLowerCase();
+      }
+
+      function getEffectiveRating(book) {
+        const backendAvg = Number(book?.rating?.average || 0);
+        const backendCount = Number(book?.rating?.count || 0);
+        const backendTotal = Number(book?.rating?.total || 0);
+        if (backendCount > 0) {
+          return {
+            average: backendAvg,
+            count: backendCount,
+            total: backendTotal > 0 ? backendTotal : backendAvg * backendCount
+          };
+        }
+
+        const ratings = readLocalRatings();
+        const local = ratings[getBookKey(book)];
+        if (!local) {
+          return { average: 0, count: 0 };
+        }
+
+        return {
+          average: Number(local.average || 0),
+          count: Number(local.count || 0),
+          total: Number(local.total || 0)
+        };
+      }
+
+      function resolveCoverImage(book) {
+        const apiOrigin = API_URL.replace('/api', '');
+        const normalizePath = (value) => String(value || '').replace(/\\/g, '/').trim();
+        const toAbsolute = (value) => {
+          const path = normalizePath(value);
+          if (!path) return '';
+          if (/^https?:\/\//i.test(path)) return path;
+          if (path.startsWith('/')) return `${apiOrigin}${path}`;
+          if (path.startsWith('uploads/') || path.startsWith('books/')) return `${apiOrigin}/${path}`;
+          return path;
+        };
+
+        const cover = book?.coverImage;
+        const candidates = [
+          cover,
+          cover?.url,
+          cover?.secure_url,
+          cover?.localPath,
+          cover?.filename ? `uploads/covers/${cover.filename}` : '',
+          book?.cover?.url,
+          book?.cover,
+          book?.book_cover,
+          book?.bookCover,
+          book?.image,
+          book?.thumbnail,
+          book?.poster,
+          book?.coverUrl
+        ];
+
+        for (const item of candidates) {
+          if (typeof item === 'string' && item.trim()) {
+            const resolved = toAbsolute(item);
+            if (resolved) return resolved;
+          }
+        }
+
+        return 'https://via.placeholder.com/220x260?text=No+Cover';
+      }
+
+      function dedupeBooks(books) {
+        const seen = new Set();
+        const unique = [];
+
+        (books || []).forEach((book) => {
+          const idKey = String(book?._id || book?.id || '').trim().toLowerCase();
+          const titleKey = String(book?.title || '').trim().toLowerCase();
+          const authorKey = String(book?.author || '').trim().toLowerCase();
+          const key = idKey || `${titleKey}::${authorKey}`;
+
+          if (!key || seen.has(key)) return;
+          seen.add(key);
+          unique.push(book);
+        });
+
+        return unique;
+      }
+
+      function renderRecommendationBackground(books) {
+        const bg = document.getElementById('recommendationBg');
+        if (!bg) return;
+
+        const coverPool = dedupeBooks(books || [])
+          .map((book) => resolveCoverImage(book))
+          .filter((src) => typeof src === 'string' && src.trim());
+
+        if (!coverPool.length) return;
+
+        const targetCount = window.innerWidth <= 900 ? 110 : 220;
+        const html = [];
+        for (let i = 0; i < targetCount; i += 1) {
+          const src = coverPool[i % coverPool.length];
+          html.push(`<img src="${src}" alt="" loading="lazy" decoding="async">`);
+        }
+
+        bg.innerHTML = html.join('');
+      }
+
+      // Fetch and display automatic recommendations
+      async function loadRecommendedBooks() {
+        try {
+          const heading = document.getElementById('recommendedHeading');
+          const currentUserId = getCurrentUserId();
+          const coldStartPrefs = getColdStartPreferences();
+          const params = new URLSearchParams();
+          params.set('limit', '8');
+          if (currentUserId) params.set('userId', currentUserId);
+          if (coldStartPrefs.preferredBranch) params.set('preferredBranch', coldStartPrefs.preferredBranch);
+          if (coldStartPrefs.preferredYear) params.set('preferredYear', coldStartPrefs.preferredYear);
+          if (coldStartPrefs.preferredCategory) params.set('preferredCategory', coldStartPrefs.preferredCategory);
+          const recommendedUrl = `${API_URL}/books/recommended?${params.toString()}`;
+
+          const response = await fetch(recommendedUrl);
+          const data = await response.json();
+
+          if (data.ok && data.books && data.books.length > 0) {
+            const mostViewedGrid = document.getElementById('mostViewedGrid');
+            const mostViewedSection = document.getElementById('mostViewedSection');
+            const uniqueBooks = dedupeBooks(data.books).slice(0, 8);
+            renderRecommendationBackground(data.books);
+            
+            mostViewedGrid.innerHTML = '';
+            heading.textContent = data.personalized
+              ? '⭐ Recommended For You (Based on Your Ratings)'
+              : '⭐ Recommended Books (Top Rated)';
+
+            uniqueBooks.forEach(book => {
+              const bookCard = createBookCard(book);
+              mostViewedGrid.appendChild(bookCard);
+            });
+
+            mostViewedSection.style.display = 'block';
+            
+            attachClickTracking();
+            return;
+          }
+
+          // Fallback to most viewed if no recommendations are available
+          const fallback = await fetch(`${API_URL}/books/most-viewed?limit=8`);
+          const fallbackData = await fallback.json();
+          if (fallbackData.ok && fallbackData.books && fallbackData.books.length > 0) {
+            const mostViewedGrid = document.getElementById('mostViewedGrid');
+            const mostViewedSection = document.getElementById('mostViewedSection');
+            const uniqueBooks = dedupeBooks(fallbackData.books).slice(0, 8);
+            renderRecommendationBackground(fallbackData.books);
+
+            mostViewedGrid.innerHTML = '';
+            heading.textContent = '📊 Recommended Books (Most Viewed)';
+
+            uniqueBooks.forEach(book => {
+              const bookCard = createBookCard(book);
+              mostViewedGrid.appendChild(bookCard);
+            });
+
+            mostViewedSection.style.display = 'block';
+            attachClickTracking();
+          }
+        } catch (error) {
+          console.error('Error loading recommendations:', error);
+        }
+      }
+
+      // Create book card element
+      function createBookCard(book) {
+        const article = document.createElement('article');
+        article.className = 'book-card';
+        article.setAttribute('data-book-id', book._id || book.id);
+
+        const figure = document.createElement('figure');
+        const link = document.createElement('a');
+        const bookId = book._id || book.id;
+        link.href = `book-view.html${bookId ? `?id=${encodeURIComponent(bookId)}` : ''}`;
+        link.addEventListener('click', function() {
+          const normalizedBook = {
+            ...book,
+            id: bookId || book.id || '',
+            _id: book._id || bookId || ''
+          };
+          sessionStorage.setItem('selectedBook', JSON.stringify(normalizedBook));
+        });
+
+        const img = document.createElement('img');
+        img.src = resolveCoverImage(book);
+        img.alt = book.title;
+
+        link.appendChild(img);
+        figure.appendChild(link);
+
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+
+        const title = document.createElement('h3');
+        title.textContent = book.title;
+
+        const details = document.createElement('p');
+        details.textContent = `${book.author || 'Unknown'} — ${book.branch || book.subject || 'General'}`;
+
+        const ratingSummary = document.createElement('p');
+        ratingSummary.className = 'rating-summary';
+        const rating = getEffectiveRating(book);
+        const avg = Number(rating.average || 0);
+        ratingSummary.textContent = `Rating: ${avg.toFixed(1)}/5`;
+
+        meta.appendChild(title);
+        meta.appendChild(details);
+        meta.appendChild(ratingSummary);
+
+        article.appendChild(figure);
+        article.appendChild(meta);
+
+        return article;
+      }
+
+      // Track book view via API
+      async function trackBookView(bookCard) {
+        const userData = localStorage.getItem('currentUser');
+        if (!userData) return;
+        
+        const bookId = bookCard.getAttribute('data-book-id');
+        if (!bookId) return;
+
+        try {
+          // Track in backend
+          await fetch(`${API_URL}/books/${bookId}/track-view`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+
+          // Also store locally for offline tracking
+          const user = typeof userData === 'string' ? 
+            (userData.startsWith('{') ? JSON.parse(userData) : { email: userData }) : 
+            userData;
+          
+          const titleElement = bookCard.querySelector('h3');
+          const metaElement = bookCard.querySelector('p');
+          
+          const title = titleElement ? titleElement.textContent.trim() : 'Unknown';
+          let author = 'Unknown';
+          let category = 'General';
+          
+          if (metaElement && metaElement.textContent.includes('—')) {
+            const parts = metaElement.textContent.split('—');
+            author = parts[0].trim();
+            category = parts[1].trim();
+          }
+          
+          const viewedBooks = JSON.parse(localStorage.getItem('viewedBooks') || '[]');
+          
+          viewedBooks.push({
+            userId: user.email,
+            bookId: bookId,
+            title: title,
+            author: author,
+            category: category,
+            viewedAt: new Date().toISOString()
+          });
+          
+          if (viewedBooks.length > 1000) {
+            viewedBooks.splice(0, viewedBooks.length - 1000);
+          }
+          localStorage.setItem('viewedBooks', JSON.stringify(viewedBooks));
+        } catch (error) {
+          console.error('Error tracking book view:', error);
+        }
+      }
+
+      // Attach click tracking to all book cards
+      function attachClickTracking() {
+        document.querySelectorAll('.book-card a').forEach(link => {
+          link.addEventListener('click', function(e) {
+            const bookCard = this.closest('.book-card');
+            if (bookCard) {
+              trackBookView(bookCard);
+            }
+          });
+        });
+        
+        document.querySelectorAll('.book-card').forEach(card => {
+          card.addEventListener('click', function(e) {
+            if (!e.target.closest('button') && !e.target.closest('a')) {
+              trackBookView(this);
+            }
+          });
+        });
+      }
+
+      // Initialize
+      loadRecommendedBooks();
+      attachClickTracking();
+
+      // Refresh recommendations every 5 minutes
+      setInterval(loadRecommendedBooks, 5 * 60 * 1000);
+    })();
+  </script>
+  </body>
+</html>

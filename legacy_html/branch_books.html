@@ -14,6 +14,13 @@
       --shadow: 0 8px 24px rgba(0,0,0,0.08);
     }
     html,body{height:100%;margin:0;font-family:system-ui,Arial;background:var(--bg);color:#0f1724}
+    body{
+      background-image: linear-gradient(rgba(243,246,248,0.9), rgba(243,246,248,0.92)), url('ChatGPT Image Sep 18, 2025, 09_32_41 AM.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
     .topbar{
       display:flex;
       align-items:center;
@@ -177,6 +184,8 @@
       flex-direction:column;
       gap:8px;
       align-items:stretch;
+      width:140px;
+      min-height:150px;
     }
     .book-card figure{margin:0}
     .book-card img{
@@ -190,6 +199,7 @@
     .book-card .meta{padding:6px 2px}
     .book-card h3{margin:6px 0;font-size:16px}
     .book-card p{margin:0;color:var(--muted);font-size:13px}
+    .book-card .rating-line{margin-top:4px;font-size:12px;color:var(--muted)}
     .book-actions {
       display: flex;
       gap: 6px;
@@ -297,6 +307,9 @@
       .book-card img{height:180px}
     }
   </style>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="theme.js"></script>
 </head>
 <body>
   <header class="topbar">
@@ -481,6 +494,7 @@
         profileBtn.addEventListener('click', (e) => {
           e.stopPropagation();
           window.location.href = 'profile.html';
+        });
       }
 
       if (profileModal) {
@@ -500,7 +514,7 @@
         }
         profileModal.classList.remove('show');
         updateProfileUI();
-        location.href = 'main.html';
+        location.href = 'index.html';
       });
 
       updateProfileUI();
@@ -618,7 +632,183 @@
           { id: 'mech4_pp1', title: 'Heat Transfer Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/mech/previous/heat-2023.pdf', type: 'previous' },
           { id: 'mech4_pp2', title: 'Manufacturing Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/mech/previous/mfg-2023.pdf', type: 'previous' }
         ]
+      },
+      'CSM': {
+        name: 'Computer Science and AI with Machine Learning',
+        books: [
+          { id: 'csm1', title: 'Machine Learning Fundamentals', author: 'Andrew Ng', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/ml-fundamentals.pdf', type: 'book' },
+          { id: 'csm2', title: 'Python for Data Science', author: 'Jake VanderPlas', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/python-ds.pdf', type: 'book' },
+          { id: 'csm1_pp1', title: 'ML Fundamentals Previous Paper 2023', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/previous/ml-fund-2023.pdf', type: 'previous' },
+          { id: 'csm1_pp2', title: 'Python for DS Previous Paper 2023', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/previous/python-ds-2023.pdf', type: 'previous' },
+          { id: 'csm1_pp3', title: 'ML Fundamentals Previous Paper 2022', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/previous/ml-fund-2022.pdf', type: 'previous' },
+          { id: 'csm1_pp4', title: 'Python for DS Previous Paper 2022', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/previous/python-ds-2022.pdf', type: 'previous' },
+          { id: 'csm_ml_2nd', title: 'Machine Learning', author: 'Sasi Ram', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'http://localhost:3000/books/Branch%20Books/CSM/2nd%20Year/1773068267114_ML_UNIT_1.pdf', type: 'book' },
+          { id: 'csm3', title: 'Deep Learning', author: 'Goodfellow & Bengio', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/deep-learning.pdf', type: 'book' },
+          { id: 'csm4', title: 'Natural Language Processing', author: 'Christopher Manning', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/nlp.pdf', type: 'book' },
+          { id: 'csm2_pp1', title: 'Deep Learning Previous Paper 2023', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/previous/dl-2023.pdf', type: 'previous' },
+          { id: 'csm2_pp2', title: 'NLP Previous Paper 2023', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/previous/nlp-2023.pdf', type: 'previous' },
+          { id: 'csm2_pp3', title: 'Deep Learning Previous Paper 2022', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/previous/dl-2022.pdf', type: 'previous' },
+          { id: 'csm2_pp4', title: 'NLP Previous Paper 2022', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/previous/nlp-2022.pdf', type: 'previous' },
+          { id: 'csm5', title: 'Computer Vision', author: 'Richard Szeliski', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/computer-vision.pdf', type: 'book' },
+          { id: 'csm6', title: 'Reinforcement Learning', author: 'Richard Sutton', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/rl.pdf', type: 'book' },
+          { id: 'csm3_pp1', title: 'Computer Vision Previous Paper 2023', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/previous/cv-2023.pdf', type: 'previous' },
+          { id: 'csm3_pp2', title: 'Reinforcement Learning Previous Paper 2023', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/previous/rl-2023.pdf', type: 'previous' },
+          { id: 'csm3_pp3', title: 'Computer Vision Previous Paper 2022', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/previous/cv-2022.pdf', type: 'previous' },
+          { id: 'csm3_pp4', title: 'Reinforcement Learning Previous Paper 2022', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/previous/rl-2022.pdf', type: 'previous' },
+          { id: 'csm7', title: 'Advanced ML Algorithms', author: 'Trevor Hastie', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/adv-ml.pdf', type: 'book' },
+          { id: 'csm8', title: 'AI Ethics & Fairness', author: 'Brent Mittelstadt', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/ai-ethics.pdf', type: 'book' },
+          { id: 'csm4_pp1', title: 'Advanced ML Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/previous/adv-ml-2023.pdf', type: 'previous' },
+          { id: 'csm4_pp2', title: 'AI Ethics Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/previous/ethics-2023.pdf', type: 'previous' },
+          { id: 'csm4_pp3', title: 'Advanced ML Previous Paper 2022', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/previous/adv-ml-2022.pdf', type: 'previous' },
+          { id: 'csm4_pp4', title: 'AI Ethics Previous Paper 2022', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csm/previous/ethics-2022.pdf', type: 'previous' }
+        ]
+      },
+      'AIML': {
+        name: 'Artificial Intelligence with Machine Learning',
+        books: [
+          { id: 'aiml1', title: 'AI Fundamentals', author: 'Stuart Russell', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/ai-fundamentals.pdf', type: 'book' },
+          { id: 'aiml2', title: 'Intelligent Systems', author: 'Jackson', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/intelligent-systems.pdf', type: 'book' },
+          { id: 'aiml1_pp1', title: 'AI Fundamentals Previous Paper 2023', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/previous/ai-fund-2023.pdf', type: 'previous' },
+          { id: 'aiml1_pp2', title: 'Intelligent Systems Previous Paper 2023', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/previous/is-2023.pdf', type: 'previous' },
+          { id: 'aiml1_pp3', title: 'AI Fundamentals Previous Paper 2022', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/previous/ai-fund-2022.pdf', type: 'previous' },
+          { id: 'aiml1_pp4', title: 'Intelligent Systems Previous Paper 2022', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/previous/is-2022.pdf', type: 'previous' },
+          { id: 'aiml3', title: 'Neural Networks', author: 'Haykin Simon', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/neural-networks.pdf', type: 'book' },
+          { id: 'aiml4', title: 'Fuzzy Logic & Systems', author: 'Klir & Yuan', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/fuzzy-logic.pdf', type: 'book' },
+          { id: 'aiml2_pp1', title: 'Neural Networks Previous Paper 2023', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/previous/nn-2023.pdf', type: 'previous' },
+          { id: 'aiml2_pp2', title: 'Fuzzy Logic Previous Paper 2023', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/previous/fuzzy-2023.pdf', type: 'previous' },
+          { id: 'aiml2_pp3', title: 'Neural Networks Previous Paper 2022', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/previous/nn-2022.pdf', type: 'previous' },
+          { id: 'aiml2_pp4', title: 'Fuzzy Logic Previous Paper 2022', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/previous/fuzzy-2022.pdf', type: 'previous' },
+          { id: 'aiml5', title: 'Expert Systems', author: 'Peter Jackson', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/expert-systems.pdf', type: 'book' },
+          { id: 'aiml6', title: 'Genetic Algorithms', author: 'David Goldberg', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/genetic-algorithms.pdf', type: 'book' },
+          { id: 'aiml3_pp1', title: 'Expert Systems Previous Paper 2023', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/previous/es-2023.pdf', type: 'previous' },
+          { id: 'aiml3_pp2', title: 'Genetic Algorithms Previous Paper 2023', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/previous/ga-2023.pdf', type: 'previous' },
+          { id: 'aiml3_pp3', title: 'Expert Systems Previous Paper 2022', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/previous/es-2022.pdf', type: 'previous' },
+          { id: 'aiml3_pp4', title: 'Genetic Algorithms Previous Paper 2022', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/previous/ga-2022.pdf', type: 'previous' },
+          { id: 'aiml7', title: 'Swarm Intelligence', author: 'James Kennedy', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/swarm-intelligence.pdf', type: 'book' },
+          { id: 'aiml8', title: 'AI Applications', author: 'Henning Christiansen', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/ai-applications.pdf', type: 'book' },
+          { id: 'aiml4_pp1', title: 'Swarm Intelligence Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/previous/si-2023.pdf', type: 'previous' },
+          { id: 'aiml4_pp2', title: 'AI Applications Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/previous/app-2023.pdf', type: 'previous' },
+          { id: 'aiml4_pp3', title: 'Swarm Intelligence Previous Paper 2022', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/previous/si-2022.pdf', type: 'previous' },
+          { id: 'aiml4_pp4', title: 'AI Applications Previous Paper 2022', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/aiml/previous/app-2022.pdf', type: 'previous' }
+        ]
+      },
+      'CST': {
+        name: 'Computer Science and Technology',
+        books: [
+          { id: 'cst1', title: 'Programming Languages', author: 'Sebesta Robert', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/prog-languages.pdf', type: 'book' },
+          { id: 'cst2', title: 'Web Technologies', author: 'Markel', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/web-tech.pdf', type: 'book' },
+          { id: 'cst1_pp1', title: 'Programming Languages Previous Paper 2023', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/previous/pl-2023.pdf', type: 'previous' },
+          { id: 'cst1_pp2', title: 'Web Technologies Previous Paper 2023', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/previous/web-2023.pdf', type: 'previous' },
+          { id: 'cst1_pp3', title: 'Programming Languages Previous Paper 2022', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/previous/pl-2022.pdf', type: 'previous' },
+          { id: 'cst1_pp4', title: 'Web Technologies Previous Paper 2022', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/previous/web-2022.pdf', type: 'previous' },
+          { id: 'cst3', title: 'Database Technologies', author: 'Elmasri & Navathe', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/db-tech.pdf', type: 'book' },
+          { id: 'cst4', title: 'Cloud Computing', author: 'Buyya Rajkumar', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/cloud-computing.pdf', type: 'book' },
+          { id: 'cst2_pp1', title: 'Database Technologies Previous Paper 2023', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/previous/db-2023.pdf', type: 'previous' },
+          { id: 'cst2_pp2', title: 'Cloud Computing Previous Paper 2023', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/previous/cloud-2023.pdf', type: 'previous' },
+          { id: 'cst2_pp3', title: 'Database Technologies Previous Paper 2022', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/previous/db-2022.pdf', type: 'previous' },
+          { id: 'cst2_pp4', title: 'Cloud Computing Previous Paper 2022', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/previous/cloud-2022.pdf', type: 'previous' },
+          { id: 'cst5', title: 'Mobile Application Development', author: 'Rogers Robert', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/mobile-dev.pdf', type: 'book' },
+          { id: 'cst6', title: 'Internet of Things', author: 'Kramp Thomas', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/iot.pdf', type: 'book' },
+          { id: 'cst3_pp1', title: 'Mobile Development Previous Paper 2023', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/previous/mobile-2023.pdf', type: 'previous' },
+          { id: 'cst3_pp2', title: 'IoT Previous Paper 2023', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/previous/iot-2023.pdf', type: 'previous' },
+          { id: 'cst3_pp3', title: 'Mobile Development Previous Paper 2022', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/previous/mobile-2022.pdf', type: 'previous' },
+          { id: 'cst3_pp4', title: 'IoT Previous Paper 2022', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/previous/iot-2022.pdf', type: 'previous' },
+          { id: 'cst7', title: 'Big Data Technologies', author: 'Frank Leymann', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/big-data.pdf', type: 'book' },
+          { id: 'cst8', title: 'Cybersecurity', author: 'Whitman & Mattord', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/cybersecurity.pdf', type: 'book' },
+          { id: 'cst4_pp1', title: 'Big Data Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/previous/bd-2023.pdf', type: 'previous' },
+          { id: 'cst4_pp2', title: 'Cybersecurity Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/previous/cyber-2023.pdf', type: 'previous' },
+          { id: 'cst4_pp3', title: 'Big Data Previous Paper 2022', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/previous/bd-2022.pdf', type: 'previous' },
+          { id: 'cst4_pp4', title: 'Cybersecurity Previous Paper 2022', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/cst/previous/cyber-2022.pdf', type: 'previous' }
+        ]
+      },
+      'CSD': {
+        name: 'Computer Science with Data Science',
+        books: [
+          { id: 'csd1', title: 'Data Analytics', author: 'Provost Foster', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/data-analytics.pdf', type: 'book' },
+          { id: 'csd2', title: 'Statistics for Data Science', author: 'Wasserman Larry', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/stats-ds.pdf', type: 'book' },
+          { id: 'csd1_pp1', title: 'Data Analytics Previous Paper 2023', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/previous/da-2023.pdf', type: 'previous' },
+          { id: 'csd1_pp2', title: 'Statistics Previous Paper 2023', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/previous/stats-2023.pdf', type: 'previous' },
+          { id: 'csd1_pp3', title: 'Data Analytics Previous Paper 2022', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/previous/da-2022.pdf', type: 'previous' },
+          { id: 'csd1_pp4', title: 'Statistics Previous Paper 2022', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/previous/stats-2022.pdf', type: 'previous' },
+          { id: 'csd3', title: 'Data Visualization', author: 'Cairo Alberto', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/data-viz.pdf', type: 'book' },
+          { id: 'csd4', title: 'Predictive Modeling', author: 'Kuhn Max & Johnson Kjell', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/predictive-modeling.pdf', type: 'book' },
+          { id: 'csd2_pp1', title: 'Data Visualization Previous Paper 2023', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/previous/viz-2023.pdf', type: 'previous' },
+          { id: 'csd2_pp2', title: 'Predictive Modeling Previous Paper 2023', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/previous/pm-2023.pdf', type: 'previous' },
+          { id: 'csd2_pp3', title: 'Data Visualization Previous Paper 2022', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/previous/viz-2022.pdf', type: 'previous' },
+          { id: 'csd2_pp4', title: 'Predictive Modeling Previous Paper 2022', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/previous/pm-2022.pdf', type: 'previous' },
+          { id: 'csd5', title: 'Feature Engineering', author: 'Zheng Alice & Casari', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/feature-eng.pdf', type: 'book' },
+          { id: 'csd6', title: 'Time Series Analysis', author: 'Cleveland William', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/time-series.pdf', type: 'book' },
+          { id: 'csd3_pp1', title: 'Feature Engineering Previous Paper 2023', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/previous/fe-2023.pdf', type: 'previous' },
+          { id: 'csd3_pp2', title: 'Time Series Previous Paper 2023', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/previous/ts-2023.pdf', type: 'previous' },
+          { id: 'csd3_pp3', title: 'Feature Engineering Previous Paper 2022', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/previous/fe-2022.pdf', type: 'previous' },
+          { id: 'csd3_pp4', title: 'Time Series Previous Paper 2022', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/previous/ts-2022.pdf', type: 'previous' },
+          { id: 'csd7', title: 'Advanced Analytics', author: 'Davenport Thomas', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/adv-analytics.pdf', type: 'book' },
+          { id: 'csd8', title: 'Data Ethics & Privacy', author: 'Lane Kinson', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/data-ethics.pdf', type: 'book' },
+          { id: 'csd4_pp1', title: 'Advanced Analytics Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/previous/aa-2023.pdf', type: 'previous' },
+          { id: 'csd4_pp2', title: 'Data Ethics Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/previous/ethics-2023.pdf', type: 'previous' },
+          { id: 'csd4_pp3', title: 'Advanced Analytics Previous Paper 2022', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/previous/aa-2022.pdf', type: 'previous' },
+          { id: 'csd4_pp4', title: 'Data Ethics Previous Paper 2022', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/csd/previous/ethics-2022.pdf', type: 'previous' }
+        ]
+      },
+      'CIVIL': {
+        name: 'Civil Engineering',
+        books: [
+          { id: 'civil1', title: 'Engineering Geology', author: 'Blyth Frederick', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/geology.pdf', type: 'book' },
+          { id: 'civil2', title: 'Building Materials', author: 'Shetty', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/materials.pdf', type: 'book' },
+          { id: 'civil1_pp1', title: 'Engineering Geology Previous Paper 2023', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/previous/geology-2023.pdf', type: 'previous' },
+          { id: 'civil1_pp2', title: 'Building Materials Previous Paper 2023', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/previous/materials-2023.pdf', type: 'previous' },
+          { id: 'civil1_pp3', title: 'Engineering Geology Previous Paper 2022', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/previous/geology-2022.pdf', type: 'previous' },
+          { id: 'civil1_pp4', title: 'Building Materials Previous Paper 2022', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/previous/materials-2022.pdf', type: 'previous' },
+          { id: 'civil3', title: 'Soil Mechanics', author: 'Terzaghi Peck', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/soil-mechanics.pdf', type: 'book' },
+          { id: 'civil4', title: 'Structural Analysis', author: 'S.S. Bhavikatti', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/structural-analysis.pdf', type: 'book' },
+          { id: 'civil2_pp1', title: 'Soil Mechanics Previous Paper 2023', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/previous/soil-2023.pdf', type: 'previous' },
+          { id: 'civil2_pp2', title: 'Structural Analysis Previous Paper 2023', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/previous/sa-2023.pdf', type: 'previous' },
+          { id: 'civil2_pp3', title: 'Soil Mechanics Previous Paper 2022', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/previous/soil-2022.pdf', type: 'previous' },
+          { id: 'civil2_pp4', title: 'Structural Analysis Previous Paper 2022', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/previous/sa-2022.pdf', type: 'previous' },
+          { id: 'civil5', title: 'Environmental Engineering', author: 'Peavy Howard', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/environmental.pdf', type: 'book' },
+          { id: 'civil6', title: 'Transportation Engineering', author: 'Khanna Justo', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/transportation.pdf', type: 'book' },
+          { id: 'civil3_pp1', title: 'Environmental Engineering Previous Paper 2023', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/previous/env-2023.pdf', type: 'previous' },
+          { id: 'civil3_pp2', title: 'Transportation Previous Paper 2023', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/previous/transport-2023.pdf', type: 'previous' },
+          { id: 'civil3_pp3', title: 'Environmental Engineering Previous Paper 2022', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/previous/env-2022.pdf', type: 'previous' },
+          { id: 'civil3_pp4', title: 'Transportation Previous Paper 2022', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/previous/transport-2022.pdf', type: 'previous' },
+          { id: 'civil7', title: 'Building Design', author: 'Arora Bindra', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/building-design.pdf', type: 'book' },
+          { id: 'civil8', title: 'Construction Management', author: 'Punmia Jain', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/construction-mgmt.pdf', type: 'book' },
+          { id: 'civil4_pp1', title: 'Building Design Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/previous/bd-2023.pdf', type: 'previous' },
+          { id: 'civil4_pp2', title: 'Construction Mgmt Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/previous/cm-2023.pdf', type: 'previous' },
+          { id: 'civil4_pp3', title: 'Building Design Previous Paper 2022', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/previous/bd-2022.pdf', type: 'previous' },
+          { id: 'civil4_pp4', title: 'Construction Mgmt Previous Paper 2022', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/civil/previous/cm-2022.pdf', type: 'previous' }
+        ]
+      },
+      'IT': {
+        name: 'Information Technology',
+        books: [
+          { id: 'it1', title: 'IT Fundamentals', author: 'Sybex', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/it-fundamentals.pdf', type: 'book' },
+          { id: 'it2', title: 'Network Administration', author: 'Michael Palmer', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/network-admin.pdf', type: 'book' },
+          { id: 'it1_pp1', title: 'IT Fundamentals Previous Paper 2023', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/previous/itf-2023.pdf', type: 'previous' },
+          { id: 'it1_pp2', title: 'Network Admin Previous Paper 2023', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/previous/na-2023.pdf', type: 'previous' },
+          { id: 'it1_pp3', title: 'IT Fundamentals Previous Paper 2022', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/previous/itf-2022.pdf', type: 'previous' },
+          { id: 'it1_pp4', title: 'Network Admin Previous Paper 2022', author: 'Previous Year Paper', year: '1st Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/previous/na-2022.pdf', type: 'previous' },
+          { id: 'it3', title: 'System Administration', author: 'Evi Nemeth', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/sys-admin.pdf', type: 'book' },
+          { id: 'it4', title: 'Database Administration', author: 'Sean McMillan', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/dba.pdf', type: 'book' },
+          { id: 'it2_pp1', title: 'System Administration Previous Paper 2023', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/previous/sa-2023.pdf', type: 'previous' },
+          { id: 'it2_pp2', title: 'DBA Previous Paper 2023', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/previous/dba-2023.pdf', type: 'previous' },
+          { id: 'it2_pp3', title: 'System Administration Previous Paper 2022', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/previous/sa-2022.pdf', type: 'previous' },
+          { id: 'it2_pp4', title: 'DBA Previous Paper 2022', author: 'Previous Year Paper', year: '2nd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/previous/dba-2022.pdf', type: 'previous' },
+          { id: 'it5', title: 'Enterprise IT Solutions', author: 'David Miller', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/enterprise-it.pdf', type: 'book' },
+          { id: 'it6', title: 'IT Project Management', author: 'Vasant Desai', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/it-pm.pdf', type: 'book' },
+          { id: 'it3_pp1', title: 'Enterprise IT Previous Paper 2023', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/previous/ent-2023.pdf', type: 'previous' },
+          { id: 'it3_pp2', title: 'IT PM Previous Paper 2023', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/previous/pm-2023.pdf', type: 'previous' },
+          { id: 'it3_pp3', title: 'Enterprise IT Previous Paper 2022', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/previous/ent-2022.pdf', type: 'previous' },
+          { id: 'it3_pp4', title: 'IT PM Previous Paper 2022', author: 'Previous Year Paper', year: '3rd Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/previous/pm-2022.pdf', type: 'previous' },
+          { id: 'it7', title: 'IT Strategy & Governance', author: 'Jeanne Harris', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/strategy.pdf', type: 'book' },
+          { id: 'it8', title: 'Digital Transformation', author: 'Thomas M. Siebel', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/digital-transform.pdf', type: 'book' },
+          { id: 'it4_pp1', title: 'IT Strategy Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/previous/strat-2023.pdf', type: 'previous' },
+          { id: 'it4_pp2', title: 'Digital Transformation Previous Paper 2023', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/previous/dt-2023.pdf', type: 'previous' },
+          { id: 'it4_pp3', title: 'IT Strategy Previous Paper 2022', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/previous/strat-2022.pdf', type: 'previous' },
+          { id: 'it4_pp4', title: 'Digital Transformation Previous Paper 2022', author: 'Previous Year Paper', year: '4th Year', book_cover: 'images/book_cover.jpeg', pdf: 'pdfs/it/previous/dt-2022.pdf', type: 'previous' }
+        ]
       }
+      
     };
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -628,6 +818,7 @@
     let currentBranch = branch || 'CSE';
     let currentYear = year || '1st Year';
     let currentMode = 'books'; // 'books' or 'previous'
+    const API_URL = 'http://localhost:3000/api';
 
     function init() {
       if (!branchBooks[currentBranch]) {
@@ -664,20 +855,61 @@
       });
     }
 
-    function loadBooks() {
+    async function getLiveBranchBooks() {
+      try {
+        const params = new URLSearchParams();
+        params.set('category', 'Branch Books');
+        params.set('branch', currentBranch);
+        if (currentYear !== 'all') {
+          params.set('year', currentYear);
+        }
+        params.set('limit', '200');
+
+        const response = await fetch(`${API_URL}/books?${params.toString()}`);
+        const data = await response.json();
+        if (!response.ok || !data.ok || !Array.isArray(data.books)) {
+          return [];
+        }
+
+        return data.books.map((book) => {
+          const openUrl = book.viewUrl || book.pdfUrl || book?.pdf?.url || '#';
+          return {
+            id: String(book._id || book.id || `${book.title || 'book'}-${book.author || 'author'}`),
+            title: book.title || 'Untitled Book',
+            author: book.author || 'Unknown Author',
+            year: book.year || '-',
+            book_cover: book.book_cover || book.coverImage || book?.coverImage?.url || 'images/book_cover.jpeg',
+            rating: book.rating || { average: 0, count: 0, total: 0 },
+            pdf: openUrl,
+            type: 'book',
+            _isDynamic: true
+          };
+        });
+      } catch (error) {
+        console.error('[branch_books] Failed to load live books:', error);
+        return [];
+      }
+    }
+
+    async function loadBooks() {
       const bookGrid = document.getElementById('bookGrid');
       const books = branchBooks[currentBranch].books;
+      const liveBooks = await getLiveBranchBooks();
 
-      const filteredBooks = currentYear === 'all' 
+      const localFilteredBooks = currentYear === 'all' 
         ? books 
         : books.filter(book => book.year === currentYear);
+
+      const dedupeKey = (book) => `${(book.title || '').trim().toLowerCase()}|${(book.author || '').trim().toLowerCase()}|${(book.year || '').trim().toLowerCase()}`;
+      const existingKeys = new Set(localFilteredBooks.map(dedupeKey));
+      const mergedBooks = [...liveBooks.filter((book) => !existingKeys.has(dedupeKey(book))), ...localFilteredBooks];
 
       // Filter based on current mode
       let displayBooks;
       if (currentMode === 'books') {
-        displayBooks = filteredBooks.filter(book => book.type === 'book' || !book.type);
+        displayBooks = mergedBooks.filter(book => book.type === 'book' || !book.type);
       } else if (currentMode === 'previous') {
-        displayBooks = filteredBooks.filter(book => book.type === 'previous');
+        displayBooks = mergedBooks.filter(book => book.type === 'previous');
       }
 
       if (displayBooks.length === 0) {
@@ -690,11 +922,13 @@
 
       // Helper function to render book cards
       function renderBookCard(book, isPreviousPaper = false) {
+        const serializedBook = JSON.stringify(book).replace(/"/g, '&quot;');
+        const avgRating = Number(book?.rating?.average || 0).toFixed(1);
         return `
         <article class="book-card" style="position: relative;">
           ${isPreviousPaper ? '<span style="position: absolute; top: 8px; right: 8px; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; z-index: 1;">PREVIOUS PAPER</span>' : ''}
           <figure>
-            <a href="branch_book.html?id=${book.id}">
+            <a href="book-view.html" onclick="openBookView(${serializedBook}); return false;">
               <img src="${book.book_cover}" alt="${book.title}" loading="lazy"
                    onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22300%22%3E%3Crect fill=%22%230a1628%22 width=%22220%22 height=%22300%22/%3E%3Ctext x=%22110%22 y=%22140%22 font-size=%2224%22 fill=%22%2300d4ff%22 text-anchor=%22middle%22 font-family=%22Arial%22%3ESASI%3C/text%3E%3Ctext x=%22110%22 y=%22170%22 font-size=%2214%22 fill=%22%2300d4ff%22 text-anchor=%22middle%22 font-family=%22Arial%22%3EBooks%3C/text%3E%3C/svg%3E'" 
                    style="cursor:pointer;">
@@ -703,10 +937,11 @@
           <div class="meta">
             <h3>${book.title}</h3>
             <p>${book.author}</p>
+            <p class="rating-line">Rating: ${avgRating}/5</p>
           </div>
           <div class="book-actions">
-            <button class="btn-open" onclick="window.location.href='branch_book.html?id=${book.id}'">Open</button>
-            <button class="btn-save" onclick="event.stopPropagation(); saveBook(${JSON.stringify(book).replace(/"/g, '&quot;')})" id="save-${book.id}">Save</button>
+            <button class="btn-open" onclick="event.stopPropagation(); openBookView(${serializedBook})">Open</button>
+            <button class="btn-save" onclick="event.stopPropagation(); saveBook(${serializedBook})" id="save-${book.id}">Save</button>
           </div>
         </article>
         `;
@@ -717,6 +952,15 @@
       const html = displayBooks.map(book => renderBookCard(book, isPreviousMode)).join('');
 
       bookGrid.innerHTML = html;
+    }
+
+    function openBookView(book) {
+      const normalizedBook = { ...book, id: book.id || book._id || '' };
+      sessionStorage.setItem('selectedBook', JSON.stringify(normalizedBook));
+      const target = normalizedBook.id
+        ? `book-view.html?id=${encodeURIComponent(normalizedBook.id)}`
+        : 'book-view.html';
+      window.location.href = target;
     }
 
     function saveBook(book) {

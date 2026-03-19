@@ -8,6 +8,11 @@ const validateEmail = (email) => {
   return emailRegex.test(email);
 };
 
+const isInstitutionEmail = (email) => {
+  const normalizedEmail = (email || '').trim().toLowerCase();
+  return /^[^\s@]+@sasi\.ac\.in$/.test(normalizedEmail);
+};
+
 const validatePassword = (password) => {
   return password && password.length >= 6;
 };
@@ -17,6 +22,8 @@ const validateRegistrationData = (data) => {
 
   if (!data.email || !validateEmail(data.email)) {
     errors.push('Valid email is required');
+  } else if (!isInstitutionEmail(data.email)) {
+    errors.push('Only @sasi.ac.in email addresses are allowed');
   }
 
   if (!data.password || !validatePassword(data.password)) {
@@ -38,6 +45,8 @@ const validateLoginData = (data) => {
 
   if (!data.email || !validateEmail(data.email)) {
     errors.push('Valid email is required');
+  } else if (!isInstitutionEmail(data.email)) {
+    errors.push('Only @sasi.ac.in email addresses are allowed');
   }
 
   if (!data.password) {
@@ -55,6 +64,8 @@ const validateOTPData = (data) => {
 
   if (!data.email || !validateEmail(data.email)) {
     errors.push('Valid email is required');
+  } else if (!isInstitutionEmail(data.email)) {
+    errors.push('Only @sasi.ac.in email addresses are allowed');
   }
 
   if (!data.code) {
@@ -81,6 +92,7 @@ const sanitizePassword = (password) => {
 
 module.exports = {
   validateEmail,
+  isInstitutionEmail,
   validatePassword,
   validateRegistrationData,
   validateLoginData,

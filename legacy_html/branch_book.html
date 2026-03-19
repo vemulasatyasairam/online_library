@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Branch Book Details</title>
+  <script>
+    window.location.replace('book-view.html' + window.location.search);
+  </script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
@@ -77,6 +80,9 @@
     .reader-pdf-action:hover { background: #651d10; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
     @media (max-width: 768px) { .reader-container { width: 95%; max-height: 85vh; } .reader-header { padding: 15px; } .reader-title { font-size: 16px; } .reader-content { padding: 20px; } .reader-book-meta { grid-template-columns: 1fr; } }
   </style>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="theme.js"></script>
 </head>
 <body>
   <div class="header">

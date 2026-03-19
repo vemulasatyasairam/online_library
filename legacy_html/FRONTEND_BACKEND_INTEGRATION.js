@@ -401,7 +401,7 @@ function userLogout() {
 
 ✓ HTML Pages Updated:
   - login.html (with tabs for login/register)
-  - main.html (with logout handler)
+  - index.html (with logout handler)
   - personal.html (includes auth-service)
 
 ✓ Data Storage:

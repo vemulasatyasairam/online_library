@@ -7,6 +7,11 @@
 const AuthService = (() => {
   const API_BASE = 'http://localhost:3000/api';
   const USERS_STORAGE_KEY = 'auth_users';
+  const INSTITUTION_EMAIL_REGEX = /^[^\s@]+@sasi\.ac\.in$/i;
+
+  const isInstitutionEmail = (email) => {
+    return INSTITUTION_EMAIL_REGEX.test((email || '').trim());
+  };
   
   // Get all registered users from localStorage
   const getAllUsers = () => {
@@ -95,6 +100,10 @@ const AuthService = (() => {
   // Login - uses localStorage as fallback
   const login = async (email, password) => {
     console.log('[AuthService] Login attempt for:', email);
+
+    if (!isInstitutionEmail(email)) {
+      return { ok: false, error: 'Only @sasi.ac.in email accounts can access this library.' };
+    }
     
     // Try API first
     const apiResult = await apiRequest('/auth/login', 'POST', { email, password });
@@ -129,6 +138,10 @@ const AuthService = (() => {
   // Register - uses localStorage as fallback
   const register = async (email, password, name = null) => {
     console.log('[AuthService] Register attempt for:', email);
+
+    if (!isInstitutionEmail(email)) {
+      return { ok: false, error: 'Only @sasi.ac.in email accounts can access this library.' };
+    }
     
     // Try API first
     const apiResult = await apiRequest('/auth/register', 'POST', { email, password, name });
@@ -171,11 +184,18 @@ const AuthService = (() => {
   
   // Send OTP
   const sendOTP = async (email) => {
+    if (!isInstitutionEmail(email)) {
+      return { ok: false, error: 'Only @sasi.ac.in email accounts can access this library.' };
+    }
     return await apiRequest('/auth/send-otp', 'POST', { email });
   };
   
   // Verify OTP and reset password
   const verifyOTP = async (email, code, newPassword) => {
+    if (!isInstitutionEmail(email)) {
+      return { ok: false, error: 'Only @sasi.ac.in email accounts can access this library.' };
+    }
+
     const result = await apiRequest('/auth/verify-otp', 'POST', {
       email,
       code,

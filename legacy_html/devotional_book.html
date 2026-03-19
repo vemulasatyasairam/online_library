@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Book Details - Devotional</title>
+  <script>
+    window.location.replace('book-view.html' + window.location.search);
+  </script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
@@ -51,6 +54,9 @@
     .not-found { text-align: center; padding: 60px 20px; }
     @media (max-width: 768px) { .book-content { grid-template-columns: 1fr; } .details-list { grid-template-columns: 1fr; } }
   </style>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="theme.js"></script>
 </head>
 <body>
   <div class="header">

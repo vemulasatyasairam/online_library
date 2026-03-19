@@ -1,0 +1,467 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Course Book Details</title>
+  <script>
+    window.location.replace('book-view.html' + window.location.search);
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .header {
+      background-color: #1f2937;
+      color: white;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      border-radius: 8px 8px 0 0;
+      margin-bottom: 0;
+    }
+    .header a {
+      color: white;
+      text-decoration: none;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .header h2 {
+      flex: 1;
+      font-size: 24px;
+      margin: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .book-detail-card {
+      background: white;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+    .book-content {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 40px;
+      padding: 40px;
+    }
+    .book-cover {
+      position: relative;
+    }
+    .book-cover img {
+      width: 100%;
+      height: 380px;
+      object-fit: cover;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+    .book-info {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .book-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1a202c;
+      line-height: 1.2;
+    }
+    .book-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .meta-label {
+      font-size: 12px;
+      color: #718096;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .meta-value {
+      font-size: 16px;
+      color: #2d3748;
+      font-weight: 500;
+      margin-top: 4px;
+    }
+    .divider {
+      height: 1px;
+      background-color: #e2e8f0;
+      margin: 10px 0;
+    }
+    .description {
+      color: #4a5568;
+      font-size: 15px;
+      line-height: 1.6;
+      margin: 10px 0;
+    }
+    .details-section {
+      margin: 20px 0;
+    }
+    .details-section h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 12px;
+    }
+    .details-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+    .detail-item {
+      padding: 12px;
+      background-color: #f7fafc;
+      border-left: 3px solid #0891b2;
+      border-radius: 4px;
+    }
+    .detail-item label {
+      font-size: 12px;
+      color: #718096;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .detail-item value {
+      display: block;
+      font-size: 14px;
+      color: #2d3748;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+    .features-list {
+      background: #cffafe;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    .features-list ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .features-list li {
+      padding: 8px 0 8px 24px;
+      position: relative;
+      color: #4a5568;
+    }
+    .features-list li:before {
+      content: "\2713";
+      position: absolute;
+      left: 0;
+      color: #0891b2;
+      font-weight: bold;
+    }
+    .toc-list {
+      background: #e0f2fe;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    .toc-list ol {
+      margin: 0;
+      padding-left: 20px;
+      color: #4a5568;
+    }
+    .toc-list li {
+      padding: 6px 0;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .btn {
+      flex: 1;
+      padding: 14px 20px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .btn.open {
+      background: #0891b2;
+      color: white;
+    }
+    .btn.open:hover {
+      background: #0e7490;
+      transform: translateY(-2px);
+    }
+    .btn.save {
+      background: #10b981;
+      color: white;
+    }
+    .btn.save:hover {
+      background: #059669;
+      transform: translateY(-2px);
+    }
+    .message {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: 500;
+    }
+    .message.success {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    .message.error {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+    .warning-banner {
+      background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .warning-banner-header {
+      display: flex;
+      gap: 12px;
+      font-weight: 700;
+      align-items: center;
+    }
+    .warning-banner-icon {
+      font-size: 24px;
+    }
+    .not-found {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    @media (max-width: 768px) {
+      .book-content {
+        grid-template-columns: 1fr;
+      }
+      .details-list {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="theme.js"></script>
+</head>
+<body>
+  <div class="header">
+    <a href="course_books.html">&larr;</a>
+    <h2>💻 Course Book Details</h2>
+  </div>
+  <div class="container">
+    <div class="book-detail-card">
+      <div id="notFound" class="not-found" style="display:none;">
+        <h1>Book Not Found</h1>
+        <p>We couldn't find the course book you're looking for.</p>
+        <a href="course_books.html">Back to Course Books</a>
+      </div>
+
+      <div id="bookContainer" style="display:none;">
+        <div class="book-content">
+          <div class="book-cover">
+            <img id="bookImage" src="" alt="Book Cover">
+          </div>
+
+          <div class="book-info">
+            <h1 class="book-title" id="title">Book Title</h1>
+
+            <div class="book-meta">
+              <div class="meta-item">
+                <span class="meta-label">Author</span>
+                <span class="meta-value" id="author">Unknown</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Subject</span>
+                <span class="meta-value" id="subject">General</span>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="description" id="description">
+              This is a detailed description of the course book.
+            </div>
+
+            <div class="details-section">
+              <h3>📖 Publication Details</h3>
+              <div class="details-list">
+                <div class="detail-item">
+                  <label>Publisher</label>
+                  <value id="publisher">Not Available</value>
+                </div>
+                <div class="detail-item">
+                  <label>Year of Publication</label>
+                  <value id="year">Not Available</value>
+                </div>
+                <div class="detail-item">
+                  <label>Edition</label>
+                  <value id="edition">Not Available</value>
+                </div>
+                <div class="detail-item">
+                  <label>Pages</label>
+                  <value id="pages">Not Available</value>
+                </div>
+                <div class="detail-item">
+                  <label>Language</label>
+                  <value id="language">Not Available</value>
+                </div>
+                <div class="detail-item">
+                  <label>ISBN</label>
+                  <value id="isbn">Not Available</value>
+                </div>
+              </div>
+            </div>
+
+            <div class="details-section features-list" id="featuresSection" style="display:none;">
+              <h3>✨ Key Features</h3>
+              <ul id="featuresList"></ul>
+            </div>
+
+            <div class="details-section toc-list" id="tocSection" style="display:none;">
+              <h3>📚 Table of Contents</h3>
+              <ol id="tocList"></ol>
+            </div>
+
+            <div class="warning-banner" id="warningBanner" style="display:none;">
+              <div class="warning-banner-header">
+                <span class="warning-banner-icon">ℹ️</span>
+                <span>IMPORTANT: Educational Use Only</span>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button id="openBtn" class="btn open">📖 Open PDF</button>
+              <button id="saveBtn" class="btn save">⭐ Save to My Books</button>
+            </div>
+            <div id="msg" class="message"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const booksDatabase = {
+      py1: { id: 'py1', title: 'Python Basics', author: 'Mark Lutz', subject: 'Programming', publisher: 'O\'Reilly Media', year: 2013, edition: 'Fifth Edition', pages: 1600, language: 'English', isbn: '978-1491927281', book_cover: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=400&fit=crop', description: 'Comprehensive Python guide for beginners covering fundamentals, data structures, functions, OOP, and practical coding exercises with real-world applications.', features: ['Python fundamentals', 'Object-oriented programming', 'Data structures', 'Exception handling', 'Functional programming', 'Modules and packages', 'File I/O operations', 'Practical exercises', 'Best practices', 'Real-world examples'], toc: ['Chapter 1 - Python Q&A', 'Chapter 2 - How Python Runs Code', 'Chapter 3 - Program Execution', 'Chapter 4 - Object Types', 'Chapter 5 - Numbers', 'Chapter 6 - Strings', 'Chapter 7 - Lists and Dicts'], pdf: 'pdfs/python-basics.pdf' },
+      py2: { id: 'py2', title: 'Advanced Python', author: 'Luciano Ramalho', subject: 'Programming', publisher: 'O\'Reilly Media', year: 2015, edition: 'First Edition', pages: 800, language: 'English', isbn: '978-1491927269', book_cover: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=400&fit=crop', description: 'Master advanced Python techniques including metaprogramming, decorators, design patterns, and functional programming for elegant, efficient code.', features: ['Data model mastery', 'Sequence protocols', 'Dictionaries and sets', 'Text and bytes', 'Functions design', 'Classes and protocols', 'Async programming', 'Design patterns', 'Advanced OOP', 'Performance tuning'], toc: ['Chapter 1 - Data Model', 'Chapter 2 - Sequences', 'Chapter 3 - Dicts and Sets', 'Chapter 4 - Bytes and Text', 'Chapter 5 - First-Class Functions', 'Chapter 6 - Design Patterns'], pdf: 'pdfs/advanced-python.pdf' },
+      web1: { id: 'web1', title: 'Web Development Fundamentals', author: 'Jon Duckett', subject: 'Web Development', publisher: 'Indie Pub', year: 2014, edition: 'First Edition', pages: 880, language: 'English', isbn: '978-1491927297', book_cover: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=400&fit=crop', description: 'Complete guide to HTML, CSS, and JavaScript with visual learning approach, covering responsive design, accessibility, and modern web practices.', features: ['HTML semantics', 'CSS styling and layouts', 'JavaScript programming', 'DOM manipulation', 'Responsive design', 'Web accessibility', 'Performance optimization', 'Cross-browser support', 'Framework intro', 'Security basics'], toc: ['Chapter 1 - Structure', 'Chapter 2 - Text', 'Chapter 3 - Lists', 'Chapter 4 - Links', 'Chapter 5 - Images', 'Chapter 6 - Tables'], pdf: 'pdfs/web-development.pdf' },
+      web2: { id: 'web2', title: 'React: The Complete Guide', author: 'David Ceddia', subject: 'Frontend Framework', publisher: 'Self Published', year: 2018, edition: 'Second Edition', pages: 650, language: 'English', isbn: '978-1491959909', book_cover: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=400&fit=crop', description: 'Build modern web applications with React. Learn components, hooks, state management, routing, and best practices with real-world projects.', features: ['React fundamentals', 'Component lifecycle', 'React hooks', 'State management', 'Props and composition', 'Event handling', 'Conditional rendering', 'Real projects', 'Performance tuning', 'Testing'], toc: ['Chapter 1 - Basics', 'Chapter 2 - Components', 'Chapter 3 - JSX', 'Chapter 4 - State and Props', 'Chapter 5 - Hooks', 'Chapter 6 - Context API'], pdf: 'pdfs/react-guide.pdf' },
+      java1: { id: 'java1', title: 'Java Programming', author: 'Herbert Schildt', subject: 'Programming', publisher: 'McGraw-Hill', year: 2014, edition: 'Fourth Edition', pages: 1200, language: 'English', isbn: '978-0071808552', book_cover: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=400&fit=crop', description: 'Complete Java reference from basics to advanced features including generics, annotations, concurrency, and modern Java 8+ features.', features: ['Java fundamentals', 'OOP principles', 'Exception handling', 'Collections framework', 'Concurrency', 'File I/O', 'Generics and wildcards', 'Annotations', 'Stream API', 'Lambda expressions'], toc: ['Chapter 1 - Fundamentals', 'Chapter 2 - Data Types', 'Chapter 3 - Operators', 'Chapter 4 - Control Statements', 'Chapter 5 - Classes', 'Chapter 6 - OOP'], pdf: 'pdfs/java-programming.pdf' },
+      db1: { id: 'db1', title: 'Database Design & SQL', author: 'C.J. Date', subject: 'Databases', publisher: 'Addison-Wesley', year: 2012, edition: 'Fifth Edition', pages: 960, language: 'English', isbn: '978-0321884496', book_cover: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=400&fit=crop', description: 'Master relational database design, normalization, SQL programming, query optimization, and best practices for database administration.', features: ['Relational model', 'Database design', 'Normalization', 'SQL fundamentals', 'Query optimization', 'Transactions and concurrency', 'Administration', 'Case studies', 'Advanced SQL', 'Performance tuning'], toc: ['Chapter 1 - SQL Introduction', 'Chapter 2 - Tables', 'Chapter 3 - Data Retrieval', 'Chapter 4 - Data Manipulation', 'Chapter 5 - Joins', 'Chapter 6 - Subqueries'], pdf: 'pdfs/database-sql.pdf' }
+    };
+
+    function getQueryParam(name) {
+      const params = new URLSearchParams(location.search);
+      return params.get(name);
+    }
+
+    const bookId = getQueryParam('id');
+    const book = booksDatabase[bookId];
+    
+    const notFoundEl = document.getElementById('notFound');
+    const bookContainerEl = document.getElementById('bookContainer');
+    const warningBanner = document.getElementById('warningBanner');
+    const titleEl = document.getElementById('title');
+    const authorEl = document.getElementById('author');
+    const subjectEl = document.getElementById('subject');
+    const descriptionEl = document.getElementById('description');
+    const publisherEl = document.getElementById('publisher');
+    const yearEl = document.getElementById('year');
+    const editionEl = document.getElementById('edition');
+    const pagesEl = document.getElementById('pages');
+    const languageEl = document.getElementById('language');
+    const isbnEl = document.getElementById('isbn');
+    const bookImageEl = document.getElementById('bookImage');
+    const msgEl = document.getElementById('msg');
+
+    if (!book) {
+      notFoundEl.style.display = 'block';
+      bookContainerEl.style.display = 'none';
+      warningBanner.style.display = 'none';
+    } else {
+      notFoundEl.style.display = 'none';
+      bookContainerEl.style.display = 'block';
+      warningBanner.style.display = 'block';
+
+      titleEl.textContent = book.title;
+      authorEl.textContent = book.author;
+      subjectEl.textContent = book.subject;
+      descriptionEl.textContent = book.description;
+      publisherEl.textContent = book.publisher || 'Not Available';
+      yearEl.textContent = book.year || 'Not Available';
+      editionEl.textContent = book.edition || 'Not Available';
+      pagesEl.textContent = book.pages ? `${book.pages} Pages` : 'Not Available';
+      languageEl.textContent = book.language || 'English';
+      isbnEl.textContent = book.isbn || 'Not Available';
+      bookImageEl.src = book.book_cover;
+      
+      if (book.features && book.features.length > 0) {
+        const featuresList = document.getElementById('featuresList');
+        featuresList.innerHTML = book.features.map(feature => `<li>${feature}</li>`).join('');
+        document.getElementById('featuresSection').style.display = 'block';
+      }
+
+      if (book.toc && book.toc.length > 0) {
+        const tocList = document.getElementById('tocList');
+        tocList.innerHTML = book.toc.map(chapter => `<li>${chapter}</li>`).join('');
+        document.getElementById('tocSection').style.display = 'block';
+      }
+
+      document.getElementById('openBtn').addEventListener('click', function() {
+        if (book.pdf) {
+          window.open(book.pdf, '_blank');
+        } else {
+          showMessage('PDF is not available for this book.', 'error');
+        }
+      });
+
+      document.getElementById('saveBtn').addEventListener('click', function() {
+        const isLogged = localStorage.getItem('loggedIn') === 'true';
+        if (!isLogged) {
+          location.href = 'login.html';
+          return;
+        }
+
+        const email = localStorage.getItem('currentUser');
+        if (!email) {
+          location.href = 'login.html';
+          return;
+        }
+
+        const storageKey = `saved_${email}`;
+        const savedBooks = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        
+        if (!savedBooks.find(b => b.id === book.id)) {
+          savedBooks.push(book);
+          localStorage.setItem(storageKey, JSON.stringify(savedBooks));
+          showMessage('\u2713 Book saved to My Books successfully!', 'success');
+        } else {
+          showMessage('This book is already in your collection.', 'error');
+        }
+      });
+
+      function showMessage(text, type) {
+        msgEl.textContent = text;
+        msgEl.className = `message ${type}`;
+        setTimeout(() => {
+          msgEl.textContent = '';
+          msgEl.className = 'message';
+        }, 3000);
+      }
+    }
+  </script>
+</body>
+</html>

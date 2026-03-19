@@ -6,7 +6,7 @@
 const fileStore = require('../utils/fileStore');
 const { User, OTP, AuthResponse } = require('../models');
 const jwtUtils = require('../utils/jwt');
-const { sanitizeEmail, sanitizePassword } = require('../validators/authValidator');
+const { sanitizeEmail, sanitizePassword, isInstitutionEmail } = require('../validators/authValidator');
 
 class AuthService {
   /**
@@ -16,6 +16,10 @@ class AuthService {
     try {
       email = sanitizeEmail(email);
       password = sanitizePassword(password);
+
+      if (!isInstitutionEmail(email)) {
+        return AuthResponse.error('Access is allowed only for @sasi.ac.in email accounts', 403);
+      }
 
       // Check if user already exists
       const existingUser = fileStore.findUserByEmail(email);
@@ -63,6 +67,10 @@ class AuthService {
       email = sanitizeEmail(email);
       password = sanitizePassword(password);
 
+      if (!isInstitutionEmail(email)) {
+        return AuthResponse.error('Access is allowed only for @sasi.ac.in email accounts', 403);
+      }
+
       // Validate input
       const user = new User({ email, password });
       const validation = user.validateForLogin();
@@ -109,6 +117,10 @@ class AuthService {
     try {
       email = sanitizeEmail(email);
 
+      if (!isInstitutionEmail(email)) {
+        return AuthResponse.error('Access is allowed only for @sasi.ac.in email accounts', 403);
+      }
+
       // Check if user exists
       const user = fileStore.findUserByEmail(email);
       if (!user) {
@@ -142,6 +154,10 @@ class AuthService {
       email = sanitizeEmail(email);
       code = (code || '').trim();
       newPassword = sanitizePassword(newPassword);
+
+      if (!isInstitutionEmail(email)) {
+        return AuthResponse.error('Access is allowed only for @sasi.ac.in email accounts', 403);
+      }
 
       // Validate new password
       if (newPassword.length < 6) {

@@ -7,7 +7,7 @@ const UserModel = require('../models/UserSchema');
 const OTPModel = require('../models/OTPSchema');
 const jwtUtils = require('../utils/jwt');
 const EmailService = require('./emailService');
-const { sanitizeEmail, sanitizePassword } = require('../validators/authValidator');
+const { sanitizeEmail, sanitizePassword, isInstitutionEmail } = require('../validators/authValidator');
 
 class AuthService {
   /**
@@ -24,6 +24,14 @@ class AuthService {
           ok: false,
           error: 'Email and password are required',
           statusCode: 400
+        };
+      }
+
+      if (!isInstitutionEmail(email)) {
+        return {
+          ok: false,
+          error: 'Access is allowed only for @sasi.ac.in email accounts',
+          statusCode: 403
         };
       }
 
@@ -98,6 +106,14 @@ class AuthService {
         };
       }
 
+      if (!isInstitutionEmail(email)) {
+        return {
+          ok: false,
+          error: 'Access is allowed only for @sasi.ac.in email accounts',
+          statusCode: 403
+        };
+      }
+
       // Find user
       const user = await UserModel.findByEmail(email);
       if (!user) {
@@ -164,6 +180,14 @@ class AuthService {
     try {
       email = sanitizeEmail(email);
 
+      if (!isInstitutionEmail(email)) {
+        return {
+          ok: false,
+          error: 'Access is allowed only for @sasi.ac.in email accounts',
+          statusCode: 403
+        };
+      }
+
       // Check if user exists
       const user = await UserModel.findByEmail(email);
       if (!user) {
@@ -212,6 +236,14 @@ class AuthService {
     try {
       email = sanitizeEmail(email);
       newPassword = sanitizePassword(newPassword);
+
+      if (!isInstitutionEmail(email)) {
+        return {
+          ok: false,
+          error: 'Access is allowed only for @sasi.ac.in email accounts',
+          statusCode: 403
+        };
+      }
 
       // Validate new password
       if (!newPassword || newPassword.length < 6) {
@@ -293,6 +325,14 @@ class AuthService {
     try {
       email = sanitizeEmail(email);
       newPassword = sanitizePassword(newPassword);
+
+      if (!isInstitutionEmail(email)) {
+        return {
+          ok: false,
+          error: 'Access is allowed only for @sasi.ac.in email accounts',
+          statusCode: 403
+        };
+      }
 
       if (!email || !newPassword) {
         return {

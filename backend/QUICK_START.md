@@ -64,8 +64,8 @@ curl -X POST http://localhost:3000/api/pdf/upload \
 - `src/routes/pdf.js` - API endpoints
 
 ✅ Frontend:
-- `legacy_html/pdf-manager.html` - UI
-- `legacy_html/pdf-manager.js` - Functionality
+- `pages/pdf-manager.html` - UI
+- `pages/pdf-manager.js` - Functionality
 
 ✅ Server:
 - `server.js` - Updated with PDF routes

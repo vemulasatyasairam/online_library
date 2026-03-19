@@ -18,7 +18,7 @@ An automated test has created a user in your database:
 ## Testing Flows
 
 ### Flow 1: Test with Existing User (Fastest)
-1. Go to: http://127.0.0.1:5500/legacy_html/login.html
+1. Go to: http://127.0.0.1:5500/pages/login.html
 2. Click "Forgot Password"
 3. Enter: `test@example.com`
 4. Click "Send OTP"
@@ -27,7 +27,7 @@ An automated test has created a user in your database:
 7. Click "Verify & Reset Password"
 
 ### Flow 2: Complete Registration Test
-1. Go to: http://127.0.0.1:5500/legacy_html/login.html
+1. Go to: http://127.0.0.1:5500/pages/login.html
 2. Fill in registration form with:
    - Name: Any name
    - Email: Any email address

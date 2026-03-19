@@ -12,13 +12,32 @@
       --card: #ffffff;
       --muted: #6b7280;
       --bg: #f3f6f8;
+      --text: #0f1724;
+      --panel-border: #e5e7eb;
+      --soft-bg: #f9fafb;
+      --soft-bg-hover: #f3f4f6;
+      --input-bg: #ffffff;
       --radius: 12px;
       --shadow: 0 8px 24px rgba(0,0,0,0.08);
       --shadow-lg: 0 16px 40px rgba(0,0,0,0.12);
     }
 
+    body.theme-dark {
+      --card: #121d2b;
+      --muted: #9aa8ba;
+      --bg: #0b1220;
+      --text: #e6edf7;
+      --panel-border: #253448;
+      --soft-bg: #162335;
+      --soft-bg-hover: #1b2c44;
+      --input-bg: #0f1a2b;
+      --shadow: 0 8px 24px rgba(0,0,0,0.35);
+      --shadow-lg: 0 16px 40px rgba(0,0,0,0.45);
+    }
+
     * { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: var(--bg); color: #0f1724; }
+    html, body { height: 100%; margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: var(--bg); color: var(--text); }
+    body { transition: background-color 0.25s ease, color 0.25s ease; }
 
     /* Top Navigation */
     .topbar {
@@ -73,6 +92,33 @@
       height: fit-content;
       position: sticky;
       top: 100px;
+    }
+
+    .profile-sidebar-top {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 14px;
+    }
+
+    .theme-icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      border: 1px solid var(--panel-border);
+      background: var(--soft-bg);
+      color: var(--text);
+      font-size: 18px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .theme-icon-btn:hover {
+      transform: translateY(-2px);
+      background: var(--soft-bg-hover);
     }
 
     .profile-avatar-container {
@@ -132,7 +178,7 @@
       font-size: 24px;
       font-weight: 700;
       text-align: center;
-      color: #0f1724;
+      color: var(--text);
     }
 
     .profile-email {
@@ -159,7 +205,7 @@
       gap: 12px;
       margin-top: 24px;
       padding-top: 24px;
-      border-top: 1px solid #e5e7eb;
+      border-top: 1px solid var(--panel-border);
     }
 
     .stat-item {
@@ -200,19 +246,19 @@
       align-items: center;
       margin-bottom: 24px;
       padding-bottom: 16px;
-      border-bottom: 2px solid #e5e7eb;
+      border-bottom: 2px solid var(--panel-border);
     }
 
     .section-title {
       margin: 0;
       font-size: 20px;
       font-weight: 700;
-      color: #0f1724;
+      color: var(--text);
     }
 
     .btn {
       padding: 8px 16px;
-      border: 1px solid #e5e7eb;
+      border: 1px solid var(--panel-border);
       border-radius: 8px;
       background: transparent;
       color: var(--accent);
@@ -260,13 +306,15 @@
       margin-bottom: 8px;
       font-weight: 600;
       font-size: 14px;
-      color: #374151;
+      color: var(--text);
     }
 
     .form-input {
       width: 100%;
       padding: 12px;
-      border: 1px solid #e5e7eb;
+      border: 1px solid var(--panel-border);
+      background: var(--input-bg);
+      color: var(--text);
       border-radius: 8px;
       font-size: 14px;
       transition: all 0.3s ease;
@@ -279,7 +327,7 @@
     }
 
     .form-input:disabled {
-      background: #f9fafb;
+      background: var(--soft-bg);
       cursor: not-allowed;
     }
 
@@ -298,9 +346,9 @@
 
     .info-card {
       padding: 20px;
-      background: linear-gradient(135deg, #f9fafb, #ffffff);
+      background: linear-gradient(135deg, var(--soft-bg), var(--card));
       border-radius: 10px;
-      border: 1px solid #e5e7eb;
+      border: 1px solid var(--panel-border);
     }
 
     .info-card-label {
@@ -312,8 +360,37 @@
 
     .info-card-value {
       font-size: 16px;
-      color: #0f1724;
+      color: var(--text);
       font-weight: 600;
+    }
+
+    .security-tip-card {
+      margin-bottom: 24px;
+      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(11,114,185,0.14), var(--card));
+    }
+
+    .security-tip-title {
+      color: var(--accent);
+    }
+
+    .security-tip-list {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 12px 0 0 20px;
+      padding: 0;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--muted);
     }
 
     /* Edit Mode */
@@ -418,7 +495,7 @@
 
     .progress-label {
       font-weight: 600;
-      color: #0f1724;
+      color: var(--text);
       font-size: 15px;
     }
 
@@ -430,7 +507,7 @@
 
     .progress-bar {
       height: 20px;
-      background: #e5e7eb;
+      background: var(--panel-border);
       border-radius: 10px;
       overflow: hidden;
       position: relative;
@@ -458,13 +535,13 @@
       align-items: center;
       margin-bottom: 24px;
       padding-bottom: 12px;
-      border-bottom: 2px solid #e5e7eb;
+      border-bottom: 2px solid var(--panel-border);
     }
 
     .chart-title {
       font-size: 18px;
       font-weight: 700;
-      color: #0f1724;
+      color: var(--text);
       margin: 0;
     }
 
@@ -501,14 +578,14 @@
       align-items: center;
       gap: 14px;
       padding: 14px;
-      background: #f9fafb;
+      background: var(--soft-bg);
       border-radius: 10px;
       margin-bottom: 10px;
       transition: all 0.2s ease;
     }
 
     .activity-item:hover {
-      background: #f3f4f6;
+      background: var(--soft-bg-hover);
       transform: translateX(4px);
     }
 
@@ -533,7 +610,7 @@
     .activity-title {
       font-size: 14px;
       font-weight: 600;
-      color: #0f1724;
+      color: var(--text);
       margin: 0 0 4px 0;
       white-space: nowrap;
       overflow: hidden;
@@ -555,6 +632,9 @@
       }
     }
   </style>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="theme.js"></script>
 </head>
 <body>
   <!-- Top Navigation Bar -->
@@ -562,7 +642,7 @@
     <img class="logo" src="ChatGPT Image Sep 18, 2025, 09_32_41 AM.png" alt="Online Library Logo">
     <h1>My Profile</h1>
     <nav>
-      <a href="main.html">Home</a>
+      <a href="index.html">Home</a>
       <a href="explorer.html">Explore</a>
       <a href="personal.html">My Books</a>
       <button id="logout-btn">Logout</button>
@@ -704,9 +784,9 @@
           <h3 class="section-title">🔐 Security & Password</h3>
         </div>
 
-        <div class="info-card" style="margin-bottom: 24px; border-color: #0b72b9; background: linear-gradient(135deg, #dbeafe, #ffffff);">
-          <div class="info-card-label" style="color: #0b72b9;">💡 Password Security Tips</div>
-          <ul style="font-size: 13px; color: #6b7280; margin: 12px 0 0 20px; padding: 0;">
+        <div class="info-card security-tip-card">
+          <div class="info-card-label security-tip-title">💡 Password Security Tips</div>
+          <ul class="security-tip-list">
             <li>Use at least 8 characters (minimum 6 required)</li>
             <li>Include uppercase and lowercase letters</li>
             <li>Add numbers and special characters</li>
@@ -720,7 +800,7 @@
             <label class="form-label">Current Password</label>
             <div style="position: relative;">
               <input type="password" class="form-input" id="current-password" placeholder="Enter current password" required style="padding-right: 45px;">
-              <button type="button" class="toggle-password" onclick="togglePasswordVisibility('current-password')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px;">👁️</button>
+              <button type="button" class="toggle-password" onclick="togglePasswordVisibility('current-password')">👁️</button>
             </div>
           </div>
           <div class="form-row">
@@ -728,14 +808,14 @@
               <label class="form-label">New Password</label>
               <div style="position: relative;">
                 <input type="password" class="form-input" id="new-password" placeholder="Enter new password (min 6 chars)" required minlength="6" style="padding-right: 45px;">
-                <button type="button" class="toggle-password" onclick="togglePasswordVisibility('new-password')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px;">👁️</button>
+                <button type="button" class="toggle-password" onclick="togglePasswordVisibility('new-password')">👁️</button>
               </div>
             </div>
             <div class="form-group">
               <label class="form-label">Confirm New Password</label>
               <div style="position: relative;">
                 <input type="password" class="form-input" id="confirm-password" placeholder="Confirm new password" required style="padding-right: 45px;">
-                <button type="button" class="toggle-password" onclick="togglePasswordVisibility('confirm-password')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px;">👁️</button>
+                <button type="button" class="toggle-password" onclick="togglePasswordVisibility('confirm-password')">👁️</button>
               </div>
             </div>
           </div>
@@ -743,6 +823,7 @@
           <button type="submit" class="btn btn-primary">🔒 Change Password</button>
         </form>
       </section>
+
     </main>
   </div>
 
@@ -750,18 +831,150 @@
   <script src="profile-service.js"></script>
   <script src="auth-service.js"></script>
   <script>
+    function hydrateSessionFromUrl() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+        const user = params.get('user');
+        const name = params.get('name');
+
+        if (token) {
+          localStorage.setItem('auth_token', token);
+          localStorage.setItem('loggedIn', 'true');
+        }
+
+        if (user) {
+          const existingRaw = localStorage.getItem('currentUser');
+          let existingUser = null;
+          try {
+            existingUser = existingRaw ? JSON.parse(existingRaw) : null;
+          } catch (_error) {
+            existingUser = existingRaw ? { email: String(existingRaw).trim() } : null;
+          }
+
+          const nextUser = {
+            ...(existingUser && typeof existingUser === 'object' ? existingUser : {}),
+            email: user,
+            ...(name ? { name } : {})
+          };
+          localStorage.setItem('currentUser', JSON.stringify(nextUser));
+        }
+      } catch (_error) {
+        // Ignore malformed URL params.
+      }
+    }
+
+    function buildExplorerUrl() {
+      const params = new URLSearchParams();
+      const token = localStorage.getItem('auth_token') || '';
+      const rawUser = localStorage.getItem('currentUser') || '';
+
+      if (token) params.set('token', token);
+
+      if (rawUser) {
+        try {
+          const parsed = JSON.parse(rawUser);
+          if (parsed?.email) params.set('user', parsed.email);
+          if (parsed?.name) params.set('name', parsed.name);
+        } catch (_error) {
+          params.set('user', rawUser);
+        }
+      }
+
+      const query = params.toString();
+      return `explorer.html${query ? `?${query}` : ''}`;
+    }
+
+    hydrateSessionFromUrl();
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const exploreLink = document.querySelector('a[href="explorer.html"]');
+      if (exploreLink) {
+        exploreLink.href = buildExplorerUrl();
+      }
+    });
+
+    function initThemeSettings(userEmail) {
+      const button = document.getElementById('theme-toggle-button');
+      if (!button || button.dataset.bound === '1') return;
+
+      const syncThemeUi = () => {
+        const activeTheme = window.AppTheme ? window.AppTheme.getTheme(userEmail) : 'light';
+        button.textContent = activeTheme === 'dark' ? '🌙' : '☀️';
+        button.title = activeTheme === 'dark' ? 'Dark mode enabled' : 'Light mode enabled';
+        button.setAttribute('aria-label', button.title);
+      };
+
+      syncThemeUi();
+
+      button.dataset.bound = '1';
+      button.addEventListener('click', () => {
+        const activeTheme = window.AppTheme ? window.AppTheme.getTheme(userEmail) : 'light';
+        const nextTheme = activeTheme === 'dark' ? 'light' : 'dark';
+        if (window.AppTheme) {
+          window.AppTheme.setTheme(nextTheme, userEmail);
+        }
+        syncThemeUi();
+        loadDashboardData();
+      });
+
+      window.addEventListener('themechange', syncThemeUi);
+    }
+
+    function parseStoredUser(rawValue) {
+      if (!rawValue) return null;
+      try {
+        const parsed = JSON.parse(rawValue);
+        if (parsed && typeof parsed === 'object') return parsed;
+      } catch (_error) {
+        // Fallback for legacy plain-string storage.
+      }
+      return { email: String(rawValue).trim() };
+    }
+
+    async function resolveActiveUser() {
+      const authUser = (typeof AuthService !== 'undefined' && AuthService.getCurrentUser)
+        ? AuthService.getCurrentUser()
+        : null;
+
+      if (authUser) {
+        const normalizedAuthUser = typeof authUser === 'string' ? { email: authUser } : authUser;
+        if (normalizedAuthUser && normalizedAuthUser.email) {
+          return normalizedAuthUser;
+        }
+      }
+
+      const localUser = parseStoredUser(localStorage.getItem('currentUser'));
+      if (localUser && localUser.email) {
+        return localUser;
+      }
+
+      const hasToken = !!localStorage.getItem('auth_token');
+      if (!hasToken) return null;
+
+      try {
+        const profileResponse = await ProfileService.getProfile();
+        const apiUser = profileResponse?.data?.user;
+        if (apiUser && apiUser.email) {
+          localStorage.setItem('currentUser', JSON.stringify(apiUser));
+          return apiUser;
+        }
+      } catch (_error) {
+        // Ignore and let caller handle missing user.
+      }
+
+      return null;
+    }
+
     // Initialize profile data
-    function loadProfileData() {
-      const userData = AuthService.getCurrentUser();
-      
-      if (!userData) {
+    async function loadProfileData() {
+      const user = await resolveActiveUser();
+
+      if (!user || !user.email) {
         // Redirect to login if not authenticated
         window.location.href = 'login.html';
         return;
       }
-
-      // Handle both object and string formats
-      const user = typeof userData === 'string' ? { email: userData } : userData;
       
       // Get viewed books count
       const viewedBooks = JSON.parse(localStorage.getItem('viewedBooks') || '[]');
@@ -791,6 +1004,8 @@
       // Update edit mode inputs
       document.getElementById('input-name').value = user.name || '';
       document.getElementById('input-email').value = user.email;
+
+      initThemeSettings(user.email);
     }
 
     function formatDate(dateString) {
@@ -821,6 +1036,11 @@
       
       const userData = AuthService.getCurrentUser();
       const user = typeof userData === 'string' ? { email: userData } : userData;
+
+      if (!user || !user.email) {
+        window.location.href = 'login.html';
+        return;
+      }
       
       // Update user data
       user.name = document.getElementById('input-name').value;
@@ -951,6 +1171,7 @@
           // Save to localStorage (in real app, upload to server)
           const userData = AuthService.getCurrentUser();
           const user = typeof userData === 'string' ? { email: userData } : userData;
+          if (!user || !user.email) return;
           user.avatarUrl = event.target.result;
           localStorage.setItem('currentUser', JSON.stringify(user));
         };
@@ -962,14 +1183,14 @@
     document.getElementById('logout-btn').addEventListener('click', () => {
       if (confirm('Are you sure you want to logout?')) {
         AuthService.logout();
-        window.location.href = 'main.html';
+        window.location.href = 'index.html';
       }
     });
 
     // Dashboard functionality
-    function loadDashboardData() {
-      const userData = AuthService.getCurrentUser();
-      const user = typeof userData === 'string' ? { email: userData } : userData;
+    async function loadDashboardData() {
+      const user = await resolveActiveUser();
+      if (!user || !user.email) return;
       
       // Get viewed books
       const viewedBooks = JSON.parse(localStorage.getItem('viewedBooks') || '[]');
@@ -1033,6 +1254,10 @@
     function loadActivityChart(viewedBooks) {
       const ctx = document.getElementById('activityChart');
       if (!ctx) return;
+      const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
+      const tickColor = isDarkTheme ? '#cbd5e1' : '#475569';
+      const gridColor = isDarkTheme ? 'rgba(148, 163, 184, 0.14)' : 'rgba(0, 0, 0, 0.05)';
+      const tooltipBg = isDarkTheme ? 'rgba(15, 23, 42, 0.94)' : 'rgba(0, 0, 0, 0.8)';
       
       // Get last 14 days data
       const last14Days = [];
@@ -1082,7 +1307,7 @@
               display: false
             },
             tooltip: {
-              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              backgroundColor: tooltipBg,
               padding: 12,
               titleFont: { size: 14, weight: 'bold' },
               bodyFont: { size: 13 },
@@ -1094,15 +1319,17 @@
               beginAtZero: true,
               ticks: {
                 stepSize: 1,
-                font: { size: 12 }
+                font: { size: 12 },
+                color: tickColor
               },
               grid: {
-                color: 'rgba(0, 0, 0, 0.05)'
+                color: gridColor
               }
             },
             x: {
               ticks: {
-                font: { size: 12 }
+                font: { size: 12 },
+                color: tickColor
               },
               grid: {
                 display: false
@@ -1147,6 +1374,10 @@
     // Load profile data on page load
     loadProfileData();
     loadDashboardData();
+
+    window.addEventListener('themechange', () => {
+      loadDashboardData();
+    });
   </script>
 </body>
 </html>

@@ -39,7 +39,7 @@ A dedicated profile page with the following features:
 
 ### 2. Profile Modals (Updated)
 All existing pages now have updated profile modals:
-- `main.html`
+- `index.html`
 - `explorer.html`
 - `personal.html`
 - `branch_books.html`
@@ -182,7 +182,7 @@ POST   /api/auth/change-password   - Change password
 
 ## File Structure
 ```
-legacy_html/
+pages/
 ├── profile.html           # Main profile page
 └── profile-service.js     # Frontend service
 

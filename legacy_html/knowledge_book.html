@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Knowledge Book Details</title>
+  <script>
+    window.location.replace('book-view.html' + window.location.search);
+  </script>
   <style>
     * {
       margin: 0;
@@ -619,6 +622,9 @@
       }
     }
   </style>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="theme.js"></script>
 </head>
 <body>
   <div class="header">
@@ -1013,39 +1019,10 @@
         document.getElementById('tocSection').style.display = 'none';
       }
 
-      // Open PDF button - Show Reader Modal
+      // Open PDF button - Open PDF directly
       openBtn.addEventListener('click', function() {
         if (book.pdf && book.pdf !== '#') {
-          readerTitle.textContent = book.title;
-          readerAuthor.textContent = book.author;
-          readerSubject.textContent = book.subject || '-';
-          readerPublisher.textContent = book.publisher || 'Not Available';
-          readerYear.textContent = book.year || 'Not Available';
-          readerEdition.textContent = book.edition || 'Not Available';
-          readerPages.textContent = book.pages ? `${book.pages} Pages` : 'Not Available';
-          readerLanguage.textContent = book.language || 'English';
-          readerISBN.textContent = book.isbn || 'Not Available';
-          
-          // Populate features
-          if (book.features && book.features.length > 0) {
-            const featuresList = document.getElementById('readerFeaturesList');
-            featuresList.innerHTML = book.features.map(feature => `<li>${feature}</li>`).join('');
-            document.getElementById('readerFeaturesSection').style.display = 'block';
-          } else {
-            document.getElementById('readerFeaturesSection').style.display = 'none';
-          }
-          
-          // Populate table of contents
-          if (book.toc && book.toc.length > 0) {
-            const tocList = document.getElementById('readerTocList');
-            tocList.innerHTML = book.toc.map(chapter => `<li>${chapter}</li>`).join('');
-            document.getElementById('readerTocSection').style.display = 'block';
-          } else {
-            document.getElementById('readerTocSection').style.display = 'none';
-          }
-          
-          openPdfExternal.setAttribute('data-pdf', book.pdf);
-          readerModal.classList.add('active');
+          window.open(book.pdf, '_blank');
         } else {
           showMessage('PDF is not available for this book.', 'error');
         }
