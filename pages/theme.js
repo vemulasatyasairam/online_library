@@ -30,6 +30,13 @@
       }
 
       @media (max-width: 992px) {
+        html,
+        body {
+          overflow-y: auto !important;
+          -webkit-overflow-scrolling: touch;
+          touch-action: manipulation;
+        }
+
         body {
           width: 100% !important;
           min-height: 100vh;
@@ -51,6 +58,7 @@
         .header-inner,
         .nav,
         nav {
+          display: flex !important;
           flex-wrap: wrap;
           gap: 10px;
         }
