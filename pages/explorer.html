@@ -770,7 +770,7 @@
   <!-- Recommendations and Book View Tracking Script -->
   <script>
     (function() {
-      const API_URL = window.AppConfig?.getApiBase?.() || `${window.location.protocol}//${window.location.hostname}:3000/api`;
+      const API_URL = ((window.AppConfig && typeof window.AppConfig.getApiBase === 'function') ? window.AppConfig.getApiBase() : `${window.location.protocol}//${window.location.hostname}:3000/api`);
       const LOCAL_RATINGS_KEY = 'bookRatings';
 
       function getCurrentUserId() {

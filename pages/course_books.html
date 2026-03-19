@@ -403,7 +403,7 @@
   </script>
 
   <script>
-    const API_BASE_URL = window.AppConfig?.getApiBase?.() || `${window.location.protocol}//${window.location.hostname}:3000/api`;
+    const API_BASE_URL = ((window.AppConfig && typeof window.AppConfig.getApiBase === 'function') ? window.AppConfig.getApiBase() : `${window.location.protocol}//${window.location.hostname}:3000/api`);
     const courseBooks = [
       { 
         id: 'py1', 

@@ -614,7 +614,7 @@
 </div>
 
 <script>
-    const API_BASE_URL = window.AppConfig?.getApiBase?.() || `${window.location.protocol}//${window.location.hostname}:3000/api`;
+    const API_BASE_URL = ((window.AppConfig && typeof window.AppConfig.getApiBase === 'function') ? window.AppConfig.getApiBase() : `${window.location.protocol}//${window.location.hostname}:3000/api`);
     let allBooks = [];
     let uniqueViewUsersCount = null;
     const CATEGORY_CANONICAL_MAP = {
@@ -966,8 +966,8 @@
 
         tbody.innerHTML = books.map((book) => {
             const rawUrl = book?.pdf?.url || '';
-            const backendOrigin = window.AppConfig?.getBackendOrigin?.() || `${window.location.protocol}//${window.location.hostname}:3000`;
-            const normalizedRawUrl = window.AppConfig?.rewriteApiUrl?.(rawUrl) || rawUrl;
+            const backendOrigin = ((window.AppConfig && typeof window.AppConfig.getBackendOrigin === 'function') ? window.AppConfig.getBackendOrigin() : `${window.location.protocol}//${window.location.hostname}:3000`);
+            const normalizedRawUrl = ((window.AppConfig && typeof window.AppConfig.rewriteApiUrl === 'function') ? window.AppConfig.rewriteApiUrl(rawUrl) : rawUrl);
             const fileUrl = normalizedRawUrl
                 ? (normalizedRawUrl.startsWith('http') ? normalizedRawUrl : `${backendOrigin}${normalizedRawUrl}`)
                 : '#';
