@@ -5,7 +5,7 @@
  */
 
 const AuthService = (() => {
-  const API_BASE = 'http://localhost:3000/api';
+  const API_BASE = `${window.location.protocol}//${window.location.hostname}:3000/api`;
   const USERS_STORAGE_KEY = 'auth_users';
   const INSTITUTION_EMAIL_REGEX = /^[^\s@]+@sasi\.ac\.in$/i;
 

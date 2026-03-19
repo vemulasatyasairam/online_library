@@ -105,6 +105,9 @@
       @media (max-width: 992px) {
         html,
         body {
+          height: auto !important;
+          min-height: 100% !important;
+          max-height: none !important;
           overflow-y: auto !important;
           -webkit-overflow-scrolling: touch;
           touch-action: manipulation;
@@ -124,6 +127,17 @@
           width: 100%;
           max-width: 100%;
           box-sizing: border-box;
+        }
+
+        main,
+        section,
+        .hero,
+        .hero-inner,
+        .book-grid,
+        .list {
+          height: auto !important;
+          max-height: none !important;
+          overflow: visible !important;
         }
 
         .topbar,
