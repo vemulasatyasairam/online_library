@@ -124,8 +124,45 @@
       display: inline-block;
     }
 
+    #loadMoreBtn {
+      display: none;
+      margin: 20px auto;
+      padding: 12px 24px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    #loadMoreBtn:hover { background: var(--primary-dark); }
+    #loadMoreBtn.show { display: block; }
+    #loadMoreBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
     @media (max-width: 900px) {
       .filters { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+      .card { padding: 10px; }
+      .title { font-size: 14px; }
+      .meta { font-size: 12px; }
+      .action { font-size: 11px; padding: 5px 9px; }
+      #bookGrid { scroll-behavior: smooth; }
+    }
+
+    @media (max-width: 640px) {
+      .container { padding: 12px; }
+      .filters { grid-template-columns: 1fr; gap: 8px; padding: 10px; }
+      .grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .card { padding: 8px; border-radius: 8px; }
+      .header { padding: 14px; margin-bottom: 12px; }
+      .header h1 { font-size: 20px; }
+      .header p { font-size: 12px; }
+      .title { font-size: 12px; line-height: 1.3; }
+      .meta { font-size: 11px; }
+      .action { font-size: 10px; padding: 4px 7px; }
+      #loadMoreBtn { margin: 14px auto; padding: 10px 18px; font-size: 12px; }
     }
   </style>
 
@@ -189,6 +226,7 @@
 
     <div id="status" class="status"></div>
     <div id="bookGrid" class="grid"></div>
+    <button id="loadMoreBtn" class="show">Load More Books</button>
   </div>
 
   <script>
@@ -201,6 +239,10 @@
     const loadBtn = document.getElementById('loadBtn');
     const statusEl = document.getElementById('status');
     const bookGrid = document.getElementById('bookGrid');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    let currentPage = 1;
+    let isLoadingMore = false;
+    let hasMoreBooks = true;
 
     function setStatus(type, message) {
       statusEl.className = `status show ${type}`;
@@ -228,20 +270,84 @@
       }
     }
 
-    function buildQuery() {
+    function buildQuery(page) {
       const params = new URLSearchParams();
       if (categoryEl.value) params.set('category', categoryEl.value);
       if (branchEl.value) params.set('branch', branchEl.value);
       if (yearEl.value) params.set('year', yearEl.value);
+      if (page) params.set('page', page);
+      params.set('limit', '12');
       return params.toString();
+    }
+
+    async function loadMoreBooks() {
+      if (isLoadingMore || !hasMoreBooks) return;
+      isLoadingMore = true;
+      loadMoreBtn.disabled = true;
+      loadMoreBtn.textContent = 'Loading...';
+
+      try {
+        currentPage++;
+        const query = buildQuery(currentPage);
+        const fullUrl = `${API_BASE_URL}${query ? `?${query}` : ''}`;
+        const response = await fetch(fullUrl);
+        const data = await response.json();
+
+        if (!response.ok || !data.ok) {
+          currentPage--;
+          hasMoreBooks = false;
+          loadMoreBtn.style.display = 'none';
+          return;
+        }
+
+        const books = Array.isArray(data.books) ? data.books : [];
+        if (books.length === 0) {
+          hasMoreBooks = false;
+          loadMoreBtn.style.display = 'none';
+          return;
+        }
+
+        bookGrid.innerHTML += books.map(book => {
+          const pdfUrl = (book && book.pdfUrl) || (book && book.pdf && book.pdf.url) || (book && book.viewUrl) || '#';
+          const viewUrl = (book && book.viewUrl) || pdfUrl;
+          const downloadUrl = (book && book.downloadUrl) || pdfUrl;
+          return `
+            <article class="card">
+              <h3 class="title">${escapeHtml(book.title)}</h3>
+              <div class="meta">Author: ${escapeHtml(book.author)}</div>
+              <div class="meta">Category: ${escapeHtml(book.category || 'General')}</div>
+              <div class="meta">Branch: ${escapeHtml(book.branch || '-')} • Year: ${escapeHtml(book.year || '-')}</div>
+              <div class="actions">
+                <a class="action" href="${viewUrl}" target="_blank" rel="noopener">View PDF</a>
+                <a class="action" href="${downloadUrl}">Download PDF</a>
+              </div>
+            </article>
+          `;
+        }).join('');
+
+        loadMoreBtn.textContent = 'Load More Books';
+        loadMoreBtn.disabled = false;
+      } catch (error) {
+        console.error('Error loading more books:', error);
+        currentPage--;
+        loadMoreBtn.textContent = 'Load More Books';
+        loadMoreBtn.disabled = false;
+      } finally {
+        isLoadingMore = false;
+      }
     }
 
     async function fetchBooks() {
       setStatus('loading', 'Loading books...');
       bookGrid.innerHTML = '';
+      currentPage = 1;
+      hasMoreBooks = true;
+      isLoadingMore = false;
+      loadMoreBtn.textContent = 'Load More Books';
+      loadMoreBtn.disabled = false;
 
       try {
-        const query = buildQuery();
+        const query = buildQuery(1);
         const fullUrl = `${API_BASE_URL}${query ? `?${query}` : ''}`;
         console.log('[FETCH_BOOKS] URL:', fullUrl);
         
@@ -273,10 +379,15 @@
 
         if (!books.length) {
           setStatus('empty', 'No Books Available');
+          loadMoreBtn.style.display = 'none';
           return;
         }
 
         clearStatus();
+        if (books.length < 12) hasMoreBooks = false;
+        if (hasMoreBooks) loadMoreBtn.classList.add('show');
+        else loadMoreBtn.style.display = 'none';
+        
         bookGrid.innerHTML = books.map(book => {
           const pdfUrl = (book && book.pdfUrl) || (book && book.pdf && book.pdf.url) || (book && book.viewUrl) || '#';
           const viewUrl = (book && book.viewUrl) || pdfUrl;
@@ -304,6 +415,15 @@
     categoryEl.addEventListener('change', toggleBranchYearFields);
     branchEl.addEventListener('change', toggleBranchYearFields);
     loadBtn.addEventListener('click', fetchBooks);
+    loadMoreBtn.addEventListener('click', loadMoreBooks);
+    
+    if (window.innerWidth <= 768) {
+      window.addEventListener('scroll', function() {
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+          if (hasMoreBooks && !isLoadingMore) loadMoreBooks();
+        }
+      });
+    }
 
     window.addEventListener('DOMContentLoaded', () => {
       toggleBranchYearFields();

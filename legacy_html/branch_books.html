@@ -174,6 +174,41 @@
       display:grid;
       grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
       gap:16px;
+      scroll-behavior:smooth;
+    }
+    #loadMoreBtn {
+      grid-column: 1 / -1;
+      margin: 20px auto;
+      padding: 12px 24px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: none;
+    }
+    #loadMoreBtn:hover { opacity: 0.9; }
+    #loadMoreBtn.show { display: block; }
+    #loadMoreBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+    
+    @media (max-width: 900px) {
+      .book-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+      .book-card { min-height: 140px; padding: 8px; }
+      .book-card img { height: 180px; }
+      .book-card h3 { font-size: 13px; margin: 4px 0; }
+      .book-card p { font-size: 12px; }
+    }
+    @media (max-width: 640px) {
+      .book-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+      .layout { padding: 10px; }
+      .book-card { min-height: 120px; padding: 6px; }
+      .book-card img { height: 140px; }
+      .book-card h3 { font-size: 11px; margin: 3px 0; }
+      .book-card p { font-size: 10px; }
+      .book-actions button { font-size: 10px; padding: 4px 6px; }
+      #loadMoreBtn { margin: 12px auto; padding: 9px 16px; font-size: 12px; }
     }
     .book-card{
       background:var(--card);
@@ -422,6 +457,7 @@
       <div id="bookGrid" class="book-grid" aria-live="polite">
         <!-- Books will be loaded here -->
       </div>
+      <button id="loadMoreBtn" class="show">Load More Books</button>
     </section>
   </div>
 
@@ -947,11 +983,47 @@
         `;
       }
 
-      // Build HTML
-      const isPreviousMode = currentMode === 'previous';
-      const html = displayBooks.map(book => renderBookCard(book, isPreviousMode)).join('');
+      const isMobile = window.innerWidth <= 768;
+      const itemsPerPage = isMobile ? 8 : 16;
+      let currentDisplayedCount = 0;
+      const loadMoreBtn = document.getElementById('loadMoreBtn');
 
-      bookGrid.innerHTML = html;
+      function displayBooksWithPagination() {
+        const booksToShow = displayBooks.slice(0, currentDisplayedCount);
+        const isPreviousMode = currentMode === 'previous';
+        const html = booksToShow.map(book => renderBookCard(book, isPreviousMode)).join('');
+        bookGrid.innerHTML = html;
+        
+        if (currentDisplayedCount < displayBooks.length) {
+          loadMoreBtn.classList.add('show');
+        } else {
+          loadMoreBtn.style.display = 'none';
+        }
+      }
+
+      currentDisplayedCount = itemsPerPage;
+      displayBooksWithPagination();
+
+      loadMoreBtn.onclick = function() {
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.textContent = 'Loading...';
+        setTimeout(() => {
+          currentDisplayedCount += itemsPerPage;
+          displayBooksWithPagination();
+          loadMoreBtn.textContent = 'Load More Books';
+          loadMoreBtn.disabled = false;
+        }, 300);
+      };
+
+      if (isMobile) {
+        window.addEventListener('scroll', function() {
+          if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 400) {
+            if (currentDisplayedCount < displayBooks.length && !loadMoreBtn.disabled) {
+              loadMoreBtn.click();
+            }
+          }
+        }, { once: false });
+      }
     }
 
     function openBookView(book) {
