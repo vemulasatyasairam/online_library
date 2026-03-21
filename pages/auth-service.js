@@ -6,27 +6,10 @@
 
 const AuthService = (() => {
   const API_BASE = ((window.AppConfig && typeof window.AppConfig.getApiBase === 'function') ? window.AppConfig.getApiBase() : `${window.location.protocol}//${window.location.hostname}:3000/api`);
-  const USERS_STORAGE_KEY = 'auth_users';
   const INSTITUTION_EMAIL_REGEX = /^[^\s@]+@sasi\.ac\.in$/i;
 
   const isInstitutionEmail = (email) => {
     return INSTITUTION_EMAIL_REGEX.test((email || '').trim());
-  };
-  
-  // Get all registered users from localStorage
-  const getAllUsers = () => {
-    const usersStr = localStorage.getItem(USERS_STORAGE_KEY);
-    return usersStr ? JSON.parse(usersStr) : {};
-  };
-  
-  // Save users to localStorage
-  const saveUsers = (users) => {
-    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-  };
-  
-  // Simple hash function (not secure, but works for demo)
-  const hashPassword = (password) => {
-    return btoa(password); // Base64 encoding
   };
   
   // Get JWT token from localStorage
@@ -97,7 +80,7 @@ const AuthService = (() => {
     }
   };
   
-  // Login - uses localStorage as fallback
+  // Login - backend only (single source of truth)
   const login = async (email, password) => {
     console.log('[AuthService] Login attempt for:', email);
 
@@ -105,7 +88,6 @@ const AuthService = (() => {
       return { ok: false, error: 'Only @sasi.ac.in email accounts can access this library.' };
     }
     
-    // Try API first
     const apiResult = await apiRequest('/auth/login', 'POST', { email, password });
     if (apiResult && apiResult.ok && apiResult.token) {
       console.log('[AuthService] API login successful');
@@ -117,25 +99,14 @@ const AuthService = (() => {
       }
       return apiResult;
     }
-    
-    // Fallback to localStorage authentication
-    console.log('[AuthService] Using localStorage fallback');
-    const users = getAllUsers();
-    const user = users[email];
-    
-    if (!user || user.password !== hashPassword(password)) {
-      return { ok: false, error: 'Invalid email or password' };
-    }
-    
-    // Login successful
-    const token = 'local_' + btoa(email + ':' + Date.now());
-    setToken(token);
-    localStorage.setItem('currentUser', email);
-    
-    return { ok: true, token, user: { email, name: user.name } };
+
+    return {
+      ok: false,
+      error: apiResult?.error || 'Login failed. Please try again.'
+    };
   };
   
-  // Register - uses localStorage as fallback
+  // Register - backend only (prevents duplicate accounts across devices)
   const register = async (email, password, name = null) => {
     console.log('[AuthService] Register attempt for:', email);
 
@@ -143,7 +114,6 @@ const AuthService = (() => {
       return { ok: false, error: 'Only @sasi.ac.in email accounts can access this library.' };
     }
     
-    // Try API first
     const apiResult = await apiRequest('/auth/register', 'POST', { email, password, name });
     if (apiResult && apiResult.ok && apiResult.token) {
       console.log('[AuthService] API registration successful');
@@ -155,31 +125,11 @@ const AuthService = (() => {
       }
       return apiResult;
     }
-    
-    // Fallback to localStorage registration
-    console.log('[AuthService] Using localStorage fallback');
-    const users = getAllUsers();
-    
-    if (users[email]) {
-      return { ok: false, error: 'Email already registered' };
-    }
-    
-    // Register user
-    users[email] = {
-      email,
-      password: hashPassword(password),
-      name: name || email.split('@')[0],
-      createdAt: new Date().toISOString()
+
+    return {
+      ok: false,
+      error: apiResult?.error || 'Registration failed. If you already registered, please login.'
     };
-    saveUsers(users);
-    
-    // Auto-login after registration
-    const token = 'local_' + btoa(email + ':' + Date.now());
-    setToken(token);
-    localStorage.setItem('currentUser', email);
-    
-    console.log('[AuthService] User registered and logged in');
-    return { ok: true, token, user: { email, name: users[email].name } };
   };
   
   // Send OTP
