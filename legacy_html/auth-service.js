@@ -5,8 +5,23 @@
  */
 
 const AuthService = (() => {
-  const API_BASE = ((window.AppConfig && typeof window.AppConfig.getApiBase === 'function') ? window.AppConfig.getApiBase() : `${window.location.protocol}//${window.location.hostname}:3000/api`);
   const INSTITUTION_EMAIL_REGEX = /^[^\s@]+@sasi\.ac\.in$/i;
+
+  const getApiBase = () => {
+    return ((window.AppConfig && typeof window.AppConfig.getApiBase === 'function')
+      ? window.AppConfig.getApiBase()
+      : `${window.location.protocol}//${window.location.hostname}:3000/api`);
+  };
+
+  const wakeBackend = async () => {
+    if (window.AppConfig && typeof window.AppConfig.wakeBackendOnVisit === 'function') {
+      try {
+        await window.AppConfig.wakeBackendOnVisit();
+      } catch (_error) {
+        // Ignore wake-up errors; request flow below still handles failures.
+      }
+    }
+  };
 
   const isInstitutionEmail = (email) => {
     return INSTITUTION_EMAIL_REGEX.test((email || '').trim());
@@ -47,6 +62,8 @@ const AuthService = (() => {
   
   // Make authenticated API request
   const apiRequest = async (endpoint, method = 'GET', data = null) => {
+    const requestUrl = () => `${getApiBase()}${endpoint}`;
+
     const options = {
       method,
       headers: {
@@ -62,21 +79,34 @@ const AuthService = (() => {
     if (data) {
       options.body = JSON.stringify(data);
     }
-    
-    try {
-      console.log(`[AuthService] ${method} ${API_BASE}${endpoint}`, data || '');
-      const response = await fetch(`${API_BASE}${endpoint}`, options);
+
+    const runRequest = async () => {
+      const targetUrl = requestUrl();
+      console.log(`[AuthService] ${method} ${targetUrl}`, data || '');
+      const response = await fetch(targetUrl, options);
       const result = await response.json();
       console.log(`[AuthService] Response (${response.status}):`, result);
       
       if (!response.ok && response.status === 401) {
         clearToken();
       }
-      
+
       return { status: response.status, ...result };
+    };
+
+    try {
+      return await runRequest();
     } catch (error) {
       console.error('API request error:', error);
-      return { ok: false, error: 'Failed to connect to server. Please make sure the backend is running on port 3000.' };
+
+      // Backends on free tiers may sleep; wake once and retry.
+      try {
+        await wakeBackend();
+        return await runRequest();
+      } catch (retryError) {
+        console.error('API retry after wake-up failed:', retryError);
+        return { ok: false, error: 'Failed to connect to server. Backend may be starting. Please wait a few seconds and try again.' };
+      }
     }
   };
   
