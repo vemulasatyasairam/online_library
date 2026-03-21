@@ -198,9 +198,13 @@
 		}
 
 		.star-btn.active,
-		.star-btn:hover,
-		.star-btn:hover ~ .star-btn {
+		.star-btn.preview {
 			color: #f59e0b;
+		}
+
+		.star-btn[disabled] {
+			cursor: not-allowed;
+			opacity: 0.7;
 		}
 
 		.rating-meta {
@@ -585,6 +589,7 @@
 		let _currentPdfUrl = '#';
 		let _zoomFactor   = 1;
 		let _selectedRating = 0;
+		let _ratingLocked = false;
 		let _currentBook = null;
 		const LOCAL_RATINGS_KEY = 'bookRatings';
 
@@ -806,7 +811,7 @@
 		function applyLocalRating(book, score, userId) {
 			const ratings = readLocalRatings();
 			const key = getBookKey(book);
-			if (!key) return { average: 0, count: 0 };
+			if (!key) return { average: 0, count: 0, alreadyRated: false };
 
 			if (!ratings[key]) {
 				ratings[key] = {
@@ -822,11 +827,15 @@
 			const previous = Number(entry.users?.[uid] || 0);
 
 			if (previous > 0) {
-				entry.total = Math.max(0, Number(entry.total || 0) - previous + score);
-			} else {
-				entry.total = Number(entry.total || 0) + score;
-				entry.count = Number(entry.count || 0) + 1;
+				return {
+					average: Number(entry.average || 0),
+					count: Number(entry.count || 0),
+					alreadyRated: true
+				};
 			}
+
+			entry.total = Number(entry.total || 0) + score;
+			entry.count = Number(entry.count || 0) + 1;
 
 			entry.users = entry.users || {};
 			entry.users[uid] = score;
@@ -837,7 +846,8 @@
 
 			return {
 				average: Number(entry.average || 0),
-				count: Number(entry.count || 0)
+				count: Number(entry.count || 0),
+				alreadyRated: false
 			};
 		}
 
@@ -867,7 +877,37 @@
 			document.querySelectorAll('.star-btn').forEach((btn) => {
 				const v = Number(btn.dataset.value || 0);
 				btn.classList.toggle('active', v <= value);
+				btn.classList.remove('preview');
 			});
+		}
+
+		function previewStars(value) {
+			document.querySelectorAll('.star-btn').forEach((btn) => {
+				const v = Number(btn.dataset.value || 0);
+				btn.classList.toggle('preview', v <= value);
+			});
+		}
+
+		function getUserRatingForBook(book, userId) {
+			const ratings = readLocalRatings();
+			const key = getBookKey(book);
+			const uid = String(userId || getAnonymousUserId());
+			if (!key || !ratings[key] || !ratings[key].users) return 0;
+			return Number(ratings[key].users[uid] || 0);
+		}
+
+		function markUserRating(book, score, userId) {
+			const ratings = readLocalRatings();
+			const key = getBookKey(book);
+			if (!key) return;
+
+			if (!ratings[key]) {
+				ratings[key] = { total: 0, count: 0, average: 0, users: {} };
+			}
+
+			ratings[key].users = ratings[key].users || {};
+			ratings[key].users[String(userId || getAnonymousUserId())] = Number(score || 0);
+			writeLocalRatings(ratings);
 		}
 
 		function renderRatingMeta(book) {
@@ -880,18 +920,41 @@
 		}
 
 		function setupRating(book) {
+			const userId = getCurrentUserId() || getAnonymousUserId();
+			const previousRating = getUserRatingForBook(book, userId);
+
 			renderRatingMeta(book);
-			_selectedRating = 0;
-			paintStars(0);
+			_selectedRating = previousRating > 0 ? previousRating : 0;
+			_ratingLocked = previousRating > 0;
+			paintStars(_selectedRating);
+
+			const submitBtn = document.getElementById('rateSubmitBtn');
+			submitBtn.disabled = _ratingLocked;
+			submitBtn.textContent = _ratingLocked ? 'Rating Submitted' : 'Submit Rating';
 
 			document.querySelectorAll('.star-btn').forEach((btn) => {
+				btn.disabled = _ratingLocked;
+				btn.onmouseenter = () => {
+					if (_ratingLocked) return;
+					previewStars(Number(btn.dataset.value || 0));
+				};
+				btn.onmouseleave = () => {
+					if (_ratingLocked) return;
+					paintStars(_selectedRating);
+				};
 				btn.onclick = () => {
+					if (_ratingLocked) return;
 					_selectedRating = Number(btn.dataset.value || 0);
 					paintStars(_selectedRating);
 				};
 			});
 
 			document.getElementById('rateSubmitBtn').onclick = async () => {
+				if (_ratingLocked) {
+					alert('You already submitted a rating for this book.');
+					return;
+				}
+
 				if (!_currentBook || !(_currentBook._id || _currentBook.id)) {
 					alert('Book details not ready. Please try again.');
 					return;
@@ -901,7 +964,6 @@
 					return;
 				}
 
-				const submitBtn = document.getElementById('rateSubmitBtn');
 				submitBtn.disabled = true;
 				submitBtn.textContent = 'Submitting...';
 
@@ -929,6 +991,7 @@
 								average: Number(data?.rating?.average || 0),
 								count: Number(data?.rating?.count || 0)
 							};
+							markUserRating(_currentBook, _selectedRating, userId);
 							submitted = true;
 						} catch (_apiError) {
 							// Fall through to local persistence.
@@ -937,19 +1000,29 @@
 
 					if (!submitted) {
 						const local = applyLocalRating(_currentBook, _selectedRating, userId);
+						if (local.alreadyRated) {
+							throw new Error('You already submitted a rating for this book.');
+						}
 						_currentBook.rating = {
 							average: local.average,
 							count: local.count
 						};
 					}
 
+					_ratingLocked = true;
+					document.querySelectorAll('.star-btn').forEach((star) => {
+						star.disabled = true;
+					});
 					renderRatingMeta(_currentBook);
+					submitBtn.textContent = 'Rating Submitted';
 					alert('Thank you for your feedback!');
 				} catch (error) {
 					alert(error.message || 'Could not submit rating.');
 				} finally {
-					submitBtn.disabled = false;
-					submitBtn.textContent = 'Submit Rating';
+					if (!_ratingLocked) {
+						submitBtn.disabled = false;
+						submitBtn.textContent = 'Submit Rating';
+					}
 				}
 			};
 		}

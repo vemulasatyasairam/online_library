@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -268,16 +268,16 @@
     <nav>
       <a href="personal.html" id="nav-mybooks-link" style="display:none">My Books</a>
       <a id="nav-login-link" href="login.html" style="display:none">Login</a>
-      <button id="profile-btn-explorer" class="profile-btn-explorer hidden" title="View Profile">👤</button>
+      <button id="profile-btn-explorer" class="profile-btn-explorer hidden" title="View Profile">ðŸ‘¤</button>
     </nav>
   </header>
 
   <!-- Profile Modal -->
   <div id="profile-modal-explorer" class="profile-modal">
     <div class="profile-content">
-      <button class="profile-close" id="profile-close-explorer">✕</button>
+      <button class="profile-close" id="profile-close-explorer">âœ•</button>
       <div class="profile-header">
-        <div class="profile-avatar" id="profile-avatar-explorer">👤</div>
+        <div class="profile-avatar" id="profile-avatar-explorer">ðŸ‘¤</div>
         <div>
           <h3 class="profile-name" id="profile-name-explorer">Loading...</h3>
           <p class="profile-email" id="profile-email-explorer"></p>
@@ -307,14 +307,14 @@
 
   <div class="layout">
     <section class="content" aria-label="Books content">
-      <h2 style="margin:0 0 6px 8px;color:#ffffff;text-shadow:0 6px 18px rgba(0,0,0,0.45)">📝 English Stories</h2>
+      <h2 style="margin:0 0 6px 8px;color:#ffffff;text-shadow:0 6px 18px rgba(0,0,0,0.45)">ðŸ“ English Stories</h2>
 
       <div class="category-links">
-        <a class="category-link" href="explorer.html">🔍 Explorer</a>
-        <a class="category-link" href="knowledgebooks.html">📚 Knowledge Books</a>
-        <a class="category-link" href="devotional.html">🕉️ Devotional</a>
-        <a class="category-link" href="course_books.html">📖 Course Books</a>
-        <a class="category-link" href="telugu_novels.html">📕 Telugu Novels</a>
+        <a class="category-link" href="explorer.html">ðŸ” Explorer</a>
+        <a class="category-link" href="knowledgebooks.html">ðŸ“š Knowledge Books</a>
+        <a class="category-link" href="devotional.html">ðŸ•‰ï¸ Devotional</a>
+        <a class="category-link" href="course_books.html">ðŸ“– Course Books</a>
+        <a class="category-link" href="telugu_novels.html">ðŸ“• Telugu Novels</a>
       </div>
 
       <div id="bookGrid" class="book-grid" aria-live="polite">
@@ -597,7 +597,7 @@
             <div class="meta">
               <h3>${book.title}</h3>
               <p>${book.author}</p>
-              <p class="rating-line">Rating: ${avgRating}/5</p>
+              <p class="rating-line">★ ${avgRating}/5</p>
             </div>
             <div class="book-actions">
               <button class="btn-open" onclick="event.stopPropagation(); openBookView(${serializedBook})">Open</button>
@@ -690,7 +690,7 @@
         alert('Already saved');
         const btn = document.getElementById('save-' + book.id);
         if (btn) {
-          btn.textContent = '✓ Saved';
+          btn.textContent = 'âœ“ Saved';
           btn.classList.add('btn-saved');
           btn.disabled = true;
         }
@@ -700,7 +700,7 @@
       localStorage.setItem(key, JSON.stringify(arr));
       const btn = document.getElementById('save-' + book.id);
       if (btn) {
-        btn.textContent = '✓ Saved';
+        btn.textContent = 'âœ“ Saved';
         btn.classList.add('btn-saved');
         btn.disabled = true;
       }
@@ -711,3 +711,4 @@
   
 </body>
 </html>
+

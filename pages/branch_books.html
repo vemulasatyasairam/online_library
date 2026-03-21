@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -358,16 +358,16 @@
     <nav>
       <a href="personal.html" id="nav-mybooks-link" style="display:none">My Books</a>
       <a id="nav-login-link" href="login.html" style="display:none">Login</a>
-      <button id="profile-btn-explorer" class="profile-btn-explorer hidden" title="View Profile">👤</button>
+      <button id="profile-btn-explorer" class="profile-btn-explorer hidden" title="View Profile">ðŸ‘¤</button>
     </nav>
   </header>
 
   <!-- Profile Modal -->
   <div id="profile-modal-explorer" class="profile-modal">
     <div class="profile-content">
-      <button class="profile-close" id="profile-close-explorer">✕</button>
+      <button class="profile-close" id="profile-close-explorer">âœ•</button>
       <div class="profile-header">
-        <div class="profile-avatar" id="profile-avatar-explorer">👤</div>
+        <div class="profile-avatar" id="profile-avatar-explorer">ðŸ‘¤</div>
         <div>
           <h3 class="profile-name" id="profile-name-explorer">Loading...</h3>
           <p class="profile-email" id="profile-email-explorer"></p>
@@ -399,15 +399,15 @@
       <h4>Branches</h4>
 
       <details>
-        <summary>CSE — Computer Science Engineering</summary>
+        <summary>CSE â€” Computer Science Engineering</summary>
       </details>
 
       <details>
-        <summary>ECE — Electrical & Electronics Communication</summary>
+        <summary>ECE â€” Electrical & Electronics Communication</summary>
       </details>
 
       <details>
-        <summary>EEE — Electrical & Electronical Engineering</summary>
+        <summary>EEE â€” Electrical & Electronical Engineering</summary>
       </details>
 
       <details>
@@ -415,27 +415,27 @@
       </details>
 
       <details>
-        <summary>CSM — Computer Science And Artificial Intelligence With Machine Learning</summary>
+        <summary>CSM â€” Computer Science And Artificial Intelligence With Machine Learning</summary>
       </details>
 
       <details>
-        <summary>AIML — Artificial Intelligence With Machine Learning</summary>
+        <summary>AIML â€” Artificial Intelligence With Machine Learning</summary>
       </details>
 
       <details>
-        <summary>CST — Computer Science Engineering</summary>
+        <summary>CST â€” Computer Science Engineering</summary>
       </details>
 
       <details>
-        <summary>CSD — Computer Science Engineering</summary>
+        <summary>CSD â€” Computer Science Engineering</summary>
       </details>
 
       <details>
-        <summary>CIVIL — Computer Science Engineering</summary>
+        <summary>CIVIL â€” Computer Science Engineering</summary>
       </details>
 
       <details>
-        <summary>IT — Computer Science Engineering</summary>
+        <summary>IT â€” Computer Science Engineering</summary>
       </details>
     </aside>
 
@@ -443,8 +443,8 @@
       <h2 id="branchTitle" style="margin:0 0 6px 8px">Branch Books</h2>
 
       <div class="mode-section">
-        <button class="mode-btn active" data-mode="books">📚 Books</button>
-        <button class="mode-btn previous-mode" data-mode="previous">📄 Previous Papers</button>
+        <button class="mode-btn active" data-mode="books">ðŸ“š Books</button>
+        <button class="mode-btn previous-mode" data-mode="previous">ðŸ“„ Previous Papers</button>
       </div>
 
       <div class="filter-section" id="filterSection">
@@ -566,7 +566,7 @@
         summary.addEventListener('click', function(e) {
           e.preventDefault();
           const branchText = this.textContent.trim();
-          const branchId = branchText.split('—')[0].trim();
+          const branchId = branchText.split('â€”')[0].trim();
           window.location.href = `branch_books.html?branch=${branchId}`;
         });
       });
@@ -973,7 +973,7 @@
           <div class="meta">
             <h3>${book.title}</h3>
             <p>${book.author}</p>
-            <p class="rating-line">Rating: ${avgRating}/5</p>
+            <p class="rating-line">★ ${avgRating}/5</p>
           </div>
           <div class="book-actions">
             <button class="btn-open" onclick="event.stopPropagation(); openBookView(${serializedBook})">Open</button>
@@ -1050,7 +1050,7 @@
         alert('Already saved');
         const btn = document.getElementById('save-' + book.id);
         if (btn) {
-          btn.textContent = '✓ Saved';
+          btn.textContent = 'âœ“ Saved';
           btn.classList.add('btn-saved');
           btn.disabled = true;
         }
@@ -1060,7 +1060,7 @@
       localStorage.setItem(key, JSON.stringify(arr));
       const btn = document.getElementById('save-' + book.id);
       if (btn) {
-        btn.textContent = '✓ Saved';
+        btn.textContent = 'âœ“ Saved';
         btn.classList.add('btn-saved');
         btn.disabled = true;
       }
@@ -1071,3 +1071,4 @@
 
 </body>
 </html>
+
