@@ -5,9 +5,12 @@
 
   function setBackendApiBase(value) {
     const normalized = normalizeBaseUrl(value);
-    if (/^https?:\/\//i.test(normalized)) {
-      localStorage.setItem(BACKEND_API_STORAGE_KEY, normalized);
-      return normalized;
+    const withProtocol = normalized && !/^https?:\/\//i.test(normalized)
+      ? `http://${normalized}`
+      : normalized;
+    if (/^https?:\/\//i.test(withProtocol)) {
+      localStorage.setItem(BACKEND_API_STORAGE_KEY, withProtocol);
+      return withProtocol;
     }
 
     localStorage.removeItem(BACKEND_API_STORAGE_KEY);
@@ -61,170 +64,31 @@
     return url.indexOf('/api/') !== -1 || url.indexOf(':3000') !== -1;
   }
 
-  function showCustomModal(title, message, defaultValue, onSubmit) {
-    if (document.getElementById('app-custom-modal')) {
-      return;
-    }
-
-    const modal = document.createElement('div');
-    modal.id = 'app-custom-modal';
-    modal.innerHTML = `
-      <div id="app-modal-backdrop" style="
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.66);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10000;
-        padding: 18px;
-        overflow-y: auto;
-      ">
-        <div style="
-          background: linear-gradient(145deg, #12253e 0%, #0a1528 100%);
-          border-radius: 16px;
-          width: 100%;
-          max-width: 520px;
-          max-height: 90vh;
-          overflow-y: auto;
-          box-sizing: border-box;
-          border: 1px solid rgba(255, 255, 255, 0.14);
-          box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
-          padding: 22px;
-        ">
-          <h3 style="margin:0 0 10px 0; color:#fff; font-size:18px; font-family:system-ui, -apple-system, sans-serif;">${title}</h3>
-          <p style="margin:0 0 14px 0; color:#b5d0f0; white-space:pre-wrap; line-height:1.45; font-size:14px; font-family:system-ui, -apple-system, sans-serif;">${message}</p>
-          <input id="app-modal-input" type="text" value="${defaultValue || ''}" placeholder="http://192.168.1.10:3000" style="
-            width:100%;
-            box-sizing:border-box;
-            margin: 0 0 8px 0;
-            padding: 12px;
-            border-radius: 10px;
-            border: 2px solid rgba(93, 190, 255, 0.35);
-            background: rgba(255, 255, 255, 0.06);
-            color:#fff;
-            font-size:14px;
-          " />
-          <div id="app-modal-warning" style="margin:0 0 14px 0; color:#ffd89a; font-size:12px; line-height:1.4; font-family:system-ui, -apple-system, sans-serif;"></div>
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button id="app-modal-ok" style="flex:1; min-width:100px; padding:11px 16px; border:none; border-radius:10px; background:#4eb2ff; color:#04203a; font-weight:700;">Save</button>
-            <button id="app-modal-cancel" style="flex:1; min-width:100px; padding:11px 16px; border:1px solid rgba(255,255,255,0.22); border-radius:10px; background:transparent; color:#cfe7ff; font-weight:600;">Cancel</button>
-          </div>
-        </div>
-      </div>
-    `;
-
-    document.body.appendChild(modal);
-
-    const input = document.getElementById('app-modal-input');
-    const okBtn = document.getElementById('app-modal-ok');
-    const cancelBtn = document.getElementById('app-modal-cancel');
-    const backdrop = document.getElementById('app-modal-backdrop');
-    const warning = document.getElementById('app-modal-warning');
-
-    function updateWarning() {
-      if (window.location.protocol === 'https:' && input.value.trim().toLowerCase().startsWith('http://')) {
-        warning.textContent = 'Tip: HTTPS pages can block HTTP APIs on some mobile browsers. If this does not connect, use an HTTPS tunnel URL.';
-      } else {
-        warning.textContent = '';
-      }
-    }
-
-    function close(value) {
-      if (modal.parentNode) {
-        modal.parentNode.removeChild(modal);
-      }
-      onSubmit(value);
-    }
-
-    updateWarning();
-    input.addEventListener('input', updateWarning);
-    okBtn.addEventListener('click', function () { close(input.value); });
-    cancelBtn.addEventListener('click', function () { close(null); });
-    backdrop.addEventListener('click', function (event) {
-      if (event.target === backdrop) {
-        close(null);
-      }
-    });
-    input.addEventListener('keydown', function (event) {
-      if (event.key === 'Enter') {
-        close(input.value);
-      }
-    });
-
-    setTimeout(function () {
-      input.focus();
-      input.setSelectionRange(input.value.length, input.value.length);
-    }, 60);
-  }
-
-  function ensureBackendSetupButton() {
-    if (!isRemoteDeployment() || document.getElementById('app-backend-setup-btn')) {
-      return;
-    }
-
-    const button = document.createElement('button');
-    button.id = 'app-backend-setup-btn';
-    button.type = 'button';
-    button.textContent = 'Set Backend URL';
-    button.style.cssText = [
-      'position:fixed',
-      'right:14px',
-      'bottom:14px',
-      'z-index:9999',
-      'padding:10px 12px',
-      'border-radius:999px',
-      'border:1px solid rgba(255,255,255,0.3)',
-      'background:#0c1f38',
-      'color:#d4ebff',
-      'font-size:12px',
-      'font-weight:700',
-      'box-shadow:0 8px 18px rgba(0,0,0,0.32)'
-    ].join(';');
-
-    button.addEventListener('click', function () {
-      window.__APP_API_PROMPT_SHOWN = false;
-      promptForBackendApiBase('', null);
-    });
-
-    document.body.appendChild(button);
-  }
-
   function promptForBackendApiBase(failedUrl, error) {
     if (window.__APP_API_PROMPT_SHOWN) return;
     window.__APP_API_PROMPT_SHOWN = true;
 
     const host = window.location.hostname || 'localhost';
-    const suggested = host && host !== 'localhost' && host !== '127.0.0.1'
-      ? `http://${host}:3000`
+    const suggested = host
+      ? `${window.location.protocol === 'https:' ? 'https' : 'http'}://${host}:3000`
       : 'http://localhost:3000';
     const current = normalizeBaseUrl(localStorage.getItem(BACKEND_API_STORAGE_KEY));
     const defaultValue = current || suggested;
-    const errorText = error && error.message ? `Reason: ${error.message}` : '';
-    const failedUrlText = failedUrl ? `Failed URL: ${failedUrl}` : '';
-    let message = 'Unable to connect to backend API from this device.\n\n';
-    if (failedUrlText) message += `${failedUrlText}\n`;
-    if (errorText) message += `${errorText}\n\n`;
-    message += 'Enter your laptop/backend URL (example: http://192.168.1.10:3000):';
-
-    showCustomModal(
-      `${window.location.hostname || 'student-online-library.netlify.app'} says`,
-      message,
-      defaultValue,
-      function (input) {
-        if (!input) {
-          return;
-        }
-
-        const saved = setBackendApiBase(input);
-        if (saved) {
-          window.location.reload();
-        }
-      }
+    const errorText = error && error.message ? `\nReason: ${error.message}` : '';
+    const failedUrlText = failedUrl ? `\nFailed URL: ${failedUrl}` : '';
+    const input = window.prompt(
+      `Unable to connect to backend API from this device.${failedUrlText}${errorText}\n\nEnter your laptop/backend URL (example: http://192.168.1.10:3000).\nIf using mobile, do not use localhost; use your laptop IP.`,
+      defaultValue
     );
+
+    if (!input) {
+      return;
+    }
+
+    const saved = setBackendApiBase(input);
+    if (saved) {
+      window.location.reload();
+    }
   }
 
   function promptForBackendOnNetlifyLoad() {
@@ -236,21 +100,19 @@
     const saved = normalizeBaseUrl(localStorage.getItem(BACKEND_API_STORAGE_KEY));
     if (saved) return;
 
-    showCustomModal(
-      `${window.location.hostname || 'student-online-library.netlify.app'} says`,
+    const input = window.prompt(
       'This app is deployed on Netlify but needs your laptop backend to load books.\n\nEnter your backend URL (example: http://192.168.1.10:3000 or http://YOUR-LAPTOP-IP:3000):',
-      'http://',
-      function (input) {
-        if (!input) {
-          return;
-        }
-
-        const saved_url = setBackendApiBase(input);
-        if (saved_url) {
-          window.location.reload();
-        }
-      }
+      'http://'
     );
+
+    if (!input) {
+      return;
+    }
+
+    const saved_url = setBackendApiBase(input);
+    if (saved_url) {
+      window.location.reload();
+    }
   }
 
   function rewriteApiUrl(url) {
@@ -555,14 +417,12 @@
   ensureViewportMeta();
   injectResponsiveStyles();
   installFetchRewrite();
-  ensureBackendSetupButton();
 
   document.addEventListener('DOMContentLoaded', function () {
     applyTheme();
     ensureViewportMeta();
     injectResponsiveStyles();
     installFetchRewrite();
-    ensureBackendSetupButton();
   });
 
   window.AppTheme = {

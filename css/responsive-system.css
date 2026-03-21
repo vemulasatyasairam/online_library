@@ -1,0 +1,62 @@
+:root {
+  --ui-scale: clamp(0.88, 0.35vw + 0.82, 1);
+}
+
+* {
+  transition: all 0.2s ease-in-out;
+}
+
+body {
+  font-size: calc(16px * var(--ui-scale));
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Keep desktop layout and allow controlled horizontal movement only when needed */
+.app {
+  width: 100%;
+  overflow-x: auto;
+  min-width: clamp(600px, 90vw, 100%);
+}
+
+.content {
+  min-width: clamp(500px, 80vw, 100%);
+}
+
+.sidebar {
+  width: clamp(180px, 20vw, 250px);
+}
+
+button,
+.btn,
+.menu-item,
+input,
+select,
+textarea {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+.table-wrap,
+.table-container {
+  overflow-x: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 900px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+}
