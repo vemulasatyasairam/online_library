@@ -23,6 +23,24 @@ const AuthService = (() => {
     }
   };
 
+  const getRecoveryApiBases = () => {
+    const host = window.location.hostname || 'localhost';
+    const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
+    const fromAppConfig = (window.AppConfig && typeof window.AppConfig.getApiBase === 'function')
+      ? window.AppConfig.getApiBase()
+      : '';
+
+    const bases = [
+      getApiBase(),
+      fromAppConfig,
+      `${protocol}//${host}:3000/api`,
+      'http://localhost:3000/api',
+      'http://127.0.0.1:3000/api'
+    ].filter(Boolean);
+
+    return bases.filter((base, index) => bases.indexOf(base) === index);
+  };
+
   const isInstitutionEmail = (email) => {
     return INSTITUTION_EMAIL_REGEX.test((email || '').trim());
   };
@@ -80,11 +98,11 @@ const AuthService = (() => {
       options.body = JSON.stringify(data);
     }
 
-    const runRequest = async () => {
-      const targetUrl = requestUrl();
+    const runRequest = async (baseOverride) => {
+      const targetUrl = baseOverride ? `${baseOverride}${endpoint}` : requestUrl();
       console.log(`[AuthService] ${method} ${targetUrl}`, data || '');
       const response = await fetch(targetUrl, options);
-      const result = await response.json();
+      const result = await response.json().catch(() => ({}));
       console.log(`[AuthService] Response (${response.status}):`, result);
       
       if (!response.ok && response.status === 401) {
@@ -105,11 +123,24 @@ const AuthService = (() => {
         return await runRequest();
       } catch (retryError) {
         console.error('API retry after wake-up failed:', retryError);
+
+        const recoveryBases = getRecoveryApiBases();
+        for (const base of recoveryBases) {
+          try {
+            const recovered = await runRequest(base);
+            if (window.AppConfig && typeof window.AppConfig.setApiBase === 'function') {
+              window.AppConfig.setApiBase(base.replace(/\/api$/i, ''));
+            }
+            return recovered;
+          } catch (_recoveryError) {
+            // Continue trying next base silently.
+          }
+        }
+
         return {
           ok: false,
-          error: 'Failed to connect to server. Backend may be starting. Please wait a few seconds and try again.',
-          isConnectionError: true,
-          apiBase: getApiBase()
+          error: 'Failed to connect to server. Please try again in a few seconds.',
+          isConnectionError: true
         };
       }
     }

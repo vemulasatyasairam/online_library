@@ -85,7 +85,7 @@
     </div>
   </div>
 
-  <script src="auth-service.js?v=20260321c"></script>
+  <script src="auth-service.js?v=20260321d"></script>
   <script>
     // Toggle password visibility function
     function togglePassword(inputId) {
@@ -141,33 +141,9 @@
       const emailEl = document.getElementById('email');
       const passEl = document.getElementById('password');
       const loginMsg = document.getElementById('login-msg');
-      const configureBackendLink = document.createElement('button');
-      configureBackendLink.type = 'button';
-      configureBackendLink.className = 'link';
-      configureBackendLink.textContent = 'Set Backend URL';
-      configureBackendLink.style.display = 'none';
-      loginMsg.insertAdjacentElement('afterend', configureBackendLink);
-
-      configureBackendLink.addEventListener('click', function () {
-        const currentBase = (window.AppConfig && typeof window.AppConfig.getBackendOrigin === 'function')
-          ? window.AppConfig.getBackendOrigin()
-          : '';
-        const suggested = currentBase || 'http://localhost:3000';
-        const input = window.prompt('Enter backend URL (example: https://your-backend-domain.com or http://localhost:3000)', suggested);
-        if (!input || !window.AppConfig || typeof window.AppConfig.setApiBase !== 'function') return;
-
-        const saved = window.AppConfig.setApiBase(input);
-        if (saved) {
-          loginMsg.textContent = 'Backend URL saved. Please click Login again.';
-          configureBackendLink.style.display = 'none';
-        } else {
-          loginMsg.textContent = 'Invalid backend URL. Please enter a full http:// or https:// URL.';
-        }
-      });
 
       loginForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-        configureBackendLink.style.display = 'none';
         loginMsg.textContent = 'Starting backend...';
 
         if (window.AppConfig && typeof window.AppConfig.wakeBackendOnVisit === 'function') {
@@ -202,11 +178,6 @@
           }, 300);
         } else {
           loginMsg.textContent = (result && result.error) || 'Login failed. Try again.';
-          const isConnectionIssue = !!(result && result.isConnectionError)
-            || /failed to connect|backend may be starting/i.test(loginMsg.textContent);
-          if (isConnectionIssue) {
-            configureBackendLink.style.display = 'block';
-          }
           console.error('Login error:', result && result.error);
         }
       });

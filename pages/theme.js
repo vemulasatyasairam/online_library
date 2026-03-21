@@ -142,36 +142,8 @@
   }
 
   function promptForBackendApiBase(failedUrl, error) {
-    if (isRemoteDeployment()) return;
-    if (window.__APP_API_PROMPT_SHOWN) return;
-    window.__APP_API_PROMPT_SHOWN = true;
-
-    const host = window.location.hostname || 'localhost';
-    const suggested = isRemoteDeployment()
-      ? 'https://your-backend-domain.com'
-      : (host ? `${window.location.protocol === 'https:' ? 'https' : 'http'}://${host}:3000` : 'http://localhost:3000');
-    const current = normalizeBaseUrl(localStorage.getItem(BACKEND_API_STORAGE_KEY));
-    const defaultValue = current || suggested;
-    const errorText = error && error.message ? `\nReason: ${error.message}` : '';
-    const failedUrlText = failedUrl ? `\nFailed URL: ${failedUrl}` : '';
-    const input = window.prompt(
-      `Unable to connect to backend API from this device.${failedUrlText}${errorText}\n\nEnter your laptop/backend URL (example: http://192.168.1.10:3000).\nIf using mobile, do not use localhost; use your laptop IP.`,
-      defaultValue
-    );
-
-    if (!input) {
-      return;
-    }
-
-    if (isHttpsPage() && /^http:\/\//i.test(input)) {
-      window.alert('This site is HTTPS, so backend must also be HTTPS to work on mobile browsers. Please enter an https:// backend URL.');
-      return;
-    }
-
-    const saved = setBackendApiBase(input);
-    if (saved) {
-      window.location.reload();
-    }
+    // Intentionally silent: login flow handles backend recovery automatically.
+    return;
   }
 
   function promptForBackendOnNetlifyLoad() {
