@@ -26,7 +26,7 @@
   </style>
 
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <script src="theme.js?v=20260319b"></script>
+    <script src="theme.js?v=20260321c"></script>
 </head>
 <body>
   <div class="login-card" role="main" aria-labelledby="login-title">
@@ -85,7 +85,7 @@
     </div>
   </div>
 
-  <script src="auth-service.js"></script>
+  <script src="auth-service.js?v=20260321c"></script>
   <script>
     // Toggle password visibility function
     function togglePassword(inputId) {
@@ -202,7 +202,9 @@
           }, 300);
         } else {
           loginMsg.textContent = (result && result.error) || 'Login failed. Try again.';
-          if (result && result.isConnectionError) {
+          const isConnectionIssue = !!(result && result.isConnectionError)
+            || /failed to connect|backend may be starting/i.test(loginMsg.textContent);
+          if (isConnectionIssue) {
             configureBackendLink.style.display = 'block';
           }
           console.error('Login error:', result && result.error);
