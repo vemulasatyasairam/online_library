@@ -105,7 +105,12 @@ const AuthService = (() => {
         return await runRequest();
       } catch (retryError) {
         console.error('API retry after wake-up failed:', retryError);
-        return { ok: false, error: 'Failed to connect to server. Backend may be starting. Please wait a few seconds and try again.' };
+        return {
+          ok: false,
+          error: 'Failed to connect to server. Backend may be starting. Please wait a few seconds and try again.',
+          isConnectionError: true,
+          apiBase: getApiBase()
+        };
       }
     }
   };
