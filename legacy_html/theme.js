@@ -2,6 +2,7 @@
   const THEME_STORAGE_KEY = 'appTheme';
   const RESPONSIVE_STYLE_ID = 'app-global-responsive-style';
   const BACKEND_API_STORAGE_KEY = 'backend_api_base';
+  const BACKEND_WARMUP_TIMEOUT_MS = 8000;
 
   function setBackendApiBase(value) {
     const normalized = normalizeBaseUrl(value);
@@ -80,6 +81,59 @@
   function getApiBase() {
     const origin = getBackendOrigin();
     return origin ? `${origin}/api` : '/api';
+  }
+
+  function fetchWithTimeout(url, options, timeoutMs) {
+    if (typeof AbortController === 'undefined') {
+      return window.fetch(url, options);
+    }
+
+    const controller = new AbortController();
+    const timer = setTimeout(function () {
+      controller.abort();
+    }, timeoutMs);
+
+    return window.fetch(url, Object.assign({}, options, { signal: controller.signal }))
+      .finally(function () {
+        clearTimeout(timer);
+      });
+  }
+
+  function wakeBackendOnVisit() {
+    if (window.__APP_BACKEND_WAKE_PROMISE) {
+      return window.__APP_BACKEND_WAKE_PROMISE;
+    }
+
+    const origin = getBackendOrigin();
+    const warmupTargets = [];
+
+    if (origin) {
+      warmupTargets.push(`${origin}/health`, `${origin}/api/health`);
+    } else {
+      warmupTargets.push('/api/health', '/health');
+    }
+
+    const uniqueTargets = warmupTargets.filter(function (url, index, array) {
+      return array.indexOf(url) === index;
+    });
+
+    window.__APP_BACKEND_WAKE_PROMISE = uniqueTargets.reduce(function (chain, url) {
+      return chain.catch(function () {
+        return fetchWithTimeout(url, { method: 'GET', cache: 'no-store' }, BACKEND_WARMUP_TIMEOUT_MS)
+          .then(function (response) {
+            if (!response || !response.ok) {
+              throw new Error(`Backend warm-up failed for ${url}`);
+            }
+            return true;
+          });
+      });
+    }, Promise.reject(new Error('Backend warm-up not started')))
+      .catch(function () {
+        // Keep visit flow non-blocking. Regular API requests will still proceed.
+        return false;
+      });
+
+    return window.__APP_BACKEND_WAKE_PROMISE;
   }
 
   function looksLikeApiRequest(url) {
@@ -434,12 +488,14 @@
   applyTheme();
   ensureViewportMeta();
   injectResponsiveStyles();
+  wakeBackendOnVisit();
   installFetchRewrite();
 
   document.addEventListener('DOMContentLoaded', function () {
     applyTheme();
     ensureViewportMeta();
     injectResponsiveStyles();
+    wakeBackendOnVisit();
     installFetchRewrite();
   });
 
@@ -455,4 +511,5 @@
   window.AppConfig.getApiBase = getApiBase;
   window.AppConfig.setApiBase = setBackendApiBase;
   window.AppConfig.rewriteApiUrl = rewriteApiUrl;
+  window.AppConfig.wakeBackendOnVisit = wakeBackendOnVisit;
 })();
