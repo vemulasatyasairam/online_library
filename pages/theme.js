@@ -8,7 +8,7 @@
     const withProtocol = normalized && !/^https?:\/\//i.test(normalized)
       ? `http://${normalized}`
       : normalized;
-    if (/^https?:\/\//i.test(withProtocol)) {
+    if (isValidBackendUrl(withProtocol)) {
       localStorage.setItem(BACKEND_API_STORAGE_KEY, withProtocol);
       return withProtocol;
     }
@@ -35,6 +35,19 @@
     return value.trim().replace(/\/+$/, '');
   }
 
+  function isValidBackendUrl(value) {
+    if (!value || typeof value !== 'string') return false;
+    if (!/^https?:\/\//i.test(value)) return false;
+    try {
+      const parsed = new URL(value);
+      // Reject malformed values like "http://http:" that caused popup loops.
+      if (!parsed.hostname || parsed.hostname.toLowerCase() === 'http') return false;
+      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    } catch (_error) {
+      return false;
+    }
+  }
+
   function isHttpsPage() {
     return window.location.protocol === 'https:';
   }
@@ -46,8 +59,11 @@
 
   function getBackendOrigin() {
     const explicitBase = normalizeBaseUrl(window.BACKEND_API_BASE || localStorage.getItem(BACKEND_API_STORAGE_KEY));
-    if (explicitBase) {
+    if (isValidBackendUrl(explicitBase)) {
       return explicitBase.replace(/\/api$/i, '');
+    }
+    if (explicitBase) {
+      localStorage.removeItem(BACKEND_API_STORAGE_KEY);
     }
 
     const host = window.location.hostname || 'localhost';
@@ -72,6 +88,7 @@
   }
 
   function promptForBackendApiBase(failedUrl, error) {
+    if (isRemoteDeployment()) return;
     if (window.__APP_API_PROMPT_SHOWN) return;
     window.__APP_API_PROMPT_SHOWN = true;
 
