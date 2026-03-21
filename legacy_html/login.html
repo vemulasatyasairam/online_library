@@ -144,6 +144,12 @@
 
       loginForm.addEventListener('submit', async function (e) {
         e.preventDefault();
+        loginMsg.textContent = 'Starting backend...';
+
+        if (window.AppConfig && typeof window.AppConfig.wakeBackendOnVisit === 'function') {
+          await window.AppConfig.wakeBackendOnVisit();
+        }
+
         loginMsg.textContent = 'Signing in…';
         const email = (emailEl.value || '').trim().toLowerCase();
         const password = passEl.value || '';
