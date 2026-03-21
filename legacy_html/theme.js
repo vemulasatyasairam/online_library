@@ -35,6 +35,10 @@
     return value.trim().replace(/\/+$/, '');
   }
 
+  function isHttpsPage() {
+    return window.location.protocol === 'https:';
+  }
+
   function isRemoteDeployment() {
     const host = window.location.hostname || 'localhost';
     return host !== 'localhost' && host !== '127.0.0.1';
@@ -52,11 +56,14 @@
       return `${protocol}//${host}:3000`;
     }
 
-    return `${protocol}//${host}:3000`;
+    // On deployed hosts we should not assume :3000 exists on the same domain.
+    // Return empty and let /api (proxy) or explicit backend URL handle routing.
+    return '';
   }
 
   function getApiBase() {
-    return `${getBackendOrigin()}/api`;
+    const origin = getBackendOrigin();
+    return origin ? `${origin}/api` : '/api';
   }
 
   function looksLikeApiRequest(url) {
@@ -69,9 +76,9 @@
     window.__APP_API_PROMPT_SHOWN = true;
 
     const host = window.location.hostname || 'localhost';
-    const suggested = host
-      ? `${window.location.protocol === 'https:' ? 'https' : 'http'}://${host}:3000`
-      : 'http://localhost:3000';
+    const suggested = isRemoteDeployment()
+      ? 'https://your-backend-domain.com'
+      : (host ? `${window.location.protocol === 'https:' ? 'https' : 'http'}://${host}:3000` : 'http://localhost:3000');
     const current = normalizeBaseUrl(localStorage.getItem(BACKEND_API_STORAGE_KEY));
     const defaultValue = current || suggested;
     const errorText = error && error.message ? `\nReason: ${error.message}` : '';
@@ -82,6 +89,11 @@
     );
 
     if (!input) {
+      return;
+    }
+
+    if (isHttpsPage() && /^http:\/\//i.test(input)) {
+      window.alert('This site is HTTPS, so backend must also be HTTPS to work on mobile browsers. Please enter an https:// backend URL.');
       return;
     }
 
@@ -100,26 +112,15 @@
     const saved = normalizeBaseUrl(localStorage.getItem(BACKEND_API_STORAGE_KEY));
     if (saved) return;
 
-    const input = window.prompt(
-      'This app is deployed on Netlify but needs your laptop backend to load books.\n\nEnter your backend URL (example: http://192.168.1.10:3000 or http://YOUR-LAPTOP-IP:3000):',
-      'http://'
-    );
-
-    if (!input) {
-      return;
-    }
-
-    const saved_url = setBackendApiBase(input);
-    if (saved_url) {
-      window.location.reload();
-    }
+    // Do not block first load with prompts on deployed/mobile; prompt only after actual API failure.
+    return;
   }
 
   function rewriteApiUrl(url) {
     if (typeof url !== 'string' || !url) return url;
 
     const backendOrigin = getBackendOrigin();
-    const apiBase = `${backendOrigin}/api`;
+    const apiBase = backendOrigin ? `${backendOrigin}/api` : '/api';
 
     if (url.startsWith('http://localhost:3000')) {
       return `${backendOrigin}${url.slice('http://localhost:3000'.length)}`;
@@ -133,7 +134,7 @@
       return `${apiBase}${url.slice('/api'.length)}`;
     }
 
-    if (url.startsWith('/uploads/') || url.startsWith('/books/')) {
+    if (backendOrigin && (url.startsWith('/uploads/') || url.startsWith('/books/'))) {
       return `${backendOrigin}${url}`;
     }
 
