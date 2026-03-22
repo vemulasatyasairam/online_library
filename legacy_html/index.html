@@ -472,6 +472,7 @@
       // Masonry implementation inspired by React Bits
       const masonryContainer = document.getElementById('masonry-container');
       if (masonryContainer) {
+        const MASONRY_COVERS_CACHE_KEY = 'index_masonry_covers_v1';
         const FALLBACK_COVERS = [
           'images/book_cover.jpeg',
           'images/book_cover.jpeg',
@@ -513,8 +514,33 @@
         };
 
         const pickCover = (book) => {
-          const raw = book?.book_cover || book?.coverImage?.url || book?.coverImage || '';
+          const raw =
+            book?.book_cover ||
+            book?.coverImage?.url ||
+            book?.coverImage ||
+            book?.thumbnail ||
+            book?.image ||
+            '';
           return normalizeCover(raw);
+        };
+
+        const loadCachedCovers = () => {
+          try {
+            const cached = JSON.parse(localStorage.getItem(MASONRY_COVERS_CACHE_KEY) || '[]');
+            return Array.isArray(cached) ? cached.filter(Boolean) : [];
+          } catch (_error) {
+            return [];
+          }
+        };
+
+        const saveCachedCovers = (covers) => {
+          try {
+            if (Array.isArray(covers) && covers.length) {
+              localStorage.setItem(MASONRY_COVERS_CACHE_KEY, JSON.stringify(covers.slice(0, 80)));
+            }
+          } catch (_error) {
+            // Ignore localStorage quota/cache errors.
+          }
         };
 
         const ensureMinItems = (covers, count) => {
@@ -534,7 +560,7 @@
 
           let books = [];
           try {
-            const response = await fetch(`${apiBase}/books`);
+            const response = await fetch(`${apiBase}/books?limit=200&_=${Date.now()}`, { cache: 'no-store' });
             const data = await response.json();
             if (response.ok && data && data.ok && Array.isArray(data.books)) {
               books = data.books;
@@ -543,10 +569,22 @@
             books = [];
           }
 
-          const filtered = books.filter(isPreferredCategory);
-          const base = filtered.length ? filtered : books;
+          const byRecency = [...books].sort((a, b) => {
+            const aTime = new Date(a?.updatedAt || a?.createdAt || 0).getTime();
+            const bTime = new Date(b?.updatedAt || b?.createdAt || 0).getTime();
+            return bTime - aTime;
+          });
+
+          const filtered = byRecency.filter(isPreferredCategory);
+          const base = filtered.length ? filtered : byRecency;
           const covers = Array.from(new Set(base.map(pickCover).filter(Boolean)));
-          const selected = ensureMinItems(covers, 8);
+          const cachedCovers = loadCachedCovers();
+          const sourceCovers = covers.length ? covers : cachedCovers;
+          const selected = ensureMinItems(sourceCovers, 8);
+
+          if (covers.length) {
+            saveCachedCovers(covers);
+          }
 
           items = selected.map((img, index) => {
             const randomHeight = HEIGHT_BUCKETS[Math.floor(Math.random() * HEIGHT_BUCKETS.length)];
