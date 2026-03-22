@@ -491,17 +491,17 @@
           'ChatGPT Image Sep 25, 2025, 10_56_46 PM.png',
           'ChatGPT Image Sep 18, 2025, 09_32_41 AM.png'
         ];
-        const FALLBACK_CATEGORY_COVERS = [
-          'https://picsum.photos/seed/knowledge-books/600/900',
-          'https://picsum.photos/seed/devotional-books/600/900',
-          'https://picsum.photos/seed/english-stories/600/900',
-          'https://picsum.photos/seed/course-notes/600/900',
-          'https://picsum.photos/seed/telugu-novels/600/900',
-          'https://picsum.photos/seed/library-shelf/600/900',
-          'https://picsum.photos/seed/branch-library/600/900',
-          'https://picsum.photos/seed/books-stack/600/900'
+        const CATEGORY_GROUPS = [
+          { key: 'knowledge', hints: ['knowledge'] },
+          { key: 'devotional', hints: ['devotional', 'spiritual', 'religion'] },
+          { key: 'english', hints: ['english'] },
+          { key: 'course', hints: ['course', 'education', 'study'] },
+          { key: 'telugu', hints: ['telugu'] },
+          { key: 'novel', hints: ['novel'] },
+          { key: 'stories', hints: ['stories', 'story'] },
+          { key: 'branch', hints: ['branch', 'cse', 'ece', 'eee', 'civil', 'it', 'csm', 'csd', 'cst', 'cic'] }
         ];
-        const CATEGORY_HINTS = ['knowledge', 'devotional', 'novel', 'stories', 'story', 'course'];
+        const CATEGORY_HINTS = CATEGORY_GROUPS.flatMap((group) => group.hints);
         const HEIGHT_BUCKETS = [240, 280, 320, 360, 400, 440, 480];
         let items = [];
 
@@ -554,27 +554,25 @@
         };
 
         const buildCategoryCoverPool = (bookList) => {
-          const grouped = new Map();
-          bookList.forEach((book) => {
-            const cover = pickCover(book);
-            if (!cover) return;
-            const categoryKey = `${book?.category || ''} ${book?.branch || ''}`.trim().toLowerCase() || 'other';
-            if (!grouped.has(categoryKey)) {
-              grouped.set(categoryKey, []);
-            }
-            grouped.get(categoryKey).push(cover);
-          });
+          const categorySelections = [];
 
-          const perCategoryRandom = [];
-          grouped.forEach((coverList) => {
-            const unique = Array.from(new Set(coverList));
-            const randomCover = pickRandom(unique);
-            if (randomCover) {
-              perCategoryRandom.push(randomCover);
+          CATEGORY_GROUPS.forEach((group) => {
+            const groupCovers = bookList
+              .filter((book) => {
+                const text = getBookCategory(book);
+                return group.hints.some((hint) => text.includes(hint));
+              })
+              .map(pickCover)
+              .filter(Boolean);
+
+            const uniqueGroupCovers = Array.from(new Set(groupCovers));
+            const selected = pickRandom(uniqueGroupCovers);
+            if (selected) {
+              categorySelections.push(selected);
             }
           });
 
-          return perCategoryRandom;
+          return categorySelections;
         };
 
         const loadCachedCovers = () => {
@@ -650,7 +648,7 @@
           const covers = Array.from(new Set(base.map(pickCover).filter(Boolean)));
           const categoryCovers = buildCategoryCoverPool(base);
           const cachedCovers = loadCachedCovers();
-          const sourceCovers = covers.length ? covers : [...cachedCovers, ...FALLBACK_COVERS, ...FALLBACK_CATEGORY_COVERS];
+          const sourceCovers = covers.length ? covers : [...cachedCovers, ...FALLBACK_COVERS];
           const prioritized = Array.from(new Set([
             ...shuffle(categoryCovers),
             ...shuffle(sourceCovers)
