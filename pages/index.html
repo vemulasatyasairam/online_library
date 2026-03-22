@@ -491,17 +491,6 @@
           'ChatGPT Image Sep 25, 2025, 10_56_46 PM.png',
           'ChatGPT Image Sep 18, 2025, 09_32_41 AM.png'
         ];
-        const CATEGORY_GROUPS = [
-          { key: 'knowledge', hints: ['knowledge'] },
-          { key: 'devotional', hints: ['devotional', 'spiritual', 'religion'] },
-          { key: 'english', hints: ['english'] },
-          { key: 'course', hints: ['course', 'education', 'study'] },
-          { key: 'telugu', hints: ['telugu'] },
-          { key: 'novel', hints: ['novel'] },
-          { key: 'stories', hints: ['stories', 'story'] },
-          { key: 'branch', hints: ['branch', 'cse', 'ece', 'eee', 'civil', 'it', 'csm', 'csd', 'cst', 'cic'] }
-        ];
-        const CATEGORY_HINTS = CATEGORY_GROUPS.flatMap((group) => group.hints);
         const HEIGHT_BUCKETS = [240, 280, 320, 360, 400, 440, 480];
         let items = [];
 
@@ -533,13 +522,13 @@
           return value;
         };
 
-        const getBookCategory = (book) => {
-          return `${book?.category || ''} ${book?.branch || ''}`.toLowerCase();
-        };
-
-        const isPreferredCategory = (book) => {
-          const text = getBookCategory(book);
-          return CATEGORY_HINTS.some((hint) => text.includes(hint));
+        const getBookCategoryKey = (book) => {
+          const category = `${book?.category || ''}`.trim().toLowerCase();
+          const branch = `${book?.branch || ''}`.trim().toLowerCase();
+          if (category && branch) return `${category}::${branch}`;
+          if (category) return category;
+          if (branch) return `branch::${branch}`;
+          return 'uncategorized';
         };
 
         const pickCover = (book) => {
@@ -554,25 +543,26 @@
         };
 
         const buildCategoryCoverPool = (bookList) => {
-          const categorySelections = [];
+          const grouped = new Map();
+          bookList.forEach((book) => {
+            const cover = pickCover(book);
+            if (!cover) return;
+            const categoryKey = getBookCategoryKey(book);
+            if (!grouped.has(categoryKey)) {
+              grouped.set(categoryKey, []);
+            }
+            grouped.get(categoryKey).push(cover);
+          });
 
-          CATEGORY_GROUPS.forEach((group) => {
-            const groupCovers = bookList
-              .filter((book) => {
-                const text = getBookCategory(book);
-                return group.hints.some((hint) => text.includes(hint));
-              })
-              .map(pickCover)
-              .filter(Boolean);
-
-            const uniqueGroupCovers = Array.from(new Set(groupCovers));
-            const selected = uniqueGroupCovers[0] || '';
-            if (selected) {
-              categorySelections.push(selected);
+          const newestPerCategory = [];
+          grouped.forEach((coverList) => {
+            const unique = Array.from(new Set(coverList));
+            if (unique[0]) {
+              newestPerCategory.push(unique[0]);
             }
           });
 
-          return categorySelections;
+          return newestPerCategory;
         };
 
         const loadCachedCovers = () => {
@@ -642,8 +632,8 @@
             return bTime - aTime;
           });
 
-          const filtered = byRecency.filter(isPreferredCategory);
-          const base = filtered.length ? filtered : byRecency;
+          const withCovers = byRecency.filter((book) => Boolean(pickCover(book)));
+          const base = withCovers.length ? withCovers : byRecency;
           const covers = Array.from(new Set(base.map(pickCover).filter(Boolean)));
           const categoryCovers = buildCategoryCoverPool(base);
           const cachedCovers = loadCachedCovers();
