@@ -4,6 +4,26 @@
  */
 
 const ProfileService = {
+  getApiBase() {
+    return (window.AppConfig && typeof window.AppConfig.getApiBase === 'function')
+      ? window.AppConfig.getApiBase()
+      : `${window.location.protocol}//${window.location.hostname}:3000/api`;
+  },
+
+  getCurrentUserSafe() {
+    const userData = localStorage.getItem('currentUser');
+    if (!userData) return null;
+
+    try {
+      const parsed = JSON.parse(userData);
+      if (parsed && typeof parsed === 'object') return parsed;
+    } catch (_error) {
+      // Fallback for legacy plain-string storage.
+    }
+
+    return { email: String(userData).trim() };
+  },
+
   /**
    * Get current user profile with statistics
    */
@@ -14,7 +34,7 @@ const ProfileService = {
         throw new Error('Not authenticated');
       }
 
-      const response = await fetch('http://localhost:3000/api/users/profile', {
+      const response = await fetch(`${this.getApiBase()}/users/profile`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -40,12 +60,11 @@ const ProfileService = {
    * Get profile from localStorage (fallback)
    */
   getLocalProfile() {
-    const userData = localStorage.getItem('currentUser');
-    if (!userData) {
+    const user = this.getCurrentUserSafe();
+    if (!user || !user.email) {
       return null;
     }
 
-    const user = JSON.parse(userData);
     const savedBooks = JSON.parse(localStorage.getItem('savedBooks') || '[]');
     const userSavedBooks = savedBooks.filter(book => book.userId === user.email);
 
@@ -72,7 +91,7 @@ const ProfileService = {
         throw new Error('Not authenticated');
       }
 
-      const response = await fetch('http://localhost:3000/api/users/profile', {
+      const response = await fetch(`${this.getApiBase()}/users/profile`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -105,12 +124,12 @@ const ProfileService = {
    */
   updateLocalProfile(updates) {
     try {
-      const userData = localStorage.getItem('currentUser');
-      if (!userData) {
+      const existingUser = this.getCurrentUserSafe();
+      if (!existingUser || !existingUser.email) {
         throw new Error('User not found');
       }
 
-      let user = JSON.parse(userData);
+      let user = existingUser;
       user = { ...user, ...updates, updatedAt: new Date().toISOString() };
 
       // Save to localStorage
@@ -150,7 +169,7 @@ const ProfileService = {
       const formData = new FormData();
       formData.append('avatar', file);
 
-      const response = await fetch('http://localhost:3000/api/users/avatar', {
+      const response = await fetch(`${this.getApiBase()}/users/avatar`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -166,9 +185,8 @@ const ProfileService = {
 
       // Update localStorage
       if (data.data && data.data.avatarUrl) {
-        const userData = localStorage.getItem('currentUser');
-        if (userData) {
-          const user = JSON.parse(userData);
+        const user = this.getCurrentUserSafe();
+        if (user) {
           user.avatarUrl = data.data.avatarUrl;
           localStorage.setItem('currentUser', JSON.stringify(user));
         }
@@ -192,13 +210,12 @@ const ProfileService = {
       reader.onload = (event) => {
         try {
           const avatarUrl = event.target.result;
-          const userData = localStorage.getItem('currentUser');
-          
-          if (!userData) {
+          const user = this.getCurrentUserSafe();
+
+          if (!user) {
             throw new Error('User not found');
           }
 
-          let user = JSON.parse(userData);
           user.avatarUrl = avatarUrl;
           user.updatedAt = new Date().toISOString();
 
@@ -242,7 +259,7 @@ const ProfileService = {
         throw new Error('Not authenticated');
       }
 
-      const response = await fetch('http://localhost:3000/api/auth/change-password', {
+      const response = await fetch(`${this.getApiBase()}/auth/change-password`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -277,7 +294,7 @@ const ProfileService = {
         throw new Error('Not authenticated');
       }
 
-      const response = await fetch('http://localhost:3000/api/users/account', {
+      const response = await fetch(`${this.getApiBase()}/users/account`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -309,12 +326,10 @@ const ProfileService = {
    */
   deleteAccountLocal() {
     try {
-      const userData = localStorage.getItem('currentUser');
-      if (!userData) {
+      const user = this.getCurrentUserSafe();
+      if (!user || !user.email) {
         throw new Error('User not found');
       }
-
-      const user = JSON.parse(userData);
 
       // Remove from users array
       const users = JSON.parse(localStorage.getItem('users') || '[]');

@@ -258,7 +258,7 @@
   <div class="netflix-overlay" aria-hidden="true"></div>
 
   <header class="topbar">
-    <img class="logo" src="assets/logo.png" alt="logo">
+    <img class="logo" src="images/sasi-logo.svg" alt="logo">
     <h1>Online Library</h1>
 
     <div class="search-wrap">
@@ -268,16 +268,16 @@
     <nav>
       <a href="personal.html" id="nav-mybooks-link" style="display:none">My Books</a>
       <a id="nav-login-link" href="login.html" style="display:none">Login</a>
-      <button id="profile-btn-explorer" class="profile-btn-explorer hidden" title="View Profile">ðŸ‘¤</button>
+      <button id="profile-btn-explorer" class="profile-btn-explorer hidden" title="View Profile">&#128100;</button>
     </nav>
   </header>
 
   <!-- Profile Modal -->
   <div id="profile-modal-explorer" class="profile-modal">
     <div class="profile-content">
-      <button class="profile-close" id="profile-close-explorer">âœ•</button>
+      <button class="profile-close" id="profile-close-explorer">&#10005;</button>
       <div class="profile-header">
-        <div class="profile-avatar" id="profile-avatar-explorer">ðŸ‘¤</div>
+        <div class="profile-avatar" id="profile-avatar-explorer">&#128100;</div>
         <div>
           <h3 class="profile-name" id="profile-name-explorer">Loading...</h3>
           <p class="profile-email" id="profile-email-explorer"></p>
@@ -307,14 +307,14 @@
 
   <div class="layout">
     <section class="content" aria-label="Books content">
-      <h2 style="margin:0 0 6px 8px;color:#ffffff;text-shadow:0 6px 18px rgba(0,0,0,0.45)">ðŸ“• Telugu Novels</h2>
+      <h2 style="margin:0 0 6px 8px;color:#ffffff;text-shadow:0 6px 18px rgba(0,0,0,0.45)">&#128213; Telugu Novels</h2>
 
       <div class="category-links">
-        <a class="category-link" href="explorer.html">ðŸ” Explorer</a>
-        <a class="category-link" href="knowledgebooks.html">ðŸ“š Knowledge Books</a>
-        <a class="category-link" href="devotional.html">ðŸ•‰ï¸ Devotional</a>
-        <a class="category-link" href="course_books.html">ðŸ“– Course Books</a>
-        <a class="category-link" href="english_stories.html">ðŸ“ English Stories</a>
+        <a class="category-link" href="explorer.html">&#128269; Explorer</a>
+        <a class="category-link" href="knowledgebooks.html">&#128214; Knowledge Books</a>
+        <a class="category-link" href="devotional.html">&#128330;&#65039; Devotional</a>
+        <a class="category-link" href="course_books.html">&#128218; Course Books</a>
+        <a class="category-link" href="english_stories.html">&#128221; English Stories</a>
       </div>
 
       <div id="bookGrid" class="book-grid" aria-live="polite">
@@ -410,8 +410,7 @@
       }
 
       document.getElementById('profile-edit-explorer').addEventListener('click', () => {
-        alert('Edit profile feature coming soon!');
-        profileModal.classList.remove('show');
+        window.location.href = 'profile.html';
       });
 
       document.getElementById('profile-settings-explorer').addEventListener('click', () => {
@@ -690,7 +689,7 @@
         alert('Already saved');
         const btn = document.getElementById('save-' + book.id);
         if (btn) {
-          btn.textContent = 'âœ“ Saved';
+          btn.textContent = 'Saved';
           btn.classList.add('btn-saved');
           btn.disabled = true;
         }
@@ -700,7 +699,7 @@
       localStorage.setItem(key, JSON.stringify(arr));
       const btn = document.getElementById('save-' + book.id);
       if (btn) {
-        btn.textContent = 'âœ“ Saved';
+        btn.textContent = 'Saved';
         btn.classList.add('btn-saved');
         btn.disabled = true;
       }
@@ -711,5 +710,7 @@
   
 </body>
 </html>
+
+
 
 

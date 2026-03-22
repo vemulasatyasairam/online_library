@@ -25,12 +25,15 @@ const AuthService = (() => {
 
   const getRecoveryApiBases = () => {
     const host = window.location.hostname || 'localhost';
-    const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
+    const isHttpsPage = window.location.protocol === 'https:';
+    const protocol = isHttpsPage ? 'https:' : 'http:';
     const fromAppConfig = (window.AppConfig && typeof window.AppConfig.getApiBase === 'function')
       ? window.AppConfig.getApiBase()
       : '';
 
     const bases = [
+      '/api',
+      `${window.location.origin}/api`,
       getApiBase(),
       fromAppConfig,
       `${protocol}//${host}:3000/api`,
@@ -38,7 +41,13 @@ const AuthService = (() => {
       'http://127.0.0.1:3000/api'
     ].filter(Boolean);
 
-    return bases.filter((base, index) => bases.indexOf(base) === index);
+    const normalized = bases.map((base) => String(base).replace(/\/+$/, ''));
+    const filtered = normalized.filter((base) => {
+      if (isHttpsPage && /^http:\/\//i.test(base)) return false;
+      return true;
+    });
+
+    return filtered.filter((base, index) => filtered.indexOf(base) === index);
   };
 
   const isInstitutionEmail = (email) => {
@@ -81,6 +90,7 @@ const AuthService = (() => {
   // Make authenticated API request
   const apiRequest = async (endpoint, method = 'GET', data = null) => {
     const requestUrl = () => `${getApiBase()}${endpoint}`;
+    const shouldAttemptRecoveryStatus = (status) => [404, 502, 503, 504].includes(Number(status));
 
     const options = {
       method,
@@ -113,7 +123,37 @@ const AuthService = (() => {
     };
 
     try {
-      return await runRequest();
+      const initialResult = await runRequest();
+      if (initialResult && initialResult.ok) {
+        return initialResult;
+      }
+
+      if (shouldAttemptRecoveryStatus(initialResult && initialResult.status)) {
+        const currentBase = String(getApiBase() || '').replace(/\/+$/, '');
+        const recoveryBases = getRecoveryApiBases().filter((base) => {
+          return String(base || '').replace(/\/+$/, '') !== currentBase;
+        });
+
+        for (const base of recoveryBases) {
+          try {
+            const recovered = await runRequest(base);
+            if (recovered && recovered.ok) {
+              if (window.AppConfig && typeof window.AppConfig.setApiBase === 'function') {
+                window.AppConfig.setApiBase(base.replace(/\/api$/i, ''));
+              }
+              return recovered;
+            }
+
+            if (!shouldAttemptRecoveryStatus(recovered && recovered.status)) {
+              return recovered;
+            }
+          } catch (_recoveryStatusError) {
+            // Keep trying other bases.
+          }
+        }
+      }
+
+      return initialResult;
     } catch (error) {
       console.error('API request error:', error);
 
@@ -166,9 +206,13 @@ const AuthService = (() => {
       return apiResult;
     }
 
+    const fallbackError = (apiResult && Number(apiResult.status) === 404)
+      ? 'Server not reachable from this network. Please try again in a few seconds.'
+      : 'Login failed. Please try again.';
+
     return {
       ok: false,
-      error: apiResult?.error || 'Login failed. Please try again.'
+      error: apiResult?.error || fallbackError
     };
   };
   
