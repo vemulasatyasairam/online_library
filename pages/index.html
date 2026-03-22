@@ -825,6 +825,10 @@
             const wrapper = document.createElement('div');
             wrapper.className = 'item-wrapper';
             wrapper.dataset.key = item.id;
+            wrapper.style.width = `${item.w}px`;
+            wrapper.style.height = `${item.h}px`;
+            wrapper.style.transform = `translate(${item.x}px, ${item.y}px)`;
+            wrapper.style.opacity = '1';
             
             const imgDiv = document.createElement('div');
             imgDiv.className = 'item-img';
