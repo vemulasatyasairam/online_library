@@ -566,7 +566,7 @@
               .filter(Boolean);
 
             const uniqueGroupCovers = Array.from(new Set(groupCovers));
-            const selected = pickRandom(uniqueGroupCovers);
+            const selected = uniqueGroupCovers[0] || '';
             if (selected) {
               categorySelections.push(selected);
             }
@@ -597,9 +597,8 @@
         const ensureMinItems = (covers, count) => {
           if (!covers.length) return shuffle(FALLBACK_COVERS).slice(0, count);
           const result = [];
-          const randomized = shuffle(covers);
           while (result.length < count) {
-            result.push(...randomized);
+            result.push(...covers);
           }
           return result.slice(0, count);
         };
@@ -650,8 +649,8 @@
           const cachedCovers = loadCachedCovers();
           const sourceCovers = covers.length ? covers : [...cachedCovers, ...FALLBACK_COVERS];
           const prioritized = Array.from(new Set([
-            ...shuffle(categoryCovers),
-            ...shuffle(sourceCovers)
+            ...categoryCovers,
+            ...sourceCovers
           ]));
           let selected = ensureMinItems(prioritized, 8);
 
