@@ -481,15 +481,25 @@
       const masonryContainer = document.getElementById('masonry-container');
       if (masonryContainer) {
         const MASONRY_COVERS_CACHE_KEY = 'index_masonry_covers_v1';
+        const MASONRY_LAST_SELECTION_KEY = 'index_masonry_last_selection_v1';
+        const REFRESH_TOKEN = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
         const FALLBACK_COVERS = [
           'images/book_cover.jpeg',
-          'images/book_cover.jpeg',
-          'images/book_cover.jpeg',
-          'images/book_cover.jpeg',
-          'images/book_cover.jpeg',
-          'images/book_cover.jpeg',
-          'images/book_cover.jpeg',
-          'images/book_cover.jpeg'
+          'book_cover.jpeg',
+          'notebackground1.jpg',
+          'login1page.jpg',
+          'ChatGPT Image Sep 25, 2025, 10_56_46 PM.png',
+          'ChatGPT Image Sep 18, 2025, 09_32_41 AM.png'
+        ];
+        const FALLBACK_CATEGORY_COVERS = [
+          'https://picsum.photos/seed/knowledge-books/600/900',
+          'https://picsum.photos/seed/devotional-books/600/900',
+          'https://picsum.photos/seed/english-stories/600/900',
+          'https://picsum.photos/seed/course-notes/600/900',
+          'https://picsum.photos/seed/telugu-novels/600/900',
+          'https://picsum.photos/seed/library-shelf/600/900',
+          'https://picsum.photos/seed/branch-library/600/900',
+          'https://picsum.photos/seed/books-stack/600/900'
         ];
         const CATEGORY_HINTS = ['knowledge', 'devotional', 'novel', 'stories', 'story', 'course'];
         const HEIGHT_BUCKETS = [240, 280, 320, 360, 400, 440, 480];
@@ -507,6 +517,12 @@
         const pickRandom = (list) => {
           if (!Array.isArray(list) || !list.length) return '';
           return list[Math.floor(Math.random() * list.length)];
+        };
+
+        const withRefreshToken = (url, index = 0) => {
+          if (!url || typeof url !== 'string') return '';
+          const separator = url.includes('?') ? '&' : '?';
+          return `${url}${separator}rt=${REFRESH_TOKEN}-${index}`;
         };
 
         const normalizeCover = (value) => {
@@ -590,6 +606,23 @@
           return result.slice(0, count);
         };
 
+        const loadLastSelection = () => {
+          try {
+            const cached = JSON.parse(localStorage.getItem(MASONRY_LAST_SELECTION_KEY) || '[]');
+            return Array.isArray(cached) ? cached : [];
+          } catch (_error) {
+            return [];
+          }
+        };
+
+        const saveLastSelection = (covers) => {
+          try {
+            localStorage.setItem(MASONRY_LAST_SELECTION_KEY, JSON.stringify(covers));
+          } catch (_error) {
+            // Ignore localStorage errors.
+          }
+        };
+
         const buildMasonryItems = async () => {
           const apiBase = (window.AppConfig && typeof window.AppConfig.getApiBase === 'function')
             ? window.AppConfig.getApiBase()
@@ -617,20 +650,27 @@
           const covers = Array.from(new Set(base.map(pickCover).filter(Boolean)));
           const categoryCovers = buildCategoryCoverPool(base);
           const cachedCovers = loadCachedCovers();
-          const sourceCovers = covers.length ? covers : cachedCovers;
+          const sourceCovers = covers.length ? covers : [...cachedCovers, ...FALLBACK_COVERS, ...FALLBACK_CATEGORY_COVERS];
           const prioritized = Array.from(new Set([
             ...shuffle(categoryCovers),
             ...shuffle(sourceCovers)
           ]));
-          const selected = ensureMinItems(prioritized, 8);
+          let selected = ensureMinItems(prioritized, 8);
+
+          const lastSelection = loadLastSelection();
+          const sameAsPrevious = lastSelection.length === selected.length && lastSelection.every((item, i) => item === selected[i]);
+          if (sameAsPrevious && prioritized.length > 1) {
+            selected = ensureMinItems(shuffle(prioritized), 8);
+          }
 
           if (covers.length) {
             saveCachedCovers(covers);
           }
+          saveLastSelection(selected);
 
           items = selected.map((img, index) => {
             const randomHeight = HEIGHT_BUCKETS[Math.floor(Math.random() * HEIGHT_BUCKETS.length)];
-            return { id: String(index + 1), img, height: randomHeight };
+            return { id: String(index + 1), img: withRefreshToken(img, index), height: randomHeight };
           });
         };
 
