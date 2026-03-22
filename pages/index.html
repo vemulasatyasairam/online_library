@@ -602,6 +602,83 @@
           }
         };
 
+        const wakeBackend = async () => {
+          if (window.AppConfig && typeof window.AppConfig.wakeBackendOnVisit === 'function') {
+            try {
+              await window.AppConfig.wakeBackendOnVisit();
+            } catch (_error) {
+              // Keep fetch flow non-blocking.
+            }
+          }
+        };
+
+        const getRecoveryApiBases = () => {
+          const host = window.location.hostname || 'localhost';
+          const isHttpsPage = window.location.protocol === 'https:';
+          const protocol = isHttpsPage ? 'https:' : 'http:';
+          const fromAppConfig = (window.AppConfig && typeof window.AppConfig.getApiBase === 'function')
+            ? window.AppConfig.getApiBase()
+            : '';
+
+          const bases = [
+            '/api',
+            `${window.location.origin}/api`,
+            fromAppConfig,
+            `${protocol}//${host}:3000/api`,
+            'http://localhost:3000/api',
+            'http://127.0.0.1:3000/api'
+          ].filter(Boolean);
+
+          const normalized = bases.map((base) => String(base).replace(/\/+$/, ''));
+          const filtered = normalized.filter((base) => {
+            if (isHttpsPage && /^http:\/\//i.test(base)) return false;
+            return true;
+          });
+
+          return filtered.filter((base, index) => filtered.indexOf(base) === index);
+        };
+
+        const fetchBooksWithRecovery = async () => {
+          const bases = getRecoveryApiBases();
+
+          for (const base of bases) {
+            try {
+              const response = await fetch(`${base}/books?limit=200&_=${Date.now()}`, { cache: 'no-store' });
+              const data = await response.json().catch(() => ({}));
+              if (response.ok && data && data.ok && Array.isArray(data.books)) {
+                if (window.AppConfig && typeof window.AppConfig.setApiBase === 'function') {
+                  window.AppConfig.setApiBase(base.replace(/\/api$/i, ''));
+                }
+                return data.books;
+              }
+            } catch (_error) {
+              // Try next recovery base.
+            }
+          }
+
+          try {
+            await wakeBackend();
+            for (const base of bases) {
+              try {
+                const response = await fetch(`${base}/books?limit=200&_=${Date.now()}`, { cache: 'no-store' });
+                const data = await response.json().catch(() => ({}));
+                if (response.ok && data && data.ok && Array.isArray(data.books)) {
+                  if (window.AppConfig && typeof window.AppConfig.setApiBase === 'function') {
+                    window.AppConfig.setApiBase(base.replace(/\/api$/i, ''));
+                  }
+                  return data.books;
+                }
+              } catch (_error) {
+                // Continue through recovery bases.
+              }
+            }
+          } catch (_error) {
+            // Keep fallback behavior below.
+          }
+
+          return [];
+        };
+
         const saveLastSelection = (covers) => {
           try {
             localStorage.setItem(MASONRY_LAST_SELECTION_KEY, JSON.stringify(covers));
@@ -611,20 +688,7 @@
         };
 
         const buildMasonryItems = async () => {
-          const apiBase = (window.AppConfig && typeof window.AppConfig.getApiBase === 'function')
-            ? window.AppConfig.getApiBase()
-            : `${window.location.protocol}//${window.location.hostname}:3000/api`;
-
-          let books = [];
-          try {
-            const response = await fetch(`${apiBase}/books?limit=200&_=${Date.now()}`, { cache: 'no-store' });
-            const data = await response.json();
-            if (response.ok && data && data.ok && Array.isArray(data.books)) {
-              books = data.books;
-            }
-          } catch (_error) {
-            books = [];
-          }
+          const books = await fetchBooksWithRecovery();
 
           const byRecency = [...books].sort((a, b) => {
             const aTime = new Date(a?.updatedAt || a?.createdAt || 0).getTime();
