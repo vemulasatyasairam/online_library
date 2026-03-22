@@ -504,6 +504,11 @@
           return copy;
         };
 
+        const pickRandom = (list) => {
+          if (!Array.isArray(list) || !list.length) return '';
+          return list[Math.floor(Math.random() * list.length)];
+        };
+
         const normalizeCover = (value) => {
           if (!value || typeof value !== 'string') return '';
           if (window.AppConfig && typeof window.AppConfig.rewriteApiUrl === 'function') {
@@ -530,6 +535,30 @@
             book?.image ||
             '';
           return normalizeCover(raw);
+        };
+
+        const buildCategoryCoverPool = (bookList) => {
+          const grouped = new Map();
+          bookList.forEach((book) => {
+            const cover = pickCover(book);
+            if (!cover) return;
+            const categoryKey = `${book?.category || ''} ${book?.branch || ''}`.trim().toLowerCase() || 'other';
+            if (!grouped.has(categoryKey)) {
+              grouped.set(categoryKey, []);
+            }
+            grouped.get(categoryKey).push(cover);
+          });
+
+          const perCategoryRandom = [];
+          grouped.forEach((coverList) => {
+            const unique = Array.from(new Set(coverList));
+            const randomCover = pickRandom(unique);
+            if (randomCover) {
+              perCategoryRandom.push(randomCover);
+            }
+          });
+
+          return perCategoryRandom;
         };
 
         const loadCachedCovers = () => {
@@ -586,9 +615,14 @@
           const filtered = byRecency.filter(isPreferredCategory);
           const base = filtered.length ? filtered : byRecency;
           const covers = Array.from(new Set(base.map(pickCover).filter(Boolean)));
+          const categoryCovers = buildCategoryCoverPool(base);
           const cachedCovers = loadCachedCovers();
           const sourceCovers = covers.length ? covers : cachedCovers;
-          const selected = ensureMinItems(sourceCovers, 8);
+          const prioritized = Array.from(new Set([
+            ...shuffle(categoryCovers),
+            ...shuffle(sourceCovers)
+          ]));
+          const selected = ensureMinItems(prioritized, 8);
 
           if (covers.length) {
             saveCachedCovers(covers);
