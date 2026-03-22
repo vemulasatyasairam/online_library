@@ -467,6 +467,15 @@
           return `${url}${separator}rt=${REFRESH_TOKEN}-${index}`;
         };
 
+        const toCssUrl = (url) => {
+          if (!url || typeof url !== 'string') return '';
+          try {
+            return encodeURI(url);
+          } catch (_error) {
+            return url;
+          }
+        };
+
         const normalizeCover = (value) => {
           if (!value || typeof value !== 'string') return '';
           if (window.AppConfig && typeof window.AppConfig.rewriteApiUrl === 'function') {
@@ -745,7 +754,10 @@
             
             const imgDiv = document.createElement('div');
             imgDiv.className = 'item-img';
-            imgDiv.style.backgroundImage = `url(${item.img})`;
+            const fallbackCover = normalizeCover(FALLBACK_COVERS[index % FALLBACK_COVERS.length]) || 'images/book_cover.jpeg';
+            const primaryUrl = toCssUrl(item.img);
+            const fallbackUrl = toCssUrl(fallbackCover);
+            imgDiv.style.backgroundImage = `url("${primaryUrl}"), url("${fallbackUrl}")`;
             
             wrapper.appendChild(imgDiv);
             masonryContainer.appendChild(wrapper);
