@@ -162,11 +162,11 @@
     /* Hero (no CTAs for browse/login in hero) */
     main.hero { width:100%; display:flex; justify-content:center; padding:10px 20px; flex:1; overflow:hidden; }
     .hero-inner { width:90%; max-width:var(--max-width); display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:24px; align-items:start; }
-    .hero-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:var(--card-radius); padding:20px; box-shadow:var(--shadow); border:1px solid rgba(255,255,255,0.03); grid-column: span 1; }
+    .hero-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:var(--card-radius); padding:20px; box-shadow:var(--shadow); border:1px solid rgba(255,255,255,0.03); grid-column: span 1; overflow:hidden; }
     .hero-card h1 { margin:0 0 12px 0; font-size:36px; }
     .hero-card p { margin:0; color:var(--muted); line-height:1.5; }
 
-    .list { position:relative; width:100%; height:50%; min-height:500px; }
+    .list { position:relative; width:100%; height:auto; min-height:500px; }
     .item-wrapper { position:absolute; will-change:transform,width,height,opacity; padding:6px; cursor:pointer; top:0; left:0; border-radius:10px; }
     .item-img { position:relative; background-size:cover; background-position:center center; width:100%; height:100%; border-radius:10px; box-shadow:0 10px 50px -10px rgba(0,0,0,0.3); transition:all 0.3s ease; }
     .item-wrapper:hover .item-img { transform:scale(0.30); }
@@ -228,8 +228,16 @@
       .sasi-subjects-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
     }
     @media (max-width:768px){
+      html, body { height:auto; max-height:none; overflow-x:hidden; overflow-y:auto; }
+      body { max-height:none; }
+      main.hero { padding:8px 12px; overflow:visible; }
       .hero-inner { grid-template-columns: 1fr; gap:18px; }
+      .hero-inner { width:100%; }
+      .hero-card { padding:14px; }
+      .list { min-height:320px; }
+      .item-wrapper { padding:4px; }
       .masonry { column-count:1; }
+      .sasi-card { margin-top:12px; padding:16px; }
       .sasi-subjects-grid { grid-template-columns:1fr; }
     }
   </style>
@@ -614,11 +622,12 @@
           const containerWidth = masonryContainer.offsetWidth;
           const colHeights = new Array(columns).fill(0);
           const columnWidth = containerWidth / columns;
+          const mobileScale = window.innerWidth < 768 ? 0.78 : 1;
 
           return items.map(item => {
             const col = colHeights.indexOf(Math.min(...colHeights));
             const x = columnWidth * col;
-            const height = item.height / 2;
+            const height = (item.height / 2) * mobileScale;
             const y = colHeights[col];
             colHeights[col] += height;
             return { ...item, x, y, w: columnWidth, h: height };
@@ -643,6 +652,10 @@
             await buildMasonryItems();
           }
           const grid = calculateGrid();
+          const contentHeight = grid.reduce((maxHeight, item) => Math.max(maxHeight, item.y + item.h), 0);
+          const minHeight = window.innerWidth < 768 ? 320 : 500;
+          masonryContainer.style.height = `${Math.max(Math.ceil(contentHeight + 8), minHeight)}px`;
+
           await preloadImages(items.map(i => i.img));
 
           masonryContainer.innerHTML = '';
