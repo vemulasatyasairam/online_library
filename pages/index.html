@@ -493,6 +493,7 @@
         ];
         const HEIGHT_BUCKETS = [240, 280, 320, 360, 400, 440, 480];
         let items = [];
+        let activeApiBase = '';
 
         const shuffle = (list) => {
           const copy = [...list];
@@ -523,12 +524,36 @@
           }
         };
 
+        const getOriginFromApiBase = (base) => {
+          const value = String(base || '').replace(/\/+$/, '');
+          if (!/^https?:\/\//i.test(value)) return '';
+          return value.replace(/\/api$/i, '');
+        };
+
         const normalizeCover = (value) => {
           if (!value || typeof value !== 'string') return '';
+          let normalized = value;
+
           if (window.AppConfig && typeof window.AppConfig.rewriteApiUrl === 'function') {
-            return window.AppConfig.rewriteApiUrl(value);
+            normalized = window.AppConfig.rewriteApiUrl(normalized);
           }
-          return value;
+
+          const configuredBase = (window.AppConfig && typeof window.AppConfig.getApiBase === 'function')
+            ? window.AppConfig.getApiBase()
+            : '';
+          const activeOrigin = getOriginFromApiBase(activeApiBase) || getOriginFromApiBase(configuredBase);
+
+          if (activeOrigin) {
+            if (/^https?:\/\/(localhost|127\.0\.0\.1):3000/i.test(normalized)) {
+              return normalized.replace(/^https?:\/\/(localhost|127\.0\.0\.1):3000/i, activeOrigin);
+            }
+
+            if (normalized.startsWith('/uploads/') || normalized.startsWith('/books/')) {
+              return `${activeOrigin}${normalized}`;
+            }
+          }
+
+          return normalized;
         };
 
         const getBookCategoryKey = (book) => {
@@ -655,6 +680,7 @@
               const response = await fetch(`${base}/books?limit=200&_=${Date.now()}`, { cache: 'no-store' });
               const data = await response.json().catch(() => ({}));
               if (response.ok && data && data.ok && Array.isArray(data.books)) {
+                activeApiBase = base;
                 if (window.AppConfig && typeof window.AppConfig.setApiBase === 'function') {
                   window.AppConfig.setApiBase(base.replace(/\/api$/i, ''));
                 }
@@ -672,6 +698,7 @@
                 const response = await fetch(`${base}/books?limit=200&_=${Date.now()}`, { cache: 'no-store' });
                 const data = await response.json().catch(() => ({}));
                 if (response.ok && data && data.ok && Array.isArray(data.books)) {
+                  activeApiBase = base;
                   if (window.AppConfig && typeof window.AppConfig.setApiBase === 'function') {
                     window.AppConfig.setApiBase(base.replace(/\/api$/i, ''));
                   }
