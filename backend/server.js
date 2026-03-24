@@ -10,6 +10,7 @@ const connectDB = require('./src/config/database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const DB_RETRY_INTERVAL_MS = parseInt(process.env.DB_RETRY_INTERVAL_MS || '15000', 10);
 
 // Middleware - CORS configuration
 app.use(cors({
@@ -111,9 +112,21 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Connect to MongoDB first, then start server
+const ensureDatabaseConnection = async () => {
+  if (mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2) {
+    return;
+  }
+
+  try {
+    await connectDB();
+  } catch (error) {
+    console.warn(`[DB RETRY] MongoDB unavailable: ${error.message}`);
+  }
+};
+
+// Start server immediately; DB reconnects happen in background when needed
 const startServer = async () => {
-  await connectDB();
+  await ensureDatabaseConnection();
 
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
@@ -124,6 +137,9 @@ const startServer = async () => {
     console.log(`  - http://localhost:3000, 5000, 8000, 8080`);
     console.log(`  - file:// protocol`);
   });
+
+  const retryTimer = setInterval(ensureDatabaseConnection, DB_RETRY_INTERVAL_MS);
+  retryTimer.unref();
 };
 
 startServer();
