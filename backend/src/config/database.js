@@ -4,11 +4,17 @@
 
 const mongoose = require('mongoose');
 
+mongoose.set('bufferCommands', false);
+
 const connectDB = async () => {
   try {
     const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/online-library';
     
-    await mongoose.connect(mongoURI);
+    await mongoose.connect(mongoURI, {
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
+      socketTimeoutMS: 45000
+    });
 
     console.log('✓ MongoDB connected successfully');
     console.log(`  Database: ${mongoose.connection.name}`);

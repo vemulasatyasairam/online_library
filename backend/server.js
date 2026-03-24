@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
+const mongoose = require('mongoose');
 require('dotenv').config();
 
 // MongoDB Connection
@@ -9,9 +10,6 @@ const connectDB = require('./src/config/database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-// Connect to MongoDB
-connectDB();
 
 // Middleware - CORS configuration
 app.use(cors({
@@ -27,7 +25,8 @@ app.use(cors({
       'http://127.0.0.1:5051',
       'http://127.0.0.1:5500',
       'http://localhost:8000',
-      'http://localhost:8080'
+      'http://localhost:8080',
+      'https://online-library-y85q.onrender.com'
     ];
     
     if (allowedOrigins.includes(origin)) {
@@ -50,6 +49,18 @@ app.options('*', cors());
 app.use('/uploads', express.static('uploads'));
 app.use('/books', express.static(path.join(__dirname, 'books')));
 
+// Return a clear 503 when MongoDB is unavailable instead of query buffering timeouts
+app.use('/api', (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return res.status(503).json({
+      ok: false,
+      error: 'Database is not connected. Please try again in a few seconds.'
+    });
+  }
+
+  next();
+});
+
 // Routes
 const authRoutes = require('./src/routes/auth');
 const userRoutes = require('./src/routes/users');
@@ -71,7 +82,24 @@ app.use('/api/verify-otp', (req, res) => authRoutes.handle(req, res, 'verify-otp
 
 // Health check
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Online Library API is running' });
+  const stateMap = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting'
+  };
+
+  const dbState = mongoose.connection.readyState;
+
+  res.json({
+    status: dbState === 1 ? 'ok' : 'degraded',
+    message: 'Online Library API is running',
+    database: {
+      state: stateMap[dbState] || 'unknown',
+      name: mongoose.connection.name || null,
+      host: mongoose.connection.host || null
+    }
+  });
 });
 
 // Error handling middleware
@@ -83,15 +111,21 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`CORS enabled for:`);
-  console.log(`  - http://127.0.0.1:5051 (Live Server)`);
-  console.log(`  - http://127.0.0.1:5500 (Live Server)`);
-  console.log(`  - http://localhost:5051, 5500`);
-  console.log(`  - http://localhost:3000, 5000, 8000, 8080`);
-  console.log(`  - file:// protocol`);
-});
+// Connect to MongoDB first, then start server
+const startServer = async () => {
+  await connectDB();
+
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`CORS enabled for:`);
+    console.log(`  - http://127.0.0.1:5051 (Live Server)`);
+    console.log(`  - http://127.0.0.1:5500 (Live Server)`);
+    console.log(`  - http://localhost:5051, 5500`);
+    console.log(`  - http://localhost:3000, 5000, 8000, 8080`);
+    console.log(`  - file:// protocol`);
+  });
+};
+
+startServer();
 
 module.exports = app;
