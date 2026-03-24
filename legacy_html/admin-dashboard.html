@@ -642,16 +642,19 @@
     const resolveApiBaseUrl = () => {
         const host = window.location.hostname || 'localhost';
         const isRemoteHost = host !== 'localhost' && host !== '127.0.0.1';
+        const params = new URLSearchParams(window.location.search || '');
+        const useLocalApi = params.get('useLocalApi') === '1';
         const fallbackOrigin = isRemoteHost ? 'https://online-library-y85q.onrender.com' : `${window.location.protocol}//${host}:3000`;
+        const forcedOrigin = useLocalApi ? `${window.location.protocol}//${host}:3000` : 'https://online-library-y85q.onrender.com';
         const fromAppConfig = (window.AppConfig && typeof window.AppConfig.getApiBase === 'function') ? window.AppConfig.getApiBase() : '';
         const normalized = String(fromAppConfig || '').trim().replace(/\/+$/, '');
 
-        if (isRemoteHost && /127\.0\.0\.1:3000|localhost:3000/i.test(normalized)) {
-            return `${fallbackOrigin}/api`;
+        if (/127\.0\.0\.1:3000|localhost:3000/i.test(normalized) && !useLocalApi) {
+            return `${forcedOrigin}/api`;
         }
 
         if (!normalized) {
-            return `${fallbackOrigin}/api`;
+            return `${isRemoteHost ? fallbackOrigin : forcedOrigin}/api`;
         }
 
         return /\/api$/i.test(normalized) ? normalized : `${normalized}/api`;
