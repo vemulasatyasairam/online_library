@@ -7,10 +7,21 @@
 const AuthService = (() => {
   const INSTITUTION_EMAIL_REGEX = /^[^\s@]+@sasi\.ac\.in$/i;
 
+  const ensureApiBase = (base) => {
+    const normalized = String(base || '').trim().replace(/\/+$/, '');
+    if (!normalized) return '/api';
+    if (normalized === '/api' || /\/api$/i.test(normalized)) return normalized;
+    if (/^https?:\/\//i.test(normalized)) return `${normalized}/api`;
+    if (normalized.startsWith('/')) return `${normalized}/api`;
+    return normalized;
+  };
+
   const getApiBase = () => {
-    return ((window.AppConfig && typeof window.AppConfig.getApiBase === 'function')
+    const base = (window.AppConfig && typeof window.AppConfig.getApiBase === 'function')
       ? window.AppConfig.getApiBase()
-      : `${window.location.protocol}//${window.location.hostname}:3000/api`);
+      : `${window.location.protocol}//${window.location.hostname}:3000`;
+
+    return ensureApiBase(base);
   };
 
   const wakeBackend = async () => {
@@ -27,21 +38,20 @@ const AuthService = (() => {
     const host = window.location.hostname || 'localhost';
     const isHttpsPage = window.location.protocol === 'https:';
     const protocol = isHttpsPage ? 'https:' : 'http:';
+    const isLocalHost = host === 'localhost' || host === '127.0.0.1';
     const fromAppConfig = (window.AppConfig && typeof window.AppConfig.getApiBase === 'function')
       ? window.AppConfig.getApiBase()
       : '';
 
-    const bases = [
-      '/api',
-      `${window.location.origin}/api`,
-      getApiBase(),
-      fromAppConfig,
-      `${protocol}//${host}:3000/api`,
-      'http://localhost:3000/api',
-      'http://127.0.0.1:3000/api'
-    ].filter(Boolean);
+    const bases = [getApiBase(), ensureApiBase(fromAppConfig), 'https://online-library-y85q.onrender.com/api'];
 
-    const normalized = bases.map((base) => String(base).replace(/\/+$/, ''));
+    if (isLocalHost) {
+      bases.push('/api', `${window.location.origin}/api`, `${protocol}//${host}:3000/api`);
+    }
+
+    const filteredBases = bases.filter(Boolean);
+
+    const normalized = filteredBases.map((base) => ensureApiBase(base).replace(/\/+$/, ''));
     const filtered = normalized.filter((base) => {
       if (isHttpsPage && /^http:\/\//i.test(base)) return false;
       return true;

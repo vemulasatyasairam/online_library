@@ -61,7 +61,20 @@
   function getBackendOrigin() {
     const explicitBase = normalizeBaseUrl(window.BACKEND_API_BASE || localStorage.getItem(BACKEND_API_STORAGE_KEY));
     if (isValidBackendUrl(explicitBase)) {
-      return explicitBase.replace(/\/api$/i, '');
+      try {
+        const explicitUrl = new URL(explicitBase);
+        const currentHost = (window.location.hostname || '').toLowerCase();
+        const explicitHost = (explicitUrl.hostname || '').toLowerCase();
+
+        // Ignore stored same-host override on deployed frontend to avoid /api 404 loops.
+        if (isRemoteDeployment() && explicitHost && explicitHost === currentHost) {
+          localStorage.removeItem(BACKEND_API_STORAGE_KEY);
+        } else {
+          return explicitBase.replace(/\/api$/i, '');
+        }
+      } catch (_error) {
+        localStorage.removeItem(BACKEND_API_STORAGE_KEY);
+      }
     }
     if (explicitBase) {
       localStorage.removeItem(BACKEND_API_STORAGE_KEY);
@@ -73,9 +86,8 @@
       return `${protocol}//${host}:3000`;
     }
 
-    // On deployed hosts we should not assume :3000 exists on the same domain.
-    // Return empty and let /api (proxy) or explicit backend URL handle routing.
-    return '';
+    // On deployed hosts use Render backend (no /api suffix - endpoints include it)
+    return 'https://online-library-y85q.onrender.com';
   }
 
   function getApiBase() {
