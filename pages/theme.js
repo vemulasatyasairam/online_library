@@ -65,9 +65,10 @@
         const explicitUrl = new URL(explicitBase);
         const currentHost = (window.location.hostname || '').toLowerCase();
         const explicitHost = (explicitUrl.hostname || '').toLowerCase();
+        const isLocalOverride = explicitHost === 'localhost' || explicitHost === '127.0.0.1';
 
-        // Ignore stored same-host override on deployed frontend to avoid /api 404 loops.
-        if (isRemoteDeployment() && explicitHost && explicitHost === currentHost) {
+        // Ignore local or same-host overrides on deployed frontend.
+        if (isRemoteDeployment() && (isLocalOverride || (explicitHost && explicitHost === currentHost))) {
           localStorage.removeItem(BACKEND_API_STORAGE_KEY);
         } else {
           return explicitBase.replace(/\/api$/i, '');

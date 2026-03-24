@@ -443,7 +443,7 @@
     </style>
 
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <script src="theme.js?v=20260319b"></script>
+    <script src="theme.js?v=20260324a"></script>
 </head>
 <body>
 <div class="app">
@@ -639,7 +639,25 @@
 </div>
 
 <script>
-    const API_BASE_URL = ((window.AppConfig && typeof window.AppConfig.getApiBase === 'function') ? window.AppConfig.getApiBase() : `${window.location.protocol}//${window.location.hostname}:3000/api`);
+    const resolveApiBaseUrl = () => {
+        const host = window.location.hostname || 'localhost';
+        const isRemoteHost = host !== 'localhost' && host !== '127.0.0.1';
+        const fallbackOrigin = isRemoteHost ? 'https://online-library-y85q.onrender.com' : `${window.location.protocol}//${host}:3000`;
+        const fromAppConfig = (window.AppConfig && typeof window.AppConfig.getApiBase === 'function') ? window.AppConfig.getApiBase() : '';
+        const normalized = String(fromAppConfig || '').trim().replace(/\/+$/, '');
+
+        if (isRemoteHost && /127\.0\.0\.1:3000|localhost:3000/i.test(normalized)) {
+            return `${fallbackOrigin}/api`;
+        }
+
+        if (!normalized) {
+            return `${fallbackOrigin}/api`;
+        }
+
+        return /\/api$/i.test(normalized) ? normalized : `${normalized}/api`;
+    };
+
+    const API_BASE_URL = resolveApiBaseUrl();
     let allBooks = [];
     let uniqueViewUsersCount = null;
     const CATEGORY_CANONICAL_MAP = {
@@ -991,7 +1009,11 @@
 
         tbody.innerHTML = books.map((book) => {
             const rawUrl = book?.pdf?.url || '';
-            const backendOrigin = ((window.AppConfig && typeof window.AppConfig.getBackendOrigin === 'function') ? window.AppConfig.getBackendOrigin() : `${window.location.protocol}//${window.location.hostname}:3000`);
+            const backendOrigin = ((window.AppConfig && typeof window.AppConfig.getBackendOrigin === 'function') ? window.AppConfig.getBackendOrigin() : (() => {
+                const host = window.location.hostname || 'localhost';
+                const isRemoteHost = host !== 'localhost' && host !== '127.0.0.1';
+                return isRemoteHost ? 'https://online-library-y85q.onrender.com' : `${window.location.protocol}//${host}:3000`;
+            })());
             const normalizedRawUrl = ((window.AppConfig && typeof window.AppConfig.rewriteApiUrl === 'function') ? window.AppConfig.rewriteApiUrl(rawUrl) : rawUrl);
             const fileUrl = normalizedRawUrl
                 ? (normalizedRawUrl.startsWith('http') ? normalizedRawUrl : `${backendOrigin}${normalizedRawUrl}`)
