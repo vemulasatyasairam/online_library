@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+
 
 const adminSchema = new mongoose.Schema({
   email: {
@@ -28,35 +28,13 @@ const adminSchema = new mongoose.Schema({
   collection: 'admin'
 });
 
-adminSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) {
-    return next();
-  }
 
-  // Keep already-hashed passwords untouched for migration/manual insert scenarios.
-  if (typeof this.password === 'string' && this.password.startsWith('$2')) {
-    return next();
-  }
-
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (err) {
-    next(err);
-  }
 });
 
 adminSchema.methods.comparePassword = async function(candidatePassword) {
   if (!candidatePassword) {
     return false;
   }
-
-  // Support both bcrypt-hashed and plain-text stored passwords.
-  if (typeof this.password === 'string' && this.password.startsWith('$2')) {
-    return bcrypt.compare(candidatePassword, this.password);
-  }
-
   return candidatePassword === this.password;
 };
 
