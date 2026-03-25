@@ -17,11 +17,15 @@ const AuthService = (() => {
   };
 
   const getApiBase = () => {
+    // Always use localhost for local development
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return 'http://localhost:3000/api';
+    }
+    // Otherwise, use remote
     const base = (window.AppConfig && typeof window.AppConfig.getApiBase === 'function')
       ? window.AppConfig.getApiBase()
-      : `${window.location.protocol}//${window.location.hostname}:3000`;
-
-    return ensureApiBase(base);
+      : 'https://online-library-y85q.onrender.com/api';
+    return base;
   };
 
   const wakeBackend = async () => {
