@@ -64,6 +64,7 @@ app.use('/api', (req, res, next) => {
 
 // Routes
 const authRoutes = require('./src/routes/auth');
+const adminRoutes = require('./src/routes/admin');
 const userRoutes = require('./src/routes/users');
 const savedRoutes = require('./src/routes/saved');
 const bookRoutes = require('./src/routes/books');
@@ -71,6 +72,7 @@ const pdfRoutes = require('./src/routes/pdf');
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/saved', savedRoutes);
 app.use('/api/books', bookRoutes);

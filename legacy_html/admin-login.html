@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Online Library</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #11233a;
+            --ink-soft: #49617a;
+            --surface: #f5f9ff;
+            --card: rgba(255, 255, 255, 0.88);
+            --line: rgba(30, 70, 110, 0.18);
+            --blue: #0e6db5;
+            --blue-deep: #084c82;
+            --sun: #ff9f1c;
+            --danger: #c42a3c;
+            --radius-xl: 20px;
+            --radius-md: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "DM Sans", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 85% 10%, rgba(255, 159, 28, 0.3), transparent 35%),
+                radial-gradient(circle at 8% 85%, rgba(14, 109, 181, 0.25), transparent 40%),
+                linear-gradient(130deg, #d6e6f8 0%, #f7fbff 42%, #e7f1ff 100%);
+            display: grid;
+            place-items: center;
+            padding: 24px;
+        }
+
+        .grain {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image: radial-gradient(rgba(9, 29, 52, 0.06) 0.6px, transparent 0.6px);
+            background-size: 3px 3px;
+            opacity: 0.35;
+        }
+
+        .shell {
+            width: min(980px, 100%);
+            min-height: min(680px, 100vh - 48px);
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.52);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 24px 70px rgba(15, 48, 82, 0.2);
+        }
+
+        .hero {
+            background: linear-gradient(160deg, #0a3f6a 0%, #115f96 65%, #1d7ec1 100%);
+            color: #fff;
+            padding: 46px 40px;
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            align-content: space-between;
+            gap: 26px;
+        }
+
+        .hero::before,
+        .hero::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(0.2px);
+            opacity: 0.35;
+        }
+
+        .hero::before {
+            width: 220px;
+            height: 220px;
+            right: -70px;
+            top: -90px;
+            background: radial-gradient(circle, #ffd089 0%, transparent 70%);
+        }
+
+        .hero::after {
+            width: 320px;
+            height: 320px;
+            left: -120px;
+            bottom: -130px;
+            background: radial-gradient(circle, #9cd2ff 0%, transparent 72%);
+        }
+
+        .brand {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+        }
+
+        .brand-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 11px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.16);
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+        }
+
+        .hero-copy {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-copy h1 {
+            font-family: "Playfair Display", serif;
+            font-size: clamp(2rem, 3vw, 2.7rem);
+            line-height: 1.1;
+            margin-bottom: 12px;
+        }
+
+        .hero-copy p {
+            max-width: 28ch;
+            color: rgba(239, 248, 255, 0.92);
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .hero-points {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            gap: 10px;
+            font-size: 0.95rem;
+        }
+
+        .hero-points li {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(245, 251, 255, 0.95);
+        }
+
+        .hero-points li::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: var(--sun);
+            box-shadow: 0 0 0 4px rgba(255, 159, 28, 0.22);
+        }
+
+        .panel {
+            padding: 44px 36px;
+            background: var(--card);
+            display: grid;
+            align-content: center;
+        }
+
+        .panel-head h2 {
+            font-size: clamp(1.45rem, 2vw, 1.7rem);
+            letter-spacing: -0.2px;
+            margin-bottom: 8px;
+        }
+
+        .panel-head p {
+            color: var(--ink-soft);
+            font-size: 0.96rem;
+            margin-bottom: 22px;
+        }
+
+        form {
+            display: grid;
+            gap: 14px;
+        }
+
+        .field {
+            display: grid;
+            gap: 7px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.92rem;
+            color: #1d3957;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-md);
+            background: #fff;
+            padding: 12px 44px 12px 12px;
+            font-size: 0.97rem;
+            color: #183552;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input:focus {
+            border-color: rgba(14, 109, 181, 0.62);
+            box-shadow: 0 0 0 4px rgba(14, 109, 181, 0.12);
+        }
+
+        .toggle {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #365878;
+            font-size: 0.98rem;
+        }
+
+        .toggle:hover {
+            background: rgba(10, 55, 92, 0.08);
+        }
+
+        .meta {
+            margin-top: -2px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .meta label {
+            font-weight: 500;
+            color: var(--ink-soft);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .meta a {
+            color: var(--blue);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .meta a:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            margin-top: 6px;
+            border: none;
+            border-radius: 13px;
+            background: linear-gradient(135deg, var(--blue), #1987d4);
+            color: #fff;
+            font-size: 0.99rem;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: transform 0.14s ease, box-shadow 0.16s ease, background 0.2s ease;
+            box-shadow: 0 12px 22px rgba(14, 109, 181, 0.25);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            background: linear-gradient(135deg, var(--blue-deep), #1476bf);
+        }
+
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.75;
+            transform: none;
+        }
+
+        .msg {
+            min-height: 20px;
+            font-size: 0.91rem;
+            color: var(--danger);
+        }
+
+        .msg.ok {
+            color: #0d7f41;
+        }
+
+        .footnote {
+            margin-top: 12px;
+            font-size: 0.83rem;
+            color: #5f7691;
+            line-height: 1.5;
+        }
+
+        .spark {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: var(--sun);
+            box-shadow: 0 0 0 6px rgba(255, 159, 28, 0.15);
+            margin-right: 8px;
+        }
+
+        @keyframes riseIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero,
+        .panel {
+            animation: riseIn 0.65s ease;
+        }
+
+        @media (max-width: 920px) {
+            .shell {
+                grid-template-columns: 1fr;
+                min-height: auto;
+            }
+
+            .hero {
+                min-height: 280px;
+                padding: 30px 24px;
+            }
+
+            .hero-copy p {
+                max-width: none;
+            }
+
+            .panel {
+                padding: 30px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<main class="shell" role="main" aria-labelledby="adminLoginTitle">
+    <section class="hero" aria-hidden="true">
+        <div class="brand">
+            <div class="brand-badge">OL</div>
+            <span>Online Library Administration</span>
+        </div>
+
+        <div class="hero-copy">
+            <h1>Welcome back, Admin</h1>
+            <p>Sign in to manage uploads, monitor user activity, and keep the library catalog healthy.</p>
+        </div>
+
+        <ul class="hero-points">
+            <li>Quick upload and category routing</li>
+            <li>Live activity and engagement reports</li>
+            <li>Book catalog management tools</li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <div class="panel-head">
+            <h2 id="adminLoginTitle">Admin Dashboard Login</h2>
+            <p>Use admin credentials to continue to the control panel.</p>
+        </div>
+
+        <form id="adminLoginForm" autocomplete="on">
+            <div class="field">
+                <label for="adminEmail">Admin Email</label>
+                <div class="input-wrap">
+                    <input id="adminEmail" name="email" type="email" placeholder="admin@library.local" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="adminPassword">Password</label>
+                <div class="input-wrap">
+                    <input id="adminPassword" name="password" type="password" placeholder="Enter password" required>
+                    <button class="toggle" type="button" id="togglePassword" aria-label="Toggle password visibility">Show</button>
+                </div>
+            </div>
+
+            <div class="meta">
+                <label for="rememberAdmin">
+                    <input id="rememberAdmin" type="checkbox">
+                    Keep me signed in
+                </label>
+                <a href="login.html">User login</a>
+            </div>
+
+            <button class="btn" type="submit" id="loginBtn">Enter Dashboard</button>
+            <p id="loginMessage" class="msg" role="status" aria-live="polite"></p>
+        </form>
+
+        <p class="footnote"><span class="spark"></span>Credentials are validated from your MongoDB admin collection.</p>
+    </section>
+</main>
+
+<script>
+    const ADMIN_STORAGE_KEY = 'adminAuthenticated';
+    const ADMIN_TOKEN_KEY = 'adminToken';
+    const ADMIN_PROFILE_KEY = 'adminProfile';
+
+    const form = document.getElementById('adminLoginForm');
+    const emailInput = document.getElementById('adminEmail');
+    const passwordInput = document.getElementById('adminPassword');
+    const toggleButton = document.getElementById('togglePassword');
+    const rememberCheckbox = document.getElementById('rememberAdmin');
+    const loginButton = document.getElementById('loginBtn');
+    const message = document.getElementById('loginMessage');
+
+    const resolveApiBaseUrl = () => {
+        const host = window.location.hostname || 'localhost';
+        const isRemoteHost = host !== 'localhost' && host !== '127.0.0.1';
+        const params = new URLSearchParams(window.location.search || '');
+        const useLocalApi = params.get('useLocalApi') === '1';
+        const fallbackOrigin = isRemoteHost ? 'https://online-library-y85q.onrender.com' : `${window.location.protocol}//${host}:3000`;
+        const forcedOrigin = useLocalApi ? `${window.location.protocol}//${host}:3000` : 'https://online-library-y85q.onrender.com';
+        const fromAppConfig = (window.AppConfig && typeof window.AppConfig.getApiBase === 'function') ? window.AppConfig.getApiBase() : '';
+        const normalized = String(fromAppConfig || '').trim().replace(/\/+$/, '');
+
+        if (/127\.0\.0\.1:3000|localhost:3000/i.test(normalized) && !useLocalApi) {
+            return `${forcedOrigin}/api`;
+        }
+
+        if (!normalized) {
+            return `${isRemoteHost ? fallbackOrigin : forcedOrigin}/api`;
+        }
+
+        return /\/api$/i.test(normalized) ? normalized : `${normalized}/api`;
+    };
+
+    const API_BASE_URL = resolveApiBaseUrl();
+
+    function saveAdminSession(remember, token, adminProfile) {
+        if (remember) {
+            localStorage.setItem(ADMIN_STORAGE_KEY, 'true');
+            localStorage.setItem(ADMIN_TOKEN_KEY, token || '');
+            localStorage.setItem(ADMIN_PROFILE_KEY, JSON.stringify(adminProfile || {}));
+        } else {
+            sessionStorage.setItem(ADMIN_STORAGE_KEY, 'true');
+            sessionStorage.setItem(ADMIN_TOKEN_KEY, token || '');
+            sessionStorage.setItem(ADMIN_PROFILE_KEY, JSON.stringify(adminProfile || {}));
+        }
+    }
+
+    function isAdminAuthenticated() {
+        return localStorage.getItem(ADMIN_STORAGE_KEY) === 'true' || sessionStorage.getItem(ADMIN_STORAGE_KEY) === 'true';
+    }
+
+    if (isAdminAuthenticated()) {
+        window.location.href = 'admin-dashboard.html';
+    }
+
+    toggleButton.addEventListener('click', () => {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        toggleButton.textContent = isPassword ? 'Hide' : 'Show';
+    });
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const email = emailInput.value.trim().toLowerCase();
+        const password = passwordInput.value;
+
+        message.classList.remove('ok');
+        message.textContent = '';
+
+        if (!email || !password) {
+            message.textContent = 'Please enter both email and password.';
+            return;
+        }
+
+        loginButton.disabled = true;
+        message.textContent = 'Checking credentials...';
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/admin/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json().catch(() => ({ ok: false, error: 'Unexpected response from server' }));
+
+            if (!response.ok || !data.ok) {
+                loginButton.disabled = false;
+                message.classList.remove('ok');
+                message.textContent = data.error || 'Invalid admin credentials. Please try again.';
+                return;
+            }
+
+            saveAdminSession(rememberCheckbox.checked, data.token, data.admin);
+
+            message.classList.add('ok');
+            message.textContent = 'Login successful. Redirecting...';
+
+            setTimeout(() => {
+                window.location.href = 'admin-dashboard.html';
+            }, 300);
+        } catch (_error) {
+            loginButton.disabled = false;
+            message.classList.remove('ok');
+            message.textContent = 'Cannot connect to server. Make sure backend is running.';
+        }
+    });
+</script>
+</body>
+</html>

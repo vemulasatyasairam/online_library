@@ -658,9 +658,8 @@
             '/api',
             `${window.location.origin}/api`,
             fromAppConfig,
-            `${protocol}//${host}:3000/api`,
-            'http://localhost:3000/api',
-            'http://127.0.0.1:3000/api'
+            host === 'localhost' || host === '127.0.0.1' ? `${protocol}//${host}:3000/api` : '',
+            'https://online-library-y85q.onrender.com'
           ].filter(Boolean);
 
           const normalized = bases.map((base) => String(base).replace(/\/+$/, ''));

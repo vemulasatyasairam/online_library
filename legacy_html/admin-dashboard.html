@@ -639,6 +639,29 @@
 </div>
 
 <script>
+    const ADMIN_STORAGE_KEY = 'adminAuthenticated';
+    const ADMIN_TOKEN_KEY = 'adminToken';
+    const ADMIN_PROFILE_KEY = 'adminProfile';
+
+    function hasAdminSession() {
+        const localValid = localStorage.getItem(ADMIN_STORAGE_KEY) === 'true' && !!localStorage.getItem(ADMIN_TOKEN_KEY);
+        const sessionValid = sessionStorage.getItem(ADMIN_STORAGE_KEY) === 'true' && !!sessionStorage.getItem(ADMIN_TOKEN_KEY);
+        return localValid || sessionValid;
+    }
+
+    function clearAdminSession() {
+        localStorage.removeItem(ADMIN_STORAGE_KEY);
+        localStorage.removeItem(ADMIN_TOKEN_KEY);
+        localStorage.removeItem(ADMIN_PROFILE_KEY);
+        sessionStorage.removeItem(ADMIN_STORAGE_KEY);
+        sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+        sessionStorage.removeItem(ADMIN_PROFILE_KEY);
+    }
+
+    if (!hasAdminSession()) {
+        window.location.href = 'admin-login.html';
+    }
+
     const resolveApiBaseUrl = () => {
         const host = window.location.hostname || 'localhost';
         const isRemoteHost = host !== 'localhost' && host !== '127.0.0.1';
@@ -744,7 +767,8 @@
     });
 
     document.getElementById('logoutBtn').addEventListener('click', () => {
-        window.location.href = 'login.html';
+        clearAdminSession();
+        window.location.href = 'admin-login.html';
     });
 
     const categoryEl = document.getElementById('category');

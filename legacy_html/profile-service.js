@@ -5,9 +5,19 @@
 
 const ProfileService = {
   getApiBase() {
-    return (window.AppConfig && typeof window.AppConfig.getApiBase === 'function')
-      ? window.AppConfig.getApiBase()
-      : `${window.location.protocol}//${window.location.hostname}:3000/api`;
+    if (window.AppConfig && typeof window.AppConfig.getApiBase === 'function') {
+      const base = window.AppConfig.getApiBase();
+      // For Render, remove /api suffix if present
+      if (base.includes('onrender.com')) {
+        return base.replace(/\/api$/i, '');
+      }
+      return base;
+    }
+    const host = window.location.hostname || 'localhost';
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return `${window.location.protocol}//${host}:3000/api`;
+    }
+    return 'https://online-library-y85q.onrender.com';
   },
 
   getCurrentUserSafe() {
