@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Login — Online Library</title>
   <style>
-    body { margin:0; font-family: Arial, sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; background: url("https://static.vecteezy.com/system/resources/previews/000/702/015/non_2x/online-digital-library-education-vector.jpg") no-repeat center/cover; background-size:cover; }
-    .login-card { width:360px; background: rgba(255,255,255,0.95); padding:28px; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.2); }
+    body { margin:0; font-family: Arial, sans-serif; display:flex; align-items:center; justify-content:center; min-height:100vh; padding:16px; background: url("https://static.vecteezy.com/system/resources/previews/000/702/015/non_2x/online-digital-library-education-vector.jpg") no-repeat center/cover; background-size:cover; }
+    .login-card { width:min(360px, 100%); background: rgba(255,255,255,0.95); padding:28px; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.2); }
     h3{ margin-top:0; text-align:center; font-family:cursive }
     .field{ margin-bottom:12px; position: relative; }
-    .field input{ width:85%; height:42px; padding:8px 10px; border-radius:6px; border:1px solid #ddd; font-size:14px; padding-right: 40px; }
+    .field input{ width:100%; height:42px; padding:8px 10px; border-radius:6px; border:1px solid #ddd; font-size:14px; padding-right: 40px; }
     .field .toggle-password { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; padding: 0; }
     .btn{ width:100%; height:42px; background:#2563eb; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:700 }
     .msg{ font-size:0.95rem; color:#333; margin-top:12px; text-align:center; min-height:20px }
@@ -23,6 +23,13 @@
     #otp-area { display:none; margin-top:15px; padding-top:15px; border-top:2px solid #eee; }
     #forgot-link { transition: all 0.3s ease; }
     #forgot-link:hover { font-weight:700; }
+
+    @media (max-width: 480px) {
+      body { padding: 12px; }
+      .login-card { padding: 20px; }
+      .tabs { gap: 6px; }
+      .tab { flex: 1; }
+    }
   </style>
 
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />

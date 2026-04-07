@@ -4,8 +4,9 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  height: 99vh;
-  width: 97vw;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
   background-attachment: fixed;
 }
 .fonty {

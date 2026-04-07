@@ -1,5 +1,5 @@
 :root {
-  --ui-scale: clamp(0.88, 0.35vw + 0.82, 1);
+  --ui-scale: clamp(0.85, 0.32vw + 0.8, 1);
 }
 
 * {
@@ -15,12 +15,13 @@ body {
 /* Keep desktop layout and allow controlled horizontal movement only when needed */
 .app {
   width: 100%;
+  min-width: 0;
   overflow-x: auto;
-  min-width: clamp(600px, 90vw, 100%);
 }
 
 .content {
-  min-width: clamp(500px, 80vw, 100%);
+  min-width: 0;
+  width: 100%;
 }
 
 .sidebar {
@@ -53,10 +54,47 @@ img {
   html {
     font-size: 15px;
   }
+
+  .app {
+    min-width: 0;
+  }
+
+  .content {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 500px) {
+  html {
+    font-size: 14px;
+  }
+
+  .app {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .content {
+    min-width: 0;
+  }
 }
 
 @media (max-width: 640px) {
   html {
     font-size: 14px;
+  }
+
+  .app {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .content {
+    min-width: 0;
+  }
+
+  .sidebar {
+    width: 100%;
+    max-width: 100%;
   }
 }

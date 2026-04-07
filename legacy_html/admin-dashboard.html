@@ -112,6 +112,13 @@
             padding: clamp(12px, 1.8vw, 16px);
         }
 
+        .card.plain-card {
+            background: transparent;
+            border-color: transparent;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
         .card small { color: var(--muted); }
         .card h3 { margin-top: 8px; font-size: 30px; color: var(--accent); }
 
@@ -432,7 +439,112 @@
             .menu-item { padding: 12px; font-size: 0.88rem; }
             .header, .body { padding: 16px; }
             .cards { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+            .rating-report,
+            .chart-grid { grid-template-columns: 1fr; }
             .trend-bars { height: 96px; }
+        }
+
+        @media (max-width: 820px) {
+            .app {
+                display: flex;
+                min-width: 760px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .sidebar {
+                flex: 0 0 220px;
+                width: 220px;
+                border-right: 1px solid var(--border);
+                border-bottom: 0;
+                padding: 12px;
+                gap: 12px;
+            }
+
+            .menu {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .menu-item.logout {
+                margin-top: auto;
+            }
+
+            .content {
+                flex: 1 1 auto;
+                min-width: 540px;
+            }
+
+            .header,
+            .body {
+                padding: 12px;
+            }
+
+            .row,
+            .actions {
+                grid-template-columns: 1fr;
+                display: grid;
+                gap: 10px;
+            }
+
+            .actions .btn,
+            .search {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .manage-books-table {
+                min-width: 0;
+                border-collapse: separate;
+                border-spacing: 0 10px;
+            }
+
+            .manage-books-table thead {
+                display: none;
+            }
+
+            .manage-books-table tbody,
+            .manage-books-table tr,
+            .manage-books-table td {
+                display: block;
+                width: 100%;
+            }
+
+            .manage-books-table tr {
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                padding: 10px;
+            }
+
+            .manage-books-table td {
+                border: 0;
+                border-bottom: 1px dashed rgba(255, 255, 255, 0.09);
+                text-align: left;
+                padding: 8px 0;
+            }
+
+            .manage-books-table td:last-child {
+                border-bottom: 0;
+                padding-bottom: 0;
+            }
+
+            .manage-books-table td::before {
+                content: attr(data-label);
+                display: block;
+                color: var(--muted);
+                font-size: 12px;
+                margin-bottom: 4px;
+            }
+
+            .table-actions {
+                gap: 6px;
+            }
+
+            .table-actions .link-btn {
+                text-align: center;
+            }
         }
 
         @media (max-width: 640px) {
@@ -473,8 +585,8 @@
             <div class="tab active" id="dashboardTab">
                 <div class="cards">
                     <div class="card"><small>Total Books</small><h3 id="totalBooks">0</h3></div>
-                    <div class="card"><small>Branch Books</small><h3 id="branchBooksCount">0</h3></div>
-                    <div class="card"><small>Categories</small><h3 id="categoryCount">0</h3></div>
+                    <div class="card plain-card"><small>Branch Books</small><h3 id="branchBooksCount">0</h3></div>
+                    <div class="card plain-card"><small>Categories</small><h3 id="categoryCount">0</h3></div>
                     <div class="card"><small>Total Views</small><h3 id="totalViews">0</h3></div>
                 </div>
 
@@ -528,6 +640,7 @@
                     <div id="uploadMessage" class="message"></div>
 
                     <form id="uploadForm" action="javascript:void(0)">
+
                         <div class="row">
                             <div class="field">
                                 <label for="bookName">Book Name *</label>
@@ -536,6 +649,65 @@
                             <div class="field">
                                 <label for="authorName">Author Name *</label>
                                 <input id="authorName" class="input" type="text" required placeholder="Enter author name">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="field">
+                                <label for="subject">Subject</label>
+                                <input id="subject" class="input" type="text" placeholder="Enter subject (e.g., Political Science)">
+                            </div>
+                            <div class="field">
+                                <label for="branchDetail">Branch</label>
+                                <input id="branchDetail" class="input" type="text" placeholder="Enter branch (e.g., General)">
+                            </div>
+                        </div>
+
+                        <div class="panel" style="background:rgba(255,255,255,0.02);margin-bottom:10px;">
+                            <h4 style="margin-bottom:8px;">Publication Details</h4>
+                            <div class="row">
+                                <div class="field">
+                                    <label for="publisher">Publisher</label>
+                                    <input id="publisher" class="input" type="text" placeholder="Publisher">
+                                </div>
+                                <div class="field">
+                                    <label for="year">Year of Publication</label>
+                                    <input id="yearPub" class="input" type="text" placeholder="Year (e.g., 2023)">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="field">
+                                    <label for="edition">Edition</label>
+                                    <input id="edition" class="input" type="text" placeholder="Edition (e.g., 7th Edition)">
+                                </div>
+                                <div class="field">
+                                    <label for="pages">Pages</label>
+                                    <input id="pages" class="input" type="text" placeholder="Number of pages">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="field">
+                                    <label for="language">Language</label>
+                                    <input id="language" class="input" type="text" placeholder="Language (e.g., English)">
+                                </div>
+                                <div class="field">
+                                    <label for="isbn">ISBN</label>
+                                    <input id="isbn" class="input" type="text" placeholder="ISBN">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel" style="background:rgba(255,255,255,0.02);margin-bottom:10px;">
+                            <h4 style="margin-bottom:8px;">Key Features</h4>
+                            <div class="field">
+                                <textarea id="keyFeatures" class="input" rows="3" placeholder="Enter key features, one per line"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="panel" style="background:rgba(255,255,255,0.02);margin-bottom:10px;">
+                            <h4 style="margin-bottom:8px;">Table Of Contents</h4>
+                            <div class="field">
+                                <textarea id="tableOfContents" class="input" rows="4" placeholder="Enter table of contents, one per line"></textarea>
                             </div>
                         </div>
 
@@ -609,7 +781,7 @@
                     <h3>Manage Books</h3>
                     <input id="searchInput" class="input search" type="text" placeholder="Search by book, author, category, branch, year">
                     <div class="table-wrap">
-                        <table>
+                        <table class="manage-books-table">
                             <thead>
                             <tr>
                                 <th>Book Name</th>
@@ -664,23 +836,18 @@
 
     const resolveApiBaseUrl = () => {
         const host = window.location.hostname || 'localhost';
-        const isRemoteHost = host !== 'localhost' && host !== '127.0.0.1';
+        const isLocalHost = host === 'localhost' || host === '127.0.0.1';
         const params = new URLSearchParams(window.location.search || '');
         const useLocalApi = params.get('useLocalApi') === '1';
-        const fallbackOrigin = isRemoteHost ? 'https://online-library-y85q.onrender.com' : `${window.location.protocol}//${host}:3000`;
-        const forcedOrigin = useLocalApi ? `${window.location.protocol}//${host}:3000` : 'https://online-library-y85q.onrender.com';
         const fromAppConfig = (window.AppConfig && typeof window.AppConfig.getApiBase === 'function') ? window.AppConfig.getApiBase() : '';
-        const normalized = String(fromAppConfig || '').trim().replace(/\/+$/, '');
+        const normalized = String(fromAppConfig || '').trim().replace(/\/+$/, '').replace(/\/api$/i, '');
 
-        if (/127\.0\.0\.1:3000|localhost:3000/i.test(normalized) && !useLocalApi) {
-            return `${forcedOrigin}/api`;
+        if (isLocalHost || useLocalApi) {
+            return `${window.location.protocol}//${host}:3000/api`;
         }
 
-        if (!normalized) {
-            return `${isRemoteHost ? fallbackOrigin : forcedOrigin}/api`;
-        }
-
-        return /\/api$/i.test(normalized) ? normalized : `${normalized}/api`;
+        const origin = normalized || 'https://online-library-y85q.onrender.com';
+        return `${origin}/api`;
     };
 
     const API_BASE_URL = resolveApiBaseUrl();
@@ -961,6 +1128,7 @@
             const effectiveBranch = parsedTargetPath?.branch || branchEl.value;
             const effectiveYear = parsedTargetPath?.year || yearEl.value;
 
+
             const formData = new FormData();
             formData.append('title', document.getElementById('bookName').value.trim());
             formData.append('author', document.getElementById('authorName').value.trim());
@@ -972,6 +1140,18 @@
             if (targetPath) {
                 formData.append('targetPath', targetPath);
             }
+            // Extra details
+            formData.append('subject', document.getElementById('subject').value.trim());
+            formData.append('branchDetail', document.getElementById('branchDetail').value.trim());
+            formData.append('publisher', document.getElementById('publisher').value.trim());
+            formData.append('yearPub', document.getElementById('yearPub').value.trim());
+            formData.append('edition', document.getElementById('edition').value.trim());
+            formData.append('pages', document.getElementById('pages').value.trim());
+            formData.append('language', document.getElementById('language').value.trim());
+            formData.append('isbn', document.getElementById('isbn').value.trim());
+            formData.append('keyFeatures', document.getElementById('keyFeatures').value.trim());
+            formData.append('tableOfContents', document.getElementById('tableOfContents').value.trim());
+            // Files
             formData.append('pdf', file);
             if (coverFile) {
                 formData.append('cover', coverFile);
@@ -1050,12 +1230,12 @@
             const coverInputId = `coverInput-${bookId}`;
             return `
                 <tr>
-                    <td>${safeText(book.title)}</td>
-                    <td>${safeText(book.author)}</td>
-                    <td>${safeText(book.category || book.branch)}</td>
-                    <td>${safeText(book.branch || '-')}</td>
-                    <td>${safeText(book.year || '-')}</td>
-                    <td>
+                    <td data-label="Book Name">${safeText(book.title)}</td>
+                    <td data-label="Author">${safeText(book.author)}</td>
+                    <td data-label="Category">${safeText(book.category || book.branch)}</td>
+                    <td data-label="Branch">${safeText(book.branch || '-')}</td>
+                    <td data-label="Year">${safeText(book.year || '-')}</td>
+                    <td data-label="Actions">
                         <div class="table-actions">
                             <a class="link-btn" href="${fileUrl}" target="_blank" rel="noopener" ${hasFile ? '' : 'style="pointer-events:none;opacity:0.5;"'}>View</a>
                             <a class="link-btn" href="${fileUrl}" download ${hasFile ? '' : 'style="pointer-events:none;opacity:0.5;"'}>Download</a>
